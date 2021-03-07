@@ -1,24 +1,15 @@
-import {
-  httpServer,
-  App,
-  start,
-  textOk,
-  BodyParser,
-  concatStream,
-  defaultBodyParsers,
-  describe,
-} from '@ovotech/laminar';
+import { HttpServer, HttpApp, textOk, BodyParser, concatStream, defaultBodyParsers } from '@ovotech/laminar';
 
 const csvParser: BodyParser = {
   match: (contentType) => contentType === 'text/csv',
   parse: async (body) => String(await concatStream(body)).split(','),
 };
 
-const app: App = ({ body }) => textOk(JSON.stringify(body));
+const app: HttpApp = ({ body }) => textOk(JSON.stringify(body));
 
-const server = httpServer({
+const server = new HttpServer({
   app,
-  options: { bodyParsers: [csvParser, ...defaultBodyParsers] },
+  bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

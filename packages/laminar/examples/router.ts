@@ -1,11 +1,11 @@
-import { get, put, httpServer, router, start, jsonOk, jsonNotFound, describe } from '@ovotech/laminar';
+import { get, put, HttpServer, router, jsonOk, jsonNotFound } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
   '2': 'Foo',
 };
 
-const server = httpServer({
+const server = new HttpServer({
   app: router(
     get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
     get('/users', () => jsonOk(users)),
@@ -19,4 +19,4 @@ const server = httpServer({
   ),
 });
 
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

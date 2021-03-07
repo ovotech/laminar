@@ -2,10 +2,7 @@ import axios from 'axios';
 import {
   del,
   get,
-  httpServer,
-  httpsServer,
-  start,
-  stop,
+  HttpServer,
   options,
   patch,
   post,
@@ -13,7 +10,7 @@ import {
   redirect,
   router,
   responseTimeMiddleware,
-  Middleware,
+  HttpMiddleware,
   loggingMiddleware,
   staticAssets,
   jsonOk,
@@ -23,7 +20,7 @@ import {
   jsonNotFound,
   file,
   HttpError,
-  App,
+  HttpApp,
 } from '../src';
 import { join } from 'path';
 import { readFileSync, createReadStream } from 'fs';
@@ -32,17 +29,17 @@ import { URLSearchParams } from 'url';
 
 describe('Integration', () => {
   it('Should respect timeout', async () => {
-    const app: App = () => new Promise((resolve) => setTimeout(() => resolve(textOk('OK')), 100));
+    const app: HttpApp = () => new Promise((resolve) => setTimeout(() => resolve(textOk('OK')), 100));
     const port = 8051;
 
-    const server = httpServer({ port, app, timeout: 50 });
+    const server = new HttpServer({ port, app, timeout: 50 });
     try {
-      await start(server);
+      await server.start();
 
       const error = await axios.get(`http://localhost:${port}`).catch((error) => error);
       expect(error.message).toEqual('socket hang up');
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -53,16 +50,16 @@ describe('Integration', () => {
     const cert = readFileSync(join(__dirname, '../examples/cert.pem'));
     const ca = readFileSync(join(__dirname, '../examples/ca.pem'));
 
-    const server = httpsServer({ port, app, serverOptions: { key, cert } });
+    const server = new HttpServer({ port, app, https: { key, cert } });
     try {
-      await start(server);
+      await server.start();
 
       const response = await axios.get(`https://localhost:${port}`, {
         httpsAgent: new Agent({ ca }),
       });
       expect(response.data).toEqual('TLS Test');
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -77,7 +74,7 @@ describe('Integration', () => {
       setUser: (id: string, name: string) => void;
     }
 
-    const db: Middleware<DBRequest> = (next) => {
+    const db: HttpMiddleware<DBRequest> = (next) => {
       const users: { [key: string]: string } = {
         10: 'John',
         20: 'Tom',
@@ -167,9 +164,9 @@ describe('Integration', () => {
       ({ url }) => jsonNotFound(`Test url ${url.pathname} not found`),
     );
 
-    const server = httpServer({ port: 8050, app: responseTime(db(logging(app))) });
+    const server = new HttpServer({ port: 8050, app: responseTime(db(logging(app))) });
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:8050' });
 
@@ -360,7 +357,7 @@ describe('Integration', () => {
         stack: expect.any(String),
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

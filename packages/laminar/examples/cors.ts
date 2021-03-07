@@ -1,4 +1,4 @@
-import { start, jsonOk, get, put, httpServer, router, corsMiddleware, describe } from '@ovotech/laminar';
+import { jsonOk, get, put, HttpServer, router, corsMiddleware } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -9,7 +9,7 @@ const cors = corsMiddleware({
   allowOrigin: (origin) => ['http://example.com', 'http://localhost'].includes(origin),
 });
 
-const server = httpServer({
+const server = new HttpServer({
   app: cors(
     router(
       get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
@@ -22,4 +22,4 @@ const server = httpServer({
     ),
   ),
 });
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

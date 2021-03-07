@@ -1,8 +1,7 @@
 import {
   get,
-  httpServer,
+  HttpServer,
   router,
-  start,
   jsonOk,
   jsonNotFound,
   redirect,
@@ -17,13 +16,12 @@ import {
   csv,
   ok,
   badRequest,
-  describe,
   textOk,
 } from '@ovotech/laminar';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
-const server = httpServer({
+const server = new HttpServer({
   app: router(
     // Redirects
     get('/redirect', () => redirect('http://my-new-location.example.com', { headers: { 'X-Other': 'Other' } })),
@@ -56,4 +54,4 @@ const server = httpServer({
   ),
 });
 
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

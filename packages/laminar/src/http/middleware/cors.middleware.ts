@@ -1,5 +1,5 @@
-import { Middleware } from '../components/components';
-import { HttpError } from '../HttpError';
+import { HttpMiddleware } from '../types';
+import { HttpError } from '../http-error';
 
 export interface CorsConfig {
   allowOrigin?: string[] | string | RegExp | OriginChecker | true;
@@ -72,7 +72,7 @@ export const corsMiddleware = ({
   allowMethods,
   maxAge,
   allowCredentials,
-}: CorsConfig = {}): Middleware => {
+}: CorsConfig = {}): HttpMiddleware => {
   const accessControlExposeHeaders = toExposeHeaders(exposeHeaders);
   const accessControlAllowMethods = toAllowMethods(allowMethods);
   const accessControlMaxAge = toMaxAge(maxAge);

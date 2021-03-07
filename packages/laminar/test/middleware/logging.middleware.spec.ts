@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { loggingMiddleware, LoggerFormatters, stop, start, textOk, httpServer } from '../../src';
+import { loggingMiddleware, LoggerFormatters, textOk, HttpServer } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8098' });
 
@@ -7,14 +7,14 @@ describe('loggingMiddleware middleware', () => {
   it('Should log path and method ', async () => {
     const mockLogger = { info: jest.fn(), error: jest.fn() };
     const logging = loggingMiddleware(mockLogger);
-    const server = httpServer({
+    const server = new HttpServer({
       port: 8098,
       app: logging(() => {
         throw new Error('Test Error');
       }),
     });
     try {
-      await start(server);
+      await server.start();
 
       await expect(api.get('/test/23').catch((error) => error.response)).resolves.toMatchObject({
         status: 500,
@@ -31,7 +31,7 @@ describe('loggingMiddleware middleware', () => {
         request: 'GET /test/23',
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -39,12 +39,12 @@ describe('loggingMiddleware middleware', () => {
     const mockLogger = { info: jest.fn(), error: jest.fn() };
     const logging = loggingMiddleware(mockLogger);
 
-    const server = httpServer({
+    const server = new HttpServer({
       port: 8098,
       app: logging(() => textOk('OK')),
     });
     try {
-      await start(server);
+      await server.start();
 
       await expect(api.get('/test/23')).resolves.toMatchObject({
         status: 200,
@@ -65,7 +65,7 @@ describe('loggingMiddleware middleware', () => {
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
       expect(mockLogger.error).not.toHaveBeenCalled();
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -77,14 +77,14 @@ describe('loggingMiddleware middleware', () => {
       };
     };
     const logging = loggingMiddleware(mockLogger, { error: errorFormatter });
-    const server = httpServer({
+    const server = new HttpServer({
       port: 8098,
       app: logging(async () => {
         throw new Error('Other Error');
       }),
     });
     try {
-      await start(server);
+      await server.start();
 
       await expect(api.get('/test/23?test=other').catch((error) => error.response)).resolves.toMatchObject({
         status: 500,
@@ -94,7 +94,7 @@ describe('loggingMiddleware middleware', () => {
         message: 'MY Other Error',
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

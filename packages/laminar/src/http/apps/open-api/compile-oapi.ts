@@ -2,7 +2,7 @@ import { compile, compileInContext, ensureValid, ResolvedSchema, Schema, toSchem
 import { openapiV3 } from 'openapi-schemas';
 import { ResolvedOpenAPIObject } from './resolved-openapi-object';
 import { OapiConfig } from './types';
-import { Empty } from '../../types';
+import { Empty } from '../../../types';
 
 /**
  * Compile an OpenApi file, loading all the referenced schemas.

@@ -1,5 +1,4 @@
-import { AppRequest, Middleware } from '../components/components';
-import { Response } from '../types';
+import { HttpRequest, HttpMiddleware, HttpResponse } from '../types';
 
 export interface Metadata {
   [key: string]: unknown;
@@ -15,12 +14,12 @@ export interface RequestLogging<TLogger extends Logger = Logger> {
 }
 
 export interface LoggerFormatters {
-  request: (req: AppRequest) => Metadata;
-  response: (req: AppRequest, res: Response) => Metadata;
-  error: (req: AppRequest, error: Error) => Metadata;
+  request: (req: HttpRequest) => Metadata;
+  response: (req: HttpRequest, res: HttpResponse) => Metadata;
+  error: (req: HttpRequest, error: Error) => Metadata;
 }
 
-export const requestUri = (req: AppRequest): string => `${req.method} ${req.url.pathname}`;
+export const requestUri = (req: HttpRequest): string => `${req.method} ${req.url.pathname}`;
 
 /**
  * Logging middleware
@@ -46,7 +45,7 @@ export const loggingMiddleware = <TLogger extends Logger>(
       stack: error.stack,
     }),
   },
-): Middleware<RequestLogging<TLogger>> => (next) => async (req) => {
+): HttpMiddleware<RequestLogging<TLogger>> => (next) => async (req) => {
   try {
     if (request) {
       logger.info('Request', request(req));

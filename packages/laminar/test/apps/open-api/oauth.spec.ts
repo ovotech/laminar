@@ -2,18 +2,7 @@ import axios from 'axios';
 import { sign, verify } from 'jsonwebtoken';
 import { join } from 'path';
 import { URL, URLSearchParams } from 'url';
-import {
-  OapiConfig,
-  openApi,
-  securityOk,
-  httpServer,
-  stop,
-  start,
-  jsonOk,
-  redirect,
-  jsonForbidden,
-  setCookie,
-} from '../../../src';
+import { OapiConfig, openApi, securityOk, HttpServer, jsonOk, redirect, jsonForbidden, setCookie } from '../../../src';
 import axiosCookieJarSupport from 'axios-cookiejar-support';
 
 const globalSecret = 'oauth2-global';
@@ -21,7 +10,7 @@ const tokenSecret = 'oauth2-token';
 
 describe('Oauth', () => {
   it('Should implement oauth2 security', async () => {
-    const authorizationServer = httpServer({
+    const authorizationServer = new HttpServer({
       app: ({ query: { redirectUrl, original, scopes } }) => {
         const code = sign({ email: 'me@example.com', scopes }, globalSecret);
         const url = new URL(redirectUrl);
@@ -70,11 +59,11 @@ describe('Oauth', () => {
     };
 
     const app = await openApi(config);
-    const server = httpServer({ app, port: 8067 });
+    const server = new HttpServer({ app, port: 8067 });
 
     try {
-      await start(server);
-      await start(authorizationServer);
+      await server.start();
+      await authorizationServer.start();
 
       const api = axiosCookieJarSupport(axios.create({ baseURL: 'http://localhost:8067' }));
       const { data } = await api.get('/user', { withCredentials: true, jar: true });
@@ -84,8 +73,8 @@ describe('Oauth', () => {
         authInfo: expect.objectContaining({ email: 'me@example.com', scopes: 'users:read' }),
       });
     } finally {
-      await stop(server);
-      await stop(authorizationServer);
+      await server.stop();
+      await authorizationServer.stop();
     }
   });
 });

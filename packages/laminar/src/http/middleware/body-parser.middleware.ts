@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component } from '../types';
 import { IncomingMessage } from 'http';
-import { Readable } from 'stream';
 import { URLSearchParams } from 'url';
-import { parseQueryObjects } from '../helpers';
+import { parseQueryObjects } from '../../helpers';
+import { HttpMiddleware } from '../types';
+import { Readable } from 'stream';
 
 export interface BodyParser {
   /**
@@ -14,23 +13,6 @@ export interface BodyParser {
    * Process a raw incomming message into a concrete parsed response
    */
   parse: (body: IncomingMessage) => Promise<unknown>;
-}
-
-/**
- * Request parameters added by the {@link bodyParserComponent}
- */
-export interface RequestBody {
-  /**
-   * The parsed body of the request. Parsed using the provided body parsers.
-   *
-   * Supported:
-   *  - text
-   *  - json
-   *  - url encoded
-   *
-   * You can add additional parser / modify existing ones
-   */
-  body: any;
 }
 
 /**
@@ -93,9 +75,7 @@ export async function parseBody(incommingMessage: IncomingMessage, parsers = def
  *  - text content
  *
  * @param parsers replace with custom parsers, can use [...defaultBodyParsers, newParser] to add
- *
- * @category component
  */
-export function bodyParserComponent(parsers = defaultBodyParsers): Component<RequestBody> {
+export function bodyParserMiddleware(parsers = defaultBodyParsers): HttpMiddleware {
   return (next) => async (req) => next({ ...req, body: await parseBody(req.incommingMessage, parsers) });
 }

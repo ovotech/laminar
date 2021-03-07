@@ -1,4 +1,5 @@
-import { Empty, AppRequest } from '../..';
+import { HttpRequest } from '../../types';
+import { Empty } from '../../../types';
 import {
   ResolvedOpenAPIObject,
   ResolvedOperationObject,
@@ -9,7 +10,7 @@ import {
 } from './resolved-openapi-object';
 import { OapiPaths, Route, Matcher, OapiPath, Coerce } from './types';
 import { Schema } from '@ovotech/json-schema';
-import { toMatchPattern, toPathKeys, toPathRe } from '../../helpers';
+import { toMatchPattern, toPathKeys, toPathRe } from '../../../helpers';
 import { SecurityRequirementObject, SecuritySchemeObject, SchemaObject } from 'openapi3-ts';
 
 function toMatcher(path: string, method: string): Matcher {
@@ -288,7 +289,7 @@ export function toRoutes<TRequest extends Empty>(
  * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
  */
 export function selectRoute<TRequest extends Empty = Empty>(
-  req: TRequest & AppRequest,
+  req: TRequest & HttpRequest,
   routes: Route<TRequest>[],
 ): false | { path: OapiPath; route: Route<TRequest> } {
   for (const route of routes) {

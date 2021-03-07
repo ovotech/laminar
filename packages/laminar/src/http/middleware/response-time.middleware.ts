@@ -1,4 +1,4 @@
-import { Middleware } from '../components/components';
+import { HttpMiddleware } from '../types';
 
 export interface ResponseTimeConfig {
   header?: string;
@@ -11,9 +11,9 @@ export const defaultResponseTimeHeader = 'x-response-time';
  *
  * @category middleware
  */
-export const responseTimeMiddleware = ({ header = defaultResponseTimeHeader }: ResponseTimeConfig = {}): Middleware => (
-  next,
-) => {
+export const responseTimeMiddleware = ({
+  header = defaultResponseTimeHeader,
+}: ResponseTimeConfig = {}): HttpMiddleware => (next) => {
   return async (ctx) => {
     const startAt = process.hrtime();
     const result = await next(ctx);

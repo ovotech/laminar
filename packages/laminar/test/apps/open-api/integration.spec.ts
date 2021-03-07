@@ -3,9 +3,7 @@ import {
   openApi,
   securityOk,
   file,
-  stop,
-  start,
-  httpServer,
+  HttpServer,
   response,
   jsonOk,
   jsonBadRequest,
@@ -143,10 +141,10 @@ describe('Integration', () => {
     const oapi = await openApi(config);
     const logger = withLogger(log);
 
-    const server = httpServer({ app: logger(oapi), port: 8063 });
+    const server = new HttpServer({ app: logger(oapi), port: 8063 });
 
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:8063' });
 
@@ -533,7 +531,7 @@ describe('Integration', () => {
       console.log(error.response?.data);
       throw error;
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

@@ -1,21 +1,49 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { lookup } from 'mime-types';
-import { Response } from './types';
+import { HttpResponse } from './types';
 import { IncomingMessage, OutgoingHttpHeaders } from 'http';
 import { createReadStream, statSync } from 'fs';
-import { Json, parseRange, toJson } from './helpers';
+import { Json, parseRange, toJson } from '../helpers';
 import { Stats } from 'fs';
+import * as cookie from 'cookie';
 
 /**
- * @category Response
+ * Set additional paramters for the cookie
+ */
+export interface SetCookie extends cookie.CookieSerializeOptions {
+  value: string;
+}
+
+/**
+ * Set cookie heders on the response
+ *
+ * @category component
+ */
+export const setCookie = (cookies: { [key: string]: string | SetCookie }, res: HttpResponse): HttpResponse => ({
+  ...res,
+  headers: {
+    ...res.headers,
+    'set-cookie': Object.entries(cookies).map(([name, content]) => {
+      if (typeof content === 'string') {
+        return cookie.serialize(name, content);
+      } else {
+        const { value, ...options } = content;
+        return cookie.serialize(name, value, options);
+      }
+    }),
+  },
+});
+
+/**
+ * @category HttpResponse
  * @typeParam TResponseBody The type of the response body
  */
 export function response<TResponseBody>({
   body,
   status = 200,
   headers = { 'content-type': 'application/json' },
-}: Partial<Response<TResponseBody>> = {}) {
+}: Partial<HttpResponse<TResponseBody>> = {}) {
   return { body, status, headers };
 }
 
@@ -24,12 +52,12 @@ export function response<TResponseBody>({
  * Sets the 'Location' header.
  *
  * @param location URL the location to redirect to, would be set as the "Location" header
- * @category Response
+ * @category HttpResponse
  */
 export function redirect(
   location: string,
-  { status = 302, headers, body = `Redirecting to ${location}` }: Partial<Response> = {},
-): Response {
+  { status = 302, headers, body = `Redirecting to ${location}` }: Partial<HttpResponse> = {},
+): HttpResponse {
   return {
     body,
     status,
@@ -40,7 +68,7 @@ export function redirect(
 /**
  * Options for {@link file}
  *
- * @category Response
+ * @category HttpResponse
  */
 export interface FileOptions {
   /**
@@ -64,12 +92,12 @@ export interface FileOptions {
  * If you provide `incommingMessage`, would set 'Last-Modified', 'Content-Type' and 'Accept-Ranges'. Also 'Content-Range' if there was a 'Range' header in the request
  *
  * @param filename a local path to the file.
- * @category Response
+ * @category HttpResponse
  */
 export function file(
   filename: string,
-  { headers, status = 200, incommingMessage, stats }: Partial<Response> & FileOptions = {},
-): Response {
+  { headers, status = 200, incommingMessage, stats }: Partial<HttpResponse> & FileOptions = {},
+): HttpResponse {
   const stat = stats ?? statSync(filename);
   const contentType = lookup(filename) || 'text/plain';
   const lastModified = stat.mtime.toISOString();
@@ -118,7 +146,7 @@ export function file(
  */
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `200`
  *
@@ -128,14 +156,14 @@ export function file(
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function ok<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function ok<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 200 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `204`
  *
@@ -144,14 +172,14 @@ export function ok<TResponseBody, TResponse extends Partial<Response<TResponseBo
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function noContent<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function noContent<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 204 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `301`
  *
@@ -160,14 +188,16 @@ export function noContent<TResponseBody, TResponse extends Partial<Response<TRes
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function movedPermanently<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function movedPermanently<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(
+  res: TResponse,
+) {
   return { ...res, status: 301 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `302`
  *
@@ -181,14 +211,14 @@ export function movedPermanently<TResponseBody, TResponse extends Partial<Respon
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function found<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function found<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 302 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `303`
  *
@@ -198,14 +228,14 @@ export function found<TResponseBody, TResponse extends Partial<Response<TRespons
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function seeOther<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function seeOther<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 303 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `304`
  *
@@ -215,14 +245,14 @@ export function seeOther<TResponseBody, TResponse extends Partial<Response<TResp
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function notModified<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function notModified<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 304 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `400`
  *
@@ -231,14 +261,14 @@ export function notModified<TResponseBody, TResponse extends Partial<Response<TR
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function badRequest<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function badRequest<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 400 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `401`
  *
@@ -250,14 +280,14 @@ export function badRequest<TResponseBody, TResponse extends Partial<Response<TRe
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function unauthorized<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function unauthorized<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 401 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `403`
  *
@@ -269,14 +299,14 @@ export function unauthorized<TResponseBody, TResponse extends Partial<Response<T
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function forbidden<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function forbidden<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 403 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `404`
  *
@@ -286,14 +316,14 @@ export function forbidden<TResponseBody, TResponse extends Partial<Response<TRes
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function notFound<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function notFound<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, status: 404 as const };
 }
 
 /**
- * A helper to set the status of a {@link Response} to a specific type literal constant.
+ * A helper to set the status of a {@link HttpResponse} to a specific type literal constant.
  *
  * Status: `500`
  *
@@ -302,9 +332,11 @@ export function notFound<TResponseBody, TResponse extends Partial<Response<TResp
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function internalServerError<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function internalServerError<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(
+  res: TResponse,
+) {
   return { ...res, status: 500 as const };
 }
 
@@ -312,11 +344,11 @@ export function internalServerError<TResponseBody, TResponse extends Partial<Res
  * Type
  * ===========================================================================================
  *
- * @category Response
+ * @category HttpResponse
  */
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  * Deeply convert JS Date types to string and remove undefined values.
  *
  * Content-Type: `application/json`
@@ -324,9 +356,9 @@ export function internalServerError<TResponseBody, TResponse extends Partial<Res
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function json<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function json<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return {
     ...res,
     body: toJson(res.body) as Json<TResponseBody>,
@@ -335,7 +367,7 @@ export function json<TResponseBody, TResponse extends Partial<Response<TResponse
 }
 
 /**
- * A Response creator helper, used for {@link optional}
+ * A HttpResponse creator helper, used for {@link optional}
  */
 type ResponseCreator<TResponseBody, TStatus, THeaders> = (
   body: TResponseBody,
@@ -357,7 +389,7 @@ type ResponseCreator<TResponseBody, TStatus, THeaders> = (
  * @typeParam TStatus Strictly type the http status value
  * @typeParam THeaders Strictly type the http headers.
  *
- * @category Response
+ * @category HttpResponse
  */
 export function optional<TResponseBody, TStatus, THeaders>(
   response: ResponseCreator<TResponseBody, TStatus, THeaders>,
@@ -388,30 +420,30 @@ export function optional<TResponseBody, TStatus, THeaders>(
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `application/yaml`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function yaml<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function yaml<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'application/yaml' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `application/octet-stream`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function binary<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function binary<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return {
     ...res,
     headers: { ...res.headers, 'content-type': 'application/octet-stream' as const },
@@ -419,100 +451,100 @@ export function binary<TResponseBody, TResponse extends Partial<Response<TRespon
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `application/pdf`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function pdf<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function pdf<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'application/pdf' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `application/xml`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function xml<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function xml<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'application/xml' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `text/plain`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function text<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function text<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'text/plain' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `text/html`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function html<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function html<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'text/html' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `text/css`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function css<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function css<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'text/css' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `text/csv`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function csv<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function csv<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return { ...res, headers: { ...res.headers, 'content-type': 'text/csv' as const } };
 }
 
 /**
- * A helper to set the `Content-Type` header of a {@link Response} to a specific type literal constant.
+ * A helper to set the `Content-Type` header of a {@link HttpResponse} to a specific type literal constant.
  *
  * Content-Type: `application/x-www-form-urlencoded`
  *
  * @typeParam TResponseBody Strictly type the response body
  * @typeParam TResponse A generic response, allowing us to preserve the types passed from previous helpers
  *
- * @category Response
+ * @category HttpResponse
  */
-export function form<TResponseBody, TResponse extends Partial<Response<TResponseBody>>>(res: TResponse) {
+export function form<TResponseBody, TResponse extends Partial<HttpResponse<TResponseBody>>>(res: TResponse) {
   return {
     ...res,
     headers: { ...res.headers, 'content-type': 'application/x-www-form-urlencoded' as const },
@@ -525,7 +557,7 @@ export function form<TResponseBody, TResponse extends Partial<Response<TResponse
  */
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link json} and {@link ok}
  * Deeply convert JS Date types to string and remove undefined values.
  *
@@ -537,7 +569,7 @@ export function form<TResponseBody, TResponse extends Partial<Response<TResponse
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonOk<TResponseBody>(
   body: TResponseBody,
@@ -551,7 +583,7 @@ export function jsonOk<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link json} and {@link noContent}
  * No body is specified as this response should not have any content
  *
@@ -560,7 +592,7 @@ export function jsonOk<TResponseBody>(
  *
  * The server successfully processed the request, and is not returning any content.
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonNoContent(
   headers: OutgoingHttpHeaders = {},
@@ -573,7 +605,7 @@ export function jsonNoContent(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link movedPermanently}
  *
@@ -584,7 +616,7 @@ export function jsonNoContent(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonMovedPermanently<TResponseBody>(
   body: TResponseBody,
@@ -598,7 +630,7 @@ export function jsonMovedPermanently<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link found}
  *
@@ -614,7 +646,7 @@ export function jsonMovedPermanently<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonFound<TResponseBody>(
   body: TResponseBody,
@@ -628,7 +660,7 @@ export function jsonFound<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link json} and {@link seeOther}
  *
  * Content-Type: `application/json`
@@ -639,7 +671,7 @@ export function jsonFound<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonSeeOther<TResponseBody>(
   body: TResponseBody,
@@ -653,7 +685,7 @@ export function jsonSeeOther<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link badRequest}
  *
@@ -664,7 +696,7 @@ export function jsonSeeOther<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonBadRequest<TResponseBody>(
   body: TResponseBody,
@@ -677,7 +709,7 @@ export function jsonBadRequest<TResponseBody>(
   return json(badRequest({ body, headers }));
 }
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link unauthorized}
  *
@@ -691,7 +723,7 @@ export function jsonBadRequest<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonUnauthorized<TResponseBody>(
   body: TResponseBody,
@@ -705,7 +737,7 @@ export function jsonUnauthorized<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link forbidden}
  *
@@ -719,7 +751,7 @@ export function jsonUnauthorized<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonForbidden<TResponseBody>(
   body: TResponseBody,
@@ -733,7 +765,7 @@ export function jsonForbidden<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link notFound}
  *
@@ -745,7 +777,7 @@ export function jsonForbidden<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonNotFound<TResponseBody>(
   body: TResponseBody,
@@ -759,7 +791,7 @@ export function jsonNotFound<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * Deeply convert JS Date types to string and remove undefined values.
  * A combination of {@link json} and {@link internalServerError}
  *
@@ -770,7 +802,7 @@ export function jsonNotFound<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function jsonInternalServerError<TResponseBody>(
   body: TResponseBody,
@@ -789,7 +821,7 @@ export function jsonInternalServerError<TResponseBody>(
  */
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link ok}
  *
  * Content-Type: `text/plain`
@@ -800,7 +832,7 @@ export function jsonInternalServerError<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textOk<TResponseBody>(
   body: TResponseBody,
@@ -814,7 +846,7 @@ export function textOk<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link noContent}
  * No body is specified as this response should not have any content
  *
@@ -825,7 +857,7 @@ export function textOk<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textNoContent(
   headers: OutgoingHttpHeaders = {},
@@ -838,7 +870,7 @@ export function textNoContent(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link movedPermanently}
  *
  * Content-Type: `text/plain`
@@ -848,7 +880,7 @@ export function textNoContent(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textMovedPermanently<TResponseBody>(
   body: TResponseBody,
@@ -862,7 +894,7 @@ export function textMovedPermanently<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link found}
  *
  * Content-Type: `text/plain`
@@ -877,7 +909,7 @@ export function textMovedPermanently<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textFound<TResponseBody>(
   body: TResponseBody,
@@ -891,7 +923,7 @@ export function textFound<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link seeOther}
  *
  * Content-Type: `text/plain`
@@ -902,7 +934,7 @@ export function textFound<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textSeeOther<TResponseBody>(
   body: TResponseBody,
@@ -916,7 +948,7 @@ export function textSeeOther<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link badRequest}
  *
  * Content-Type: `text/plain`
@@ -926,13 +958,13 @@ export function textSeeOther<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textBadRequest<TResponseBody>(body: TResponseBody, headers: OutgoingHttpHeaders = {}) {
   return text(badRequest({ body, headers }));
 }
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link unauthorized}
  *
  * Content-Type: `text/plain`
@@ -945,7 +977,7 @@ export function textBadRequest<TResponseBody>(body: TResponseBody, headers: Outg
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textUnauthorized<TResponseBody>(
   body: TResponseBody,
@@ -959,7 +991,7 @@ export function textUnauthorized<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link forbidden}
  *
  * Content-Type: `text/plain`
@@ -972,7 +1004,7 @@ export function textUnauthorized<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textForbidden<TResponseBody>(
   body: TResponseBody,
@@ -986,7 +1018,7 @@ export function textForbidden<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link notFound}
  *
  * Content-Type: `text/plain`
@@ -997,7 +1029,7 @@ export function textForbidden<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textNotFound<TResponseBody>(
   body: TResponseBody,
@@ -1011,7 +1043,7 @@ export function textNotFound<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link text} and {@link internalServerError}
  *
  * Content-Type: `text/plain`
@@ -1021,7 +1053,7 @@ export function textNotFound<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function textInternalServerError<TResponseBody>(
   body: TResponseBody,
@@ -1040,7 +1072,7 @@ export function textInternalServerError<TResponseBody>(
  */
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link ok}
  *
  * Content-Type: `text/html`
@@ -1051,7 +1083,7 @@ export function textInternalServerError<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlOk<TResponseBody>(
   body: TResponseBody,
@@ -1065,7 +1097,7 @@ export function htmlOk<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link noContent}
  * No body is specified as this response should not have any content
  *
@@ -1076,7 +1108,7 @@ export function htmlOk<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlNoContent(
   headers: OutgoingHttpHeaders = {},
@@ -1089,7 +1121,7 @@ export function htmlNoContent(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link movedPermanently}
  *
  * Content-Type: `text/html`
@@ -1099,7 +1131,7 @@ export function htmlNoContent(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlMovedPermanently<TResponseBody>(
   body: TResponseBody,
@@ -1113,7 +1145,7 @@ export function htmlMovedPermanently<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link found}
  *
  * Content-Type: `text/html`
@@ -1128,7 +1160,7 @@ export function htmlMovedPermanently<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlFound<TResponseBody>(
   body: TResponseBody,
@@ -1142,7 +1174,7 @@ export function htmlFound<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link seeOther}
  *
  * Content-Type: `text/html`
@@ -1153,7 +1185,7 @@ export function htmlFound<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlSeeOther<TResponseBody>(
   body: TResponseBody,
@@ -1167,7 +1199,7 @@ export function htmlSeeOther<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link badRequest}
  *
  * Content-Type: `text/html`
@@ -1177,7 +1209,7 @@ export function htmlSeeOther<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlBadRequest<TResponseBody>(
   body: TResponseBody,
@@ -1190,7 +1222,7 @@ export function htmlBadRequest<TResponseBody>(
   return html(badRequest({ body, headers }));
 }
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link unauthorized}
  *
  * Content-Type: `text/html`
@@ -1203,7 +1235,7 @@ export function htmlBadRequest<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlUnauthorized<TResponseBody>(
   body: TResponseBody,
@@ -1217,7 +1249,7 @@ export function htmlUnauthorized<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link forbidden}
  *
  * Content-Type: `text/html`
@@ -1230,7 +1262,7 @@ export function htmlUnauthorized<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlForbidden<TResponseBody>(
   body: TResponseBody,
@@ -1244,7 +1276,7 @@ export function htmlForbidden<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link notFound}
  *
  * Content-Type: `text/html`
@@ -1255,7 +1287,7 @@ export function htmlForbidden<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlNotFound<TResponseBody>(
   body: TResponseBody,
@@ -1269,7 +1301,7 @@ export function htmlNotFound<TResponseBody>(
 }
 
 /**
- * A helper to create a {@link Response} object with specific type literal constants for Status and Content-Type Header.
+ * A helper to create a {@link HttpResponse} object with specific type literal constants for Status and Content-Type Header.
  * A combination of {@link html} and {@link internalServerError}
  *
  * Content-Type: `text/html`
@@ -1279,7 +1311,7 @@ export function htmlNotFound<TResponseBody>(
  *
  * @typeParam TResponseBody Strictly type the response body
  *
- * @category Response
+ * @category HttpResponse
  */
 export function htmlInternalServerError<TResponseBody>(
   body: TResponseBody,

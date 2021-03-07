@@ -1,4 +1,4 @@
-import { get, put, httpServer, start, router, jsonOk, loggingMiddleware, describe } from '@ovotech/laminar';
+import { get, put, HttpServer, router, jsonOk, loggingMiddleware } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -7,7 +7,7 @@ const users: Record<string, string> = {
 
 const logging = loggingMiddleware(console);
 
-const server = httpServer({
+const server = new HttpServer({
   app: logging(
     router(
       get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
@@ -21,4 +21,4 @@ const server = httpServer({
     ),
   ),
 });
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

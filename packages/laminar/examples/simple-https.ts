@@ -1,11 +1,11 @@
-import { get, post, httpsServer, router, start, textOk, jsonOk, describe } from '@ovotech/laminar';
+import { get, post, HttpServer, router, textOk, jsonOk } from '@ovotech/laminar';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const main = async () => {
-  const server = httpsServer({
+  const server = new HttpServer({
     port: 8443,
-    serverOptions: {
+    https: {
       key: readFileSync(join(__dirname, 'key.pem')),
       cert: readFileSync(join(__dirname, 'cert.pem')),
     },
@@ -15,9 +15,9 @@ const main = async () => {
       get('/test', () => textOk('index')),
     ),
   });
-  await start(server);
+  await server.start();
 
-  console.log(describe(server));
+  console.log(server.describe());
 };
 
 main();

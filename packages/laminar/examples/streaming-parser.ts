@@ -1,4 +1,4 @@
-import { httpServer, App, start, BodyParser, defaultBodyParsers, describe, csv, ok } from '@ovotech/laminar';
+import { HttpServer, HttpApp, BodyParser, defaultBodyParsers, csv, ok } from '@ovotech/laminar';
 import { pipeline, Readable, Transform } from 'stream';
 import * as parse from 'csv-parse';
 import * as stringify from 'csv-stringify';
@@ -24,11 +24,11 @@ const upperCaseTransform = new Transform({
 const transformCsv = (body: Readable): Readable =>
   pipeline(body, parse(), upperCaseTransform, stringify(), (err) => (err ? console.error(err.message) : undefined));
 
-const app: App = ({ body }) => csv(ok({ body: transformCsv(body) }));
+const app: HttpApp = ({ body }) => csv(ok({ body: transformCsv(body) }));
 
-const server = httpServer({
+const server = new HttpServer({
   app,
-  options: { bodyParsers: [csvParser, ...defaultBodyParsers] },
+  bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

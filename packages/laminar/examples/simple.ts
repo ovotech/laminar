@@ -1,16 +1,16 @@
-import { get, post, httpServer, start, router, describe, jsonOk, textOk } from '@ovotech/laminar';
+import { get, post, HttpServer, router, jsonOk, textOk } from '@ovotech/laminar';
 
 const main = async () => {
-  const server = httpServer({
+  const server = new HttpServer({
     app: router(
       get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
       post('/test', () => textOk('submited')),
       get('/test', () => textOk('index')),
     ),
   });
-  await start(server);
+  await server.start();
 
-  console.log(describe(server));
+  console.log(server.describe());
 };
 
 main();

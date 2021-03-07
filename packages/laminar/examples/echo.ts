@@ -1,5 +1,5 @@
-import { httpServer, start, response, describe } from '@ovotech/laminar';
+import { HttpServer, response } from '@ovotech/laminar';
 
-const server = httpServer({ app: ({ body }) => response({ body }) });
+const server = new HttpServer({ app: ({ body }) => response({ body }) });
 
-start(server).then(() => console.log(describe(server)));
+server.start().then((server) => console.log(server.describe()));

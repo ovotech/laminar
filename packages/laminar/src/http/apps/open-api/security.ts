@@ -1,4 +1,5 @@
-import { AppRequest, Response, Empty } from '../..';
+import { Empty } from '../../../types';
+import { HttpRequest, HttpResponse } from '../../types';
 import { SecurityRequirementObject, SecuritySchemeObject } from 'openapi3-ts';
 import { OapiAuthInfo, OapiSecurity, RequestOapi, Security, SecurityOk } from './types';
 
@@ -17,9 +18,9 @@ export function isSecurityOk(item: Security): item is SecurityOk {
 }
 
 /**
- * Check if a response from {@link OapiSecurityResolver} is a {@link Response} object, indicating a failed security check
+ * Check if a response from {@link OapiSecurityResolver} is a {@link HttpResponse} object, indicating a failed security check
  */
-export function isSecurityResponse(item: Security): item is Response {
+export function isSecurityResponse(item: Security): item is HttpResponse {
   return 'status' in item;
 }
 
@@ -30,7 +31,7 @@ export async function validateSecurity<
   TRequest extends Empty = Empty,
   TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo
 >(
-  req: TRequest & AppRequest & RequestOapi,
+  req: TRequest & HttpRequest & RequestOapi,
   requirements?: SecurityRequirementObject[],
   schemes?: { [securityScheme: string]: SecuritySchemeObject },
   security?: OapiSecurity<TRequest, TOapiAuthInfo>,

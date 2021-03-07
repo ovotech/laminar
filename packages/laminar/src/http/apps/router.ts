@@ -2,9 +2,9 @@
 import { resolve, normalize, join } from 'path';
 import { existsSync, statSync } from 'fs';
 import { file, jsonNotFound, textNotFound, textForbidden } from '../response';
-import { AppRequest, App } from '../components/components';
-import { Empty } from '../types';
-import { toPathKeys, toPathRe } from '../helpers';
+import { HttpRequest, HttpApp } from '../types';
+import { Empty } from '../../types';
+import { toPathKeys, toPathRe } from '../../helpers';
 
 /**
  * Adds the `path` property to the request, containing the captured path parameters.
@@ -24,14 +24,14 @@ export interface RequestRoute {
  *
  * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
  */
-type Matcher<TRequest> = (req: TRequest & AppRequest) => RequestRoute | false;
+type Matcher<TRequest> = (req: TRequest & HttpRequest) => RequestRoute | false;
 
 /**
  * Captured path parameters to the route would be passed to the `path` property.
  *
  * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
  */
-export type AppRoute<TRequest extends Empty = Empty> = App<TRequest & RequestRoute>;
+export type AppRoute<TRequest extends Empty = Empty> = HttpApp<TRequest & RequestRoute>;
 
 /**
  * A route object, containing a route mather and the route application
@@ -65,7 +65,7 @@ interface PathRouteOptions<TRequest extends Empty> {
   /**
    * Would pass the captured path parameters to the `path` property
    */
-  app: App<TRequest & RequestRoute>;
+  app: HttpApp<TRequest & RequestRoute>;
 }
 
 /**
@@ -96,7 +96,7 @@ export type Method = <TRequest extends Empty = Empty>(
   /**
    * Would pass the captured path parameters to the `path` property
    */
-  app: App<TRequest & RequestRoute>,
+  app: HttpApp<TRequest & RequestRoute>,
 ) => PathRoute<TRequest>;
 
 /**
@@ -115,11 +115,11 @@ export interface StaticAssetsOptions {
   /**
    * Would be called if a file was not found at all.
    */
-  fileNotFound?: App;
+  fileNotFound?: HttpApp;
   /**
    * Would be called if a directory was requested, but index file was not found (or was disabled with `index: undefined`).
    */
-  indexNotFound?: App;
+  indexNotFound?: HttpApp;
 }
 
 /**
@@ -163,9 +163,9 @@ export const route = <TRequest extends Empty = Empty>({
  * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
  */
 const selectRoute = <TRequest extends Empty = Empty>(
-  req: TRequest & AppRequest,
+  req: TRequest & HttpRequest,
   routes: (PathRoute<TRequest> | AppRoute<TRequest>)[],
-): false | { path: any; app: App<TRequest & RequestRoute> } => {
+): false | { path: any; app: HttpApp<TRequest & RequestRoute> } => {
   for (const route of routes) {
     if ('matcher' in route) {
       const params = route.matcher(req);
@@ -198,7 +198,7 @@ const selectRoute = <TRequest extends Empty = Empty>(
  */
 export function router<TRequest extends Empty = Empty>(
   ...routes: (PathRoute<TRequest> | AppRoute<TRequest>)[]
-): App<TRequest> {
+): HttpApp<TRequest> {
   return (req) => {
     const selected = selectRoute<TRequest>(req, routes);
     return selected

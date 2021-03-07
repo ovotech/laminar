@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ResponseBody, Response, Component } from '../types';
 import { URLSearchParams } from 'url';
 import { Readable } from 'stream';
+import { HttpMiddleware, HttpResponseBody, HttpResponse } from '../types';
 
 /**
  * Convert a response body into a string / buffer / readable stream
@@ -11,7 +11,7 @@ export interface ResponseParser {
    * If returns true for a given content type, this parser will be used
    */
   match: (contentType: string) => boolean;
-  parse: (body: any) => ResponseBody;
+  parse: (body: any) => HttpResponseBody;
 }
 
 const jsonResponseParserRegex = /^application\/([^\+\;]+\+)?json(\;.*)?/;
@@ -31,7 +31,7 @@ export const defaultResponseParsers: ResponseParser[] = [jsonResponseParser, for
 const toContentLength = (body: unknown): number | undefined =>
   body instanceof Buffer || typeof body === 'string' ? Buffer.byteLength(body) : undefined;
 
-export const parseResponse = (res: Response, parsers = defaultResponseParsers): Response => {
+export const parseResponse = (res: HttpResponse, parsers = defaultResponseParsers): HttpResponse => {
   const contentType = res.headers['content-type'] as string | undefined;
   const parser = parsers.find((parser) => parser.match(contentType ?? ''));
   const body = parser
@@ -56,5 +56,5 @@ export const parseResponse = (res: Response, parsers = defaultResponseParsers): 
  *
  * @category component
  */
-export const responseParserComponent = (parsers = defaultResponseParsers): Component => (next) => async (req) =>
+export const responseParserMiddleware = (parsers = defaultResponseParsers): HttpMiddleware => (next) => async (req) =>
   parseResponse(await next(req), parsers);

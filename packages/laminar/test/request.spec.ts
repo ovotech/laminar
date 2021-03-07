@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { httpServer, start, HttpServer, stop, textOk } from '../src';
+import { HttpServer, textOk } from '../src';
 
 const app = jest.fn().mockReturnValue(textOk('Test'));
 const api = axios.create({ baseURL: 'http://localhost:8051' });
@@ -8,11 +8,11 @@ let server: HttpServer;
 
 describe('Requests', () => {
   beforeAll(async () => {
-    server = httpServer({ app, port: 8051 });
-    await start(server);
+    server = new HttpServer({ app, port: 8051 });
+    await server.start();
   });
 
-  afterAll(() => stop(server));
+  afterAll(() => server.stop());
 
   beforeEach(() => app.mockClear());
 

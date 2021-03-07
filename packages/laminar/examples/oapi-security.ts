@@ -1,4 +1,4 @@
-import { httpServer, describe, jsonOk, start, jsonUnauthorized, openApi, securityOk } from '@ovotech/laminar';
+import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi-security.yaml');
@@ -19,9 +19,9 @@ const main = async () => {
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await server.start();
+  console.log(server.describe());
 };
 
 main();

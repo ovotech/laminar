@@ -1,5 +1,5 @@
 import { URLSearchParams } from 'url';
-import { parseQueryObjects } from '../../src';
+import { parseQueryObjects } from '../src';
 
 describe('queryParserMiddleware', () => {
   it.each`
