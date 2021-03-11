@@ -1,4 +1,4 @@
-import { get, post, HttpServer, router, textOk, jsonOk } from '@ovotech/laminar';
+import { get, post, HttpServer, router, textOk, jsonOk, start } from '@ovotech/laminar';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -10,14 +10,12 @@ const main = async () => {
       cert: readFileSync(join(__dirname, 'cert.pem')),
     },
     app: router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      post('/test', () => textOk('submited')),
-      get('/test', () => textOk('index')),
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      post('/test', async () => textOk('submited')),
+      get('/test', async () => textOk('index')),
     ),
   });
-  await server.start();
-
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();

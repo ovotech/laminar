@@ -87,7 +87,9 @@ export {
   ResponseTimeConfig,
   defaultResponseTimeHeader,
 } from './http/middleware/response-time.middleware';
-export { loggingMiddleware, Logger, RequestLogging, LoggerFormatters } from './http/middleware/logging.middleware';
+export { loggingMiddleware, RequestLogging, LoggerFormatters } from './http/middleware/logging.middleware';
+export { LoggerMetadata, LoggerLike, LoggerWithMetadata } from './logger';
+export { start, stop, ContextItem } from './lifecycle';
 export {
   responseParserMiddleware,
   defaultResponseParsers,
@@ -96,7 +98,12 @@ export {
   ResponseParser,
   parseResponse,
 } from './http/middleware/response-parser.middleware';
-export { errorsMiddleware, defaultErrorHandler, RequestError } from './http/middleware/errors.middleware';
+export {
+  errorsMiddleware,
+  defaultErrorHandler,
+  RequestError,
+  HttpErrorHandler,
+} from './http/middleware/errors.middleware';
 export {
   HttpRequest,
   HttpResponseBody,
@@ -119,7 +126,7 @@ export {
   RequestRoute,
   AppRoute,
 } from './http/apps/router';
-export { Empty, Service } from './types';
+export { Empty, Service, AbstractMiddleware, Middleware } from './types';
 export {
   openApi,
   securityOk,

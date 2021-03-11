@@ -1,11 +1,18 @@
 import axios from 'axios';
-import { loggingMiddleware, LoggerFormatters, textOk, HttpServer } from '../../src';
+import { loggingMiddleware, LoggerFormatters, textOk, HttpServer, LoggerLike } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8098' });
 
 describe('loggingMiddleware middleware', () => {
   it('Should log path and method ', async () => {
-    const mockLogger = { info: jest.fn(), error: jest.fn() };
+    const mockLogger: LoggerLike = {
+      info: jest.fn(),
+      error: jest.fn(),
+      log: jest.fn(),
+      debug: jest.fn(),
+      warn: jest.fn(),
+    };
+
     const logging = loggingMiddleware(mockLogger);
     const server = new HttpServer({
       port: 8098,
@@ -36,13 +43,20 @@ describe('loggingMiddleware middleware', () => {
   });
 
   it('Should not call error logger on success', async () => {
-    const mockLogger = { info: jest.fn(), error: jest.fn() };
+    const mockLogger: LoggerLike = {
+      info: jest.fn(),
+      error: jest.fn(),
+      log: jest.fn(),
+      debug: jest.fn(),
+      warn: jest.fn(),
+    };
     const logging = loggingMiddleware(mockLogger);
 
     const server = new HttpServer({
       port: 8098,
-      app: logging(() => textOk('OK')),
+      app: logging(async () => textOk('OK')),
     });
+
     try {
       await server.start();
 
@@ -70,7 +84,13 @@ describe('loggingMiddleware middleware', () => {
   });
 
   it('Should log other things with a custom function', async () => {
-    const mockLogger = { info: jest.fn(), error: jest.fn() };
+    const mockLogger: LoggerLike = {
+      info: jest.fn(),
+      error: jest.fn(),
+      log: jest.fn(),
+      debug: jest.fn(),
+      warn: jest.fn(),
+    };
     const errorFormatter: LoggerFormatters['error'] = (req, error) => {
       return {
         message: `MY ${error.message}`,

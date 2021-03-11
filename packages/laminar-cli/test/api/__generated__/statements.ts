@@ -1,8 +1,8 @@
-import { RequestOapi, OapiConfig, Empty, App, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from "@ovotech/laminar";
+import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from "@ovotech/laminar";
 
 import { Readable } from "stream";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
 
 export type ResponseWellknownHealthcheckGet = ResponseOapi<{
     success: boolean;
@@ -11,14 +11,14 @@ export type ResponseWellknownHealthcheckGet = ResponseOapi<{
 /**
  * Health check endpoint
  */
-export type PathWellknownHealthcheckGet<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseWellknownHealthcheckGet | Promise<ResponseWellknownHealthcheckGet>;
+export type PathWellknownHealthcheckGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownHealthcheckGet>;
 
 export type ResponseWellknownOpenapiyamlGet = ResponseOapi<string | Readable | Buffer, 200, "application/yaml">;
 
 /**
  * The open api spec for the service. OpenAPI v3.
  */
-export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseWellknownOpenapiyamlGet | Promise<ResponseWellknownOpenapiyamlGet>;
+export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownOpenapiyamlGet>;
 
 export type ResponseWellknownOpenapihtmlGet = ResponseOapi<string | Readable | Buffer, 200, "text/html">;
 
@@ -33,7 +33,7 @@ export interface RequestWellknownOpenapihtmlGet<TAuthInfo> extends RequestOapi {
 /**
  * The open api spec for the service. OpenAPI v3.
  */
-export type PathWellknownOpenapihtmlGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestWellknownOpenapihtmlGet<TAuthInfo> & R) => ResponseWellknownOpenapihtmlGet | Promise<ResponseWellknownOpenapihtmlGet>;
+export type PathWellknownOpenapihtmlGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestWellknownOpenapihtmlGet<TAuthInfo> & R) => Promise<ResponseWellknownOpenapihtmlGet>;
 
 export type StatementsList = StatementsListItem[];
 
@@ -84,7 +84,7 @@ export interface RequestV2StatementsGet<TAuthInfo> extends RequestOapi {
 /**
  * A full history of statements generated for an account, including invalid statements
  */
-export type PathV2StatementsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsGet<TAuthInfo> & R) => ResponseV2StatementsGet | Promise<ResponseV2StatementsGet>;
+export type PathV2StatementsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsGet<TAuthInfo> & R) => Promise<ResponseV2StatementsGet>;
 
 export type LossType = "ChangeOfTenancy" | "EstimatedLoss" | "SupplyLoss";
 
@@ -113,7 +113,7 @@ export interface RequestV2StatementsPost<TAuthInfo> extends RequestOapi {
 /**
  * Manually start generating a statement for a given account
  */
-export type PathV2StatementsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsPost<TAuthInfo> & R) => ResponseV2StatementsPost | Promise<ResponseV2StatementsPost>;
+export type PathV2StatementsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsPost<TAuthInfo> & R) => Promise<ResponseV2StatementsPost>;
 
 export interface StatementData {
     id: string;
@@ -316,7 +316,7 @@ export interface RequestV2StatementsIdDataGet<TAuthInfo> extends RequestOapi {
 /**
  * Raw data used to generate a statement for an account, at the point of generation.
  */
-export type PathV2StatementsIdDataGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdDataGet<TAuthInfo> & R) => ResponseV2StatementsIdDataGet | Promise<ResponseV2StatementsIdDataGet>;
+export type PathV2StatementsIdDataGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdDataGet<TAuthInfo> & R) => Promise<ResponseV2StatementsIdDataGet>;
 
 export type ResponseV2StatementsIdApprovalPost = ResponseOapi<{
     success: boolean;
@@ -345,7 +345,7 @@ export interface RequestV2StatementsIdApprovalPost<TAuthInfo> extends RequestOap
 /**
  * Approve a given statement to be sent to the customer
  */
-export type PathV2StatementsIdApprovalPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdApprovalPost<TAuthInfo> & R) => ResponseV2StatementsIdApprovalPost | Promise<ResponseV2StatementsIdApprovalPost>;
+export type PathV2StatementsIdApprovalPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdApprovalPost<TAuthInfo> & R) => Promise<ResponseV2StatementsIdApprovalPost>;
 
 export type ResponseV2StatementsIdModificationsPost = ResponseOapi<StatementData, 200, "application/json"> | ResponseOapi<HttpError, 400, "application/json"> | ResponseOapi<HttpError, 404, "application/json"> | ResponseOapi<HttpError, 500, "application/json">;
 
@@ -376,7 +376,7 @@ export interface RequestV2StatementsIdModificationsPost<TAuthInfo> extends Reque
 /**
  * Save modificaitons for the current statement
  */
-export type PathV2StatementsIdModificationsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdModificationsPost<TAuthInfo> & R) => ResponseV2StatementsIdModificationsPost | Promise<ResponseV2StatementsIdModificationsPost>;
+export type PathV2StatementsIdModificationsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdModificationsPost<TAuthInfo> & R) => Promise<ResponseV2StatementsIdModificationsPost>;
 
 export type ResponseV2StatementsIdPdfGet = ResponseOapi<string | Readable | Buffer, 200, "application/pdf"> | ResponseOapi<HttpError, 400, "application/json"> | ResponseOapi<HttpError, 404, "application/json"> | ResponseOapi<HttpError, 500, "application/json">;
 
@@ -403,7 +403,7 @@ export interface RequestV2StatementsIdPdfGet<TAuthInfo> extends RequestOapi {
 /**
  * Retrieve the pdf of a generated statement
  */
-export type PathV2StatementsIdPdfGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdPdfGet<TAuthInfo> & R) => ResponseV2StatementsIdPdfGet | Promise<ResponseV2StatementsIdPdfGet>;
+export type PathV2StatementsIdPdfGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdPdfGet<TAuthInfo> & R) => Promise<ResponseV2StatementsIdPdfGet>;
 
 export type ResponseV2StatementsIdHtmlGet = ResponseOapi<string | Readable | Buffer, 200, "text/html"> | ResponseOapi<HttpError, 404, "application/json"> | ResponseOapi<HttpError, 500, "application/json">;
 
@@ -430,7 +430,7 @@ export interface RequestV2StatementsIdHtmlGet<TAuthInfo> extends RequestOapi {
 /**
  * Retrieve the html, used to generate the statement pdf
  */
-export type PathV2StatementsIdHtmlGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdHtmlGet<TAuthInfo> & R) => ResponseV2StatementsIdHtmlGet | Promise<ResponseV2StatementsIdHtmlGet>;
+export type PathV2StatementsIdHtmlGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2StatementsIdHtmlGet<TAuthInfo> & R) => Promise<ResponseV2StatementsIdHtmlGet>;
 
 export type ResponseV2ReportsDailyPost = ResponseOapi<{
     success: boolean;
@@ -453,7 +453,7 @@ export interface RequestV2ReportsDailyPost<TAuthInfo> extends RequestOapi {
 /**
  * Generate all daily reports for the day. Should be called by a cron service
  */
-export type PathV2ReportsDailyPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsDailyPost<TAuthInfo> & R) => ResponseV2ReportsDailyPost | Promise<ResponseV2ReportsDailyPost>;
+export type PathV2ReportsDailyPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsDailyPost<TAuthInfo> & R) => Promise<ResponseV2ReportsDailyPost>;
 
 export interface ReportsList {
     items: ReportsListItem[];
@@ -496,7 +496,7 @@ export interface RequestV2ReportsTypeGet<TAuthInfo> extends RequestOapi {
 /**
  * Return a list of reports for a specific type
  */
-export type PathV2ReportsTypeGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsTypeGet<TAuthInfo> & R) => ResponseV2ReportsTypeGet | Promise<ResponseV2ReportsTypeGet>;
+export type PathV2ReportsTypeGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsTypeGet<TAuthInfo> & R) => Promise<ResponseV2ReportsTypeGet>;
 
 export type ResponseV2ReportsTypePost = ResponseOapi<{
     success: boolean;
@@ -531,7 +531,7 @@ export interface RequestV2ReportsTypePost<TAuthInfo> extends RequestOapi {
 /**
  * Trigger report generation for a specific type, you can pick the date range, but by default it would use the current day
  */
-export type PathV2ReportsTypePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsTypePost<TAuthInfo> & R) => ResponseV2ReportsTypePost | Promise<ResponseV2ReportsTypePost>;
+export type PathV2ReportsTypePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsTypePost<TAuthInfo> & R) => Promise<ResponseV2ReportsTypePost>;
 
 export type ResponseV2ReportsTypeFilenameGet = ResponseOapi<string | Readable | Buffer, 200, "text/csv"> | ResponseOapi<HttpError, 404, "application/json"> | ResponseOapi<HttpError, 500, "application/json">;
 
@@ -562,7 +562,7 @@ export interface RequestV2ReportsTypeFilenameGet<TAuthInfo> extends RequestOapi 
 /**
  * A report file in CSV format
  */
-export type PathV2ReportsTypeFilenameGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsTypeFilenameGet<TAuthInfo> & R) => ResponseV2ReportsTypeFilenameGet | Promise<ResponseV2ReportsTypeFilenameGet>;
+export type PathV2ReportsTypeFilenameGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ReportsTypeFilenameGet<TAuthInfo> & R) => Promise<ResponseV2ReportsTypeFilenameGet>;
 
 export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> extends OapiConfig<R> {
     paths: {

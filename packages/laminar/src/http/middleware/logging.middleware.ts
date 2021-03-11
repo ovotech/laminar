@@ -1,22 +1,14 @@
-import { HttpRequest, HttpMiddleware, HttpResponse } from '../types';
+import { LoggerLike, LoggerMetadata } from '../../logger';
+import { HttpRequest, HttpResponse, HttpMiddleware } from '../types';
 
-export interface Metadata {
-  [key: string]: unknown;
-}
-
-export interface Logger {
-  info: (message: string, metadata?: Metadata) => void;
-  error: (message: string, metadata?: Metadata) => void;
-}
-
-export interface RequestLogging<TLogger extends Logger = Logger> {
+export interface RequestLogging<TLogger extends LoggerLike = LoggerLike> {
   logger: TLogger;
 }
 
 export interface LoggerFormatters {
-  request: (req: HttpRequest) => Metadata;
-  response: (req: HttpRequest, res: HttpResponse) => Metadata;
-  error: (req: HttpRequest, error: Error) => Metadata;
+  request: (req: HttpRequest) => LoggerMetadata;
+  response: (req: HttpRequest, res: HttpResponse) => LoggerMetadata;
+  error: (req: HttpRequest, error: Error) => LoggerMetadata;
 }
 
 export const requestUri = (req: HttpRequest): string => `${req.method} ${req.url.pathname}`;
@@ -27,7 +19,7 @@ export const requestUri = (req: HttpRequest): string => `${req.method} ${req.url
  * @param logger Logger instance, must implement `info` and `error`. You can use `console` to output to stdout
  * @category middleware
  */
-export const loggingMiddleware = <TLogger extends Logger>(
+export const loggingMiddleware = <TLogger extends LoggerLike>(
   logger: TLogger,
   { request, response, error }: Partial<LoggerFormatters> = {
     response: (req, res) => ({

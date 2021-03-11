@@ -1,4 +1,4 @@
-import { Middleware, Empty, OapiSecurityResolver } from '@ovotech/laminar';
+import { HttpMiddleware, Empty, OapiSecurityResolver } from '@ovotech/laminar';
 import { authMiddleware, jwtSecurityResolver, toMissing } from './jwt';
 import { ScopeError, JWTData, JWTVerify, RequestAuthInfo } from './types';
 
@@ -19,7 +19,7 @@ export const keycloakScopeError = (service: string): ScopeError<JWTDataKeycloak>
 
 export const keycloakAuthMiddleware = <TUser extends JWTDataKeycloak = JWTDataKeycloak>(
   options: KeycloakOptions,
-): ((scopes?: string[]) => Middleware<RequestAuthInfo<TUser>>) =>
+): ((scopes?: string[]) => HttpMiddleware<RequestAuthInfo<TUser>>) =>
   authMiddleware({ ...options, scopeError: keycloakScopeError(options.service) });
 
 export const keycloakJwtSecurityResolver = <TUser extends JWTDataKeycloak = JWTDataKeycloak>(

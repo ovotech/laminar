@@ -196,9 +196,7 @@ describe('Docs examples', () => {
     try {
       service.stderr.on('data', (data) => console.error(String(data)));
       await new Promise((resolve) => {
-        service.stdout.on('data', (data) =>
-          String(data).includes('Laminar: Running') ? resolve(undefined) : undefined,
-        );
+        service.stdout.on('data', (data) => (String(data).includes('Started') ? resolve(undefined) : undefined));
       });
 
       const api = axios.create({ baseURL: `http://localhost:${port}` });

@@ -49,9 +49,7 @@ describe('Example files', () => {
     try {
       service.stderr.on('data', errorLogger);
       await new Promise((resolve) => {
-        service.stdout.on('data', (data) =>
-          String(data).includes('Laminar: Running') ? resolve(undefined) : undefined,
-        );
+        service.stdout.on('data', (data) => (String(data).includes('Started') ? resolve(undefined) : undefined));
       });
       const { data } = await axios.create({ baseURL: `http://localhost:${port}` }).request(config);
       expect(data).toEqual(expected);

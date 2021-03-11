@@ -1,6 +1,6 @@
 import { toHttpRequest } from './request';
 import { HttpApp, IncommingMessageResolver } from './types';
-import { errorsMiddleware, RequestError } from './middleware/errors.middleware';
+import { errorsMiddleware, HttpErrorHandler } from './middleware/errors.middleware';
 import { responseParserMiddleware, ResponseParser } from './middleware/response-parser.middleware';
 import { bodyParserMiddleware, BodyParser } from './middleware/body-parser.middleware';
 import * as http from 'http';
@@ -43,7 +43,7 @@ export interface IncommingMessageResolverOptions {
   /**
    * Global error handler
    */
-  errorHandler?: HttpApp<RequestError>;
+  errorHandler?: HttpErrorHandler;
 
   app: HttpApp;
 }
@@ -145,10 +145,6 @@ export class HttpServer implements Service {
     }
   }
 
-  isRunning(): boolean {
-    return this.server.listening;
-  }
-
   start(): Promise<this> {
     return new Promise((resolve) => this.server.listen(this.port, this.hostname, () => resolve(this)));
   }
@@ -162,6 +158,6 @@ export class HttpServer implements Service {
     const url =
       typeof address === 'object' && address ? `${address.address}:${address.port} (${address.family})` : address;
 
-    return ` ⛲ Laminar: ${this.isRunning() ? 'Running' : 'Stopped'}, Address: ${url}`;
+    return `⛲ Laminar: ${url}`;
   }
 }

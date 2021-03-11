@@ -1,5 +1,6 @@
 import { Middleware } from '@ovotech/laminar';
-import { PoolClient, Pool } from 'pg';
+import { PoolClient } from 'pg';
+import { PgPoolService } from './pg-pool.service';
 
 export interface RequestPgPool {
   db: PoolClient;
@@ -13,7 +14,7 @@ export interface RequestPgPool {
  * We are also able to handle exceptions gracefully,
  * releasing the client from the pool in an event of one.
  */
-export const pgPoolMiddleware = (pool: Pool): Middleware<RequestPgPool> => {
+export const pgPoolMiddleware = (pool: PgPoolService): Middleware<RequestPgPool> => {
   return (next) => async (req) => {
     // Each request gets its own client connection.
     const db = await pool.connect();

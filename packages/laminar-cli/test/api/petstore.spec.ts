@@ -1,7 +1,5 @@
 import {
-  httpServer,
-  start,
-  stop,
+  HttpServer,
   jsonUnauthorized,
   jsonNotFound,
   jsonOk,
@@ -54,11 +52,11 @@ describe('Petstore', () => {
       },
       paths: {
         '/pets': {
-          get: ({ logger }) => {
+          get: async ({ logger }) => {
             logger('Get all');
             return jsonOk(db);
           },
-          post: ({ body, authInfo, logger, headers }) => {
+          post: async ({ body, authInfo, logger, headers }) => {
             const pet = { ...body, id: Math.max(...db.map((item) => item.id)) + 1 };
             logger(`new pet ${pet.name}, trace token: ${headers['x-trace-token']}`);
 
@@ -67,11 +65,11 @@ describe('Petstore', () => {
           },
         },
         '/pets/{id}': {
-          get: ({ path }) => {
+          get: async ({ path }) => {
             const pet = db.find((item) => item.id === Number(path.id));
             return optional(jsonOk, pet) ?? jsonNotFound({ code: 123, message: 'Not Found' });
           },
-          delete: ({ path }) => {
+          delete: async ({ path }) => {
             const index = db.findIndex((item) => item.id === Number(path.id));
             if (index !== -1) {
               db.splice(index, 1);
@@ -84,10 +82,10 @@ describe('Petstore', () => {
       },
     });
     const logger = withLogger(log);
-    const server = httpServer({ app: logger(oapi), port: 4911 });
+    const server = new HttpServer({ app: logger(oapi), port: 4911 });
 
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:4911' });
 
@@ -212,7 +210,7 @@ describe('Petstore', () => {
       expect(log).toHaveBeenNthCalledWith(4, 'Get all');
       expect(log).toHaveBeenNthCalledWith(5, 'Get all');
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

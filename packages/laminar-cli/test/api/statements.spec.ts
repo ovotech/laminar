@@ -1,7 +1,5 @@
 import {
-  httpServer,
-  start,
-  stop,
+  HttpServer,
   htmlOk,
   jsonOk,
   ok,
@@ -39,40 +37,40 @@ describe('Statements', () => {
         },
       },
       paths: {
-        '/.well-known/health-check': { get: () => jsonOk({ success: true }) },
+        '/.well-known/health-check': { get: async () => jsonOk({ success: true }) },
         '/.well-known/openapi.html': {
-          get: () => htmlOk(createReadStream(join(__dirname, 'statements.html'))),
+          get: async () => htmlOk(createReadStream(join(__dirname, 'statements.html'))),
         },
         '/.well-known/openapi.yaml': {
-          get: () => yaml(ok({ body: createReadStream(join(__dirname, 'statements.yaml')) })),
+          get: async () => yaml(ok({ body: createReadStream(join(__dirname, 'statements.yaml')) })),
         },
         '/v2/reports/daily': {
-          post: () => {
+          post: async () => {
             reportsService.set('errors', 'daily', 'daily');
             return jsonOk({ success: true });
           },
         },
         '/v2/reports/{type}': {
-          get: ({ path: { type } }) => {
+          get: async ({ path: { type } }) => {
             const items = reportsService.getAll(type);
             return jsonOk({
               total: items.length,
               items: items.map((item) => ({ filename: item.filename, createdAt: item.createdAt })),
             });
           },
-          post: ({ path: { type }, body }) => {
+          post: async ({ path: { type }, body }) => {
             reportsService.set(type, 'date' in body ? body.date : `${body.fromDate}-${body.toDate}`, 'report');
             return jsonOk({ success: true });
           },
         },
         '/v2/reports/{type}/{filename}': {
-          get: ({ path: { type, filename } }) => {
+          get: async ({ path: { type, filename } }) => {
             const report = reportsService.get(type, filename);
             return report ? csv(ok({ body: report.content })) : jsonNotFound({ message: 'Report not found' });
           },
         },
         '/v2/statements': {
-          get: () =>
+          get: async () =>
             jsonOk(
               statementsService.getAll().map((item) => ({
                 id: item.id,
@@ -84,7 +82,7 @@ describe('Statements', () => {
                 state: item.state,
               })),
             ),
-          post: ({ body }) => {
+          post: async ({ body }) => {
             const statement = {
               id: body.accountId,
               ref: 'REF111',
@@ -105,25 +103,25 @@ describe('Statements', () => {
           },
         },
         '/v2/statements/{id}/approval': {
-          post: ({ path: { id } }) => {
+          post: async ({ path: { id } }) => {
             const result = statementsService.approve(id);
             return result ? jsonOk({ success: true }) : jsonNotFound({ message: 'Cannot approve: Not Found' });
           },
         },
         '/v2/statements/{id}/data': {
-          get: ({ path: { id } }) => {
+          get: async ({ path: { id } }) => {
             const item = statementsService.get(id);
             return item ? jsonOk(item) : jsonNotFound({ message: 'NoData: Statement not found' });
           },
         },
         '/v2/statements/{id}/html': {
-          get: ({ path: { id } }) => {
+          get: async ({ path: { id } }) => {
             const html = statementsService.html(id);
             return html ? htmlOk(html) : jsonNotFound({ message: 'NoHtml: Statement not found' });
           },
         },
         '/v2/statements/{id}/modifications': {
-          post: ({ path: { id }, body: { modification } }) => {
+          post: async ({ path: { id }, body: { modification } }) => {
             const item = statementsService.modify(id, modification);
             return item ? jsonOk(item) : jsonNotFound({ message: 'Cannot modify: Statement not found' });
           },
@@ -138,9 +136,9 @@ describe('Statements', () => {
     });
     const log = jest.fn();
     const logger = withLogger(log);
-    const server = httpServer({ app: logger(app), port: 4913 });
+    const server = new HttpServer({ app: logger(app), port: 4913 });
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:4913' });
 
@@ -156,7 +154,7 @@ describe('Statements', () => {
 
       expect(statementPdf).toMatchSnapshot();
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

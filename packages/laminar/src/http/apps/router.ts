@@ -199,7 +199,7 @@ const selectRoute = <TRequest extends Empty = Empty>(
 export function router<TRequest extends Empty = Empty>(
   ...routes: (PathRoute<TRequest> | AppRoute<TRequest>)[]
 ): HttpApp<TRequest> {
-  return (req) => {
+  return async (req) => {
     const selected = selectRoute<TRequest>(req, routes);
     return selected
       ? selected.app({ ...req, path: selected.path })
@@ -232,8 +232,8 @@ export function staticAssets<T extends Empty = Empty>(
   {
     index = 'index.html',
     acceptRanges = true,
-    indexNotFound = () => textNotFound('Index file not found'),
-    fileNotFound = () => textNotFound('File not found'),
+    indexNotFound = async () => textNotFound('Index file not found'),
+    fileNotFound = async () => textNotFound('File not found'),
   }: StaticAssetsOptions = {},
 ): PathRoute<T> {
   const allwoedMethods = ['GET', 'HEAD'];
@@ -245,7 +245,7 @@ export function staticAssets<T extends Empty = Empty>(
         ? { path: {} }
         : false;
     },
-    app: (req) => {
+    app: async (req) => {
       const relativePath = join('.', normalize(req.incommingMessage.url ?? '').substring(prefixPath.length));
 
       if (parentPathRegEx.test(relativePath)) {

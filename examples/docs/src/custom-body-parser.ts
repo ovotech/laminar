@@ -1,18 +1,9 @@
-import {
-  App,
-  jsonOk,
-  httpServer,
-  BodyParser,
-  concatStream,
-  defaultBodyParsers,
-  start,
-  describe,
-} from '@ovotech/laminar';
+import { HttpApp, jsonOk, HttpServer, BodyParser, concatStream, defaultBodyParsers, start } from '@ovotech/laminar';
 
 // << app
 import * as YAML from 'yaml';
 
-const app: App = ({ body }) => jsonOk(body);
+const app: HttpApp = async ({ body }) => jsonOk(body);
 
 const yamlParser: BodyParser = {
   match: (contentType) => contentType === 'application/yaml',
@@ -23,15 +14,15 @@ const yamlParser: BodyParser = {
   parse: async (stream) => YAML.parse((await concatStream(stream)) ?? ''),
 };
 
-const server = httpServer({
+const server = new HttpServer({
   app,
   /**
    * You can configure the request body parsers using `bodyParsers`
    * If we want to keep all the default ones though, so we pass the default body parsers too
    */
-  options: { bodyParsers: [yamlParser, ...defaultBodyParsers] },
+  bodyParsers: [yamlParser, ...defaultBodyParsers],
 });
 
 // app
 
-start(server).then((http) => console.log(describe(http)));
+start([server], console);

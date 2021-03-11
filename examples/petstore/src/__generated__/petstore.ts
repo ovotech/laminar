@@ -2,7 +2,7 @@ import {
   RequestOapi,
   OapiConfig,
   Empty,
-  App,
+  HttpApp,
   openApi,
   OapiSecurityResolver,
   OapiAuthInfo,
@@ -11,7 +11,7 @@ import {
 
 export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(
   config: Config<R, TAuthInfo>,
-): Promise<App<R>> => openApi(config);
+): Promise<HttpApp<R>> => openApi(config);
 
 export type Pet = NewPet & {
   id: number;
@@ -63,7 +63,7 @@ export interface RequestPetsGet<TAuthInfo> extends RequestOapi {
  */
 export type PathPetsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (
   req: RequestPetsGet<TAuthInfo> & R,
-) => ResponsePetsGet | Promise<ResponsePetsGet>;
+) => Promise<ResponsePetsGet>;
 
 export interface PetCreated {
   pet?: NewPet;
@@ -94,7 +94,7 @@ export interface RequestPetsPost<TAuthInfo> extends RequestOapi {
  */
 export type PathPetsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (
   req: RequestPetsPost<TAuthInfo> & R,
-) => ResponsePetsPost | Promise<ResponsePetsPost>;
+) => Promise<ResponsePetsPost>;
 
 export type ResponsePetsIdGet =
   | ResponseOapi<Pet, 200, 'application/json'>
@@ -118,7 +118,7 @@ export interface RequestPetsIdGet<TAuthInfo> extends RequestOapi {
  */
 export type PathPetsIdGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (
   req: RequestPetsIdGet<TAuthInfo> & R,
-) => ResponsePetsIdGet | Promise<ResponsePetsIdGet>;
+) => Promise<ResponsePetsIdGet>;
 
 export type ResponsePetsIdDelete = ResponseOapi<unknown, 204, string> | ResponseOapi<Error, number, 'application/json'>;
 
@@ -140,7 +140,7 @@ export interface RequestPetsIdDelete<TAuthInfo> extends RequestOapi {
  */
 export type PathPetsIdDelete<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (
   req: RequestPetsIdDelete<TAuthInfo> & R,
-) => ResponsePetsIdDelete | Promise<ResponsePetsIdDelete>;
+) => Promise<ResponsePetsIdDelete>;
 
 export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> extends OapiConfig<R> {
   paths: {

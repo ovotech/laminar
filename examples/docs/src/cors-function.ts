@@ -1,6 +1,6 @@
-import { httpServer, start, describe, textOk, corsMiddleware } from '@ovotech/laminar';
+import { HttpServer, start, textOk, corsMiddleware } from '@ovotech/laminar';
 
-const app = () => textOk('OK');
+const app = async () => textOk('OK');
 
 // << middleware
 
@@ -14,4 +14,4 @@ const cors = corsMiddleware({ allowOrigin: (origin) => origin.endsWith('.com') }
 /**
  * Apply cors and start http server
  */
-start(httpServer({ app: cors(app) })).then((http) => console.log(describe(http)));
+start([new HttpServer({ app: cors(app) })], console);

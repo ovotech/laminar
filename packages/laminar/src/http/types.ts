@@ -2,7 +2,7 @@
 import { IncomingHttpHeaders, IncomingMessage, OutgoingHttpHeaders } from 'http';
 import { Readable } from 'stream';
 import { URL } from 'url';
-import { Empty } from '../types';
+import { Empty, AbstractMiddleware } from '../types';
 
 /**
  * The initial Request that comes from node's [http.createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener)
@@ -104,13 +104,13 @@ export interface HttpResponse<Content = unknown, Status = number> {
  *
  * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
  */
-export type HttpApp<TRequest extends Empty = Empty> = (
-  req: TRequest & HttpRequest,
-) => HttpResponse | Promise<HttpResponse>;
+export type HttpApp<TRequest extends Empty = Empty> = (req: HttpRequest & TRequest) => Promise<HttpResponse>;
 
-export type HttpResolver<TRequest extends HttpRequest = HttpRequest> = (
-  req: TRequest,
-) => HttpResponse | Promise<HttpResponse>;
+// export type HttpMiddleware<TProvide extends Empty = Empty, TRequire extends Empty = Empty> = <
+//   TInherit extends HttpRequest
+// >(
+//   next: (req: TProvide & TRequire & TInherit) => Promise<HttpResponse>,
+// ) => (req: TRequire & TInherit) => Promise<HttpResponse>;
 
 /**
  * An middleware that uses {@link HttpRequest} and modifies it to be used by the app or the downstream middlewares
@@ -132,10 +132,11 @@ export type HttpResolver<TRequest extends HttpRequest = HttpRequest> = (
  * @typeParam TInherit A helper type to allow Typescript to correctly infer the types of all the previous / next middleware in the flow
  * @returns A function to compose with other middlewares over an app
  */
-export type HttpMiddleware<TProvide extends Empty = Empty, TRequire extends Empty = Empty> = <
-  TInherit extends HttpRequest = HttpRequest
->(
-  next: HttpResolver<TProvide & TRequire & TInherit>,
-) => HttpResolver<TRequire & TInherit>;
+export type HttpMiddleware<TProvide extends Empty = Empty, TRequire extends Empty = Empty> = AbstractMiddleware<
+  HttpRequest,
+  HttpResponse,
+  TProvide,
+  TRequire
+>;
 
 export type IncommingMessageResolver = (incommingMessage: IncomingMessage) => Promise<HttpResponse>;

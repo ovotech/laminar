@@ -506,7 +506,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/docs@workspace:examples/docs"
   dependencies:
-    "@ovotech/laminar": ^0.10.1
+    "@ovotech/laminar": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
     "@typescript-eslint/eslint-plugin": ^4.9.0
@@ -525,9 +525,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/petstore@workspace:examples/petstore"
   dependencies:
-    "@ovotech/laminar": ^0.10.1
-    "@ovotech/laminar-cli": ^0.9.4
+    "@ovotech/laminar": ^0.11.0
+    "@ovotech/laminar-cli": ^0.11.0
     "@ovotech/laminar-jwt": ^0.9.2
+    "@ovotech/laminar-pg": ^0.1.0
     "@types/jest": ^26.0.16
     "@types/jsonwebtoken": ^8.5.0
     "@types/node": ^14.14.10
@@ -551,9 +552,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/security@workspace:examples/security"
   dependencies:
-    "@ovotech/laminar": ^0.10.1
-    "@ovotech/laminar-cli": ^0.9.4
-    "@ovotech/laminar-jwt": ^0.9.2
+    "@ovotech/laminar": ^0.11.0
+    "@ovotech/laminar-cli": ^0.11.0
+    "@ovotech/laminar-jwt": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
     "@typescript-eslint/eslint-plugin": ^4.9.0
@@ -572,8 +573,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/simple@workspace:examples/simple"
   dependencies:
-    "@ovotech/laminar": ^0.10.1
-    "@ovotech/laminar-cli": ^0.9.4
+    "@ovotech/laminar": ^0.11.0
+    "@ovotech/laminar-cli": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
     "@typescript-eslint/eslint-plugin": ^4.9.0
@@ -592,7 +593,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@examples/split@workspace:examples/split"
   dependencies:
-    "@ovotech/laminar": ^0.10.1
+    "@ovotech/laminar": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
     "@types/pg": ^7.14.7
@@ -855,6 +856,18 @@ __metadata:
     "@types/yargs": ^15.0.0
     chalk: ^4.0.0
   checksum: 5c511d7807f414b298299ae4a053abf265f39984942e0eefdfb17a7986a36f1047e0fd9a6f785bdddbf7343a5737595dfabe148719a80e118dd77486502009cc
+  languageName: node
+  linkType: hard
+
+"@kafkajs/confluent-schema-registry@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@kafkajs/confluent-schema-registry@npm:2.0.0"
+  dependencies:
+    ajv: ^7.1.0
+    avsc: ">= 5.4.13 < 6"
+    mappersmith: ">= 2.30.1 < 3"
+    protobufjs: ^6.10.1
+  checksum: ce6859b108039e3a96bbd1f77e7cbbb714398bb93177563dfece751eb5519eaaeb12f029e27bdfb0e7404ee66102f64a396f305628b3be09f0e4260292b211d3
   languageName: node
   linkType: hard
 
@@ -1860,13 +1873,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/laminar-cli@^0.9.4, @ovotech/laminar-cli@workspace:packages/laminar-cli":
+"@ovotech/json-schema@npm:^0.5.3, @ovotech/json-schema@npm:^0.5.4":
+  version: 0.5.4
+  resolution: "@ovotech/json-schema@npm:0.5.4"
+  dependencies:
+    node-fetch: ^2.6.1
+    yaml: ^1.10.0
+  checksum: d9151e4bcb91e61b1b6c877a2c9908bbc0c674db13b399a1ae0695c681e69b70fe0af95d439ebce2b1612a4fe147f3fe4531f52e22599ddaf8257a54da25f2f8
+  languageName: node
+  linkType: hard
+
+"@ovotech/laminar-cli@^0.11.0, @ovotech/laminar-cli@workspace:packages/laminar-cli":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-cli@workspace:packages/laminar-cli"
   dependencies:
     "@ikerin/build-readme": ^1.0.4
     "@ovotech/json-schema": ^0.6.0
-    "@ovotech/laminar": ^0.10.1
+    "@ovotech/laminar": ^0.11.0
     "@ovotech/ts-compose": ^0.16.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
@@ -1891,12 +1914,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@ovotech/laminar-cli@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "@ovotech/laminar-cli@npm:0.9.4"
+  dependencies:
+    "@ovotech/json-schema": ^0.5.4
+    "@ovotech/ts-compose": ^0.16.0
+    chalk: ^4.0.0
+    commander: ^6.2.0
+    openapi-schemas: ^2.0.3
+    openapi3-ts: ^2.0.0
+  bin:
+    laminar: scripts/laminar
+  checksum: 9158b5d1e08bb83bf3105465d7e0e0b1cc308c281a7835ae77ad9d0733a32293a389d192e24f9fb350a3f3f5828c0360a9845094e67d6489cef99492e1932167
+  languageName: node
+  linkType: hard
+
 "@ovotech/laminar-handlebars@workspace:packages/laminar-handlebars":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-handlebars@workspace:packages/laminar-handlebars"
   dependencies:
     "@ikerin/build-readme": ^1.0.4
-    "@ovotech/laminar": ^0.10.1
+    "@ovotech/laminar": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
     "@typescript-eslint/eslint-plugin": ^4.9.0
@@ -1915,14 +1954,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/laminar-jwt@^0.9.2, @ovotech/laminar-jwt@workspace:packages/laminar-jwt":
+"@ovotech/laminar-jwt@^0.11.0, @ovotech/laminar-jwt@workspace:packages/laminar-jwt":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-jwt@workspace:packages/laminar-jwt"
   dependencies:
     "@ikerin/build-readme": ^1.0.4
     "@ovotech/json-schema": ^0.6.0
-    "@ovotech/laminar": ^0.10.1
-    "@ovotech/laminar-cli": ^0.9.4
+    "@ovotech/laminar": ^0.11.0
+    "@ovotech/laminar-cli": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/jsonwebtoken": ^8.5.0
     "@types/lru-cache": ^5.1.0
@@ -1947,6 +1986,49 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@ovotech/laminar-jwt@npm:^0.9.2":
+  version: 0.9.3
+  resolution: "@ovotech/laminar-jwt@npm:0.9.3"
+  dependencies:
+    "@ovotech/json-schema": ^0.5.3
+    axios: ^0.21.0
+    jsonwebtoken: ^8.5.1
+    lru-cache: ^6.0.0
+  peerDependencies:
+    "@ovotech/laminar": "*"
+  checksum: 311ef128955d0d009c54e8b87e23bae0f1f82e3e861b6014ede349afd858df8cc90297ed0fca7fd152bb739f6a2bef24d05747d8b6178f68c02ac4e1aab71e4e
+  languageName: node
+  linkType: hard
+
+"@ovotech/laminar-kafka@workspace:packages/laminar-kafka":
+  version: 0.0.0-use.local
+  resolution: "@ovotech/laminar-kafka@workspace:packages/laminar-kafka"
+  dependencies:
+    "@ikerin/build-readme": ^1.0.4
+    "@kafkajs/confluent-schema-registry": ^2.0.0
+    "@ovotech/laminar": ^0.11.0
+    "@ovotech/laminar-cli": ^0.9.4
+    "@types/jest": ^26.0.16
+    "@types/node": ^14.14.10
+    "@types/uuid": ^8.3.0
+    "@typescript-eslint/eslint-plugin": ^4.9.0
+    "@typescript-eslint/parser": ^4.9.0
+    eslint: ^7.14.0
+    eslint-config-prettier: ^6.15.0
+    jest: ^26.6.3
+    kafkajs: ^1.15.0
+    prettier: ^2.2.1
+    ts-jest: ^26.4.4
+    ts-retry-promise: ^0.6.0
+    typescript: ^4.1.2
+    uuid: ^8.3.0
+  peerDependencies:
+    "@kafkajs/confluent-schema-registry": ^2.0.0
+    "@ovotech/laminar": "*"
+    kafkajs: ^1.0.0
+  languageName: unknown
+  linkType: soft
+
 "@ovotech/laminar-performance-testing@workspace:performance":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-performance-testing@workspace:performance"
@@ -1960,7 +2042,58 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/laminar@^0.10.1, @ovotech/laminar@workspace:packages/laminar":
+"@ovotech/laminar-pg@^0.1.0, @ovotech/laminar-pg@workspace:packages/laminar-pg":
+  version: 0.0.0-use.local
+  resolution: "@ovotech/laminar-pg@workspace:packages/laminar-pg"
+  dependencies:
+    "@ikerin/build-readme": ^1.0.4
+    "@ovotech/laminar": ^0.11.0
+    "@types/jest": ^26.0.16
+    "@types/node": ^14.14.10
+    "@types/pg": ^7.14.9
+    "@typescript-eslint/eslint-plugin": ^4.9.0
+    "@typescript-eslint/parser": ^4.9.0
+    axios: ^0.21.0
+    eslint: ^7.14.0
+    eslint-config-prettier: ^6.15.0
+    jest: ^26.6.3
+    pg: ^8.5.1
+    prettier: ^2.2.1
+    ts-jest: ^26.4.4
+    ts-retry-promise: ^0.6.0
+    typescript: ^4.1.2
+  peerDependencies:
+    "@ovotech/laminar": "*"
+    pg: "*"
+  languageName: unknown
+  linkType: soft
+
+"@ovotech/laminar-queue@workspace:packages/laminar-queue":
+  version: 0.0.0-use.local
+  resolution: "@ovotech/laminar-queue@workspace:packages/laminar-queue"
+  dependencies:
+    "@ikerin/build-readme": ^1.0.4
+    "@ovotech/laminar": ^0.11.0
+    "@types/jest": ^26.0.16
+    "@types/node": ^14.14.10
+    "@typescript-eslint/eslint-plugin": ^4.9.0
+    "@typescript-eslint/parser": ^4.9.0
+    axios: ^0.21.0
+    eslint: ^7.14.0
+    eslint-config-prettier: ^6.15.0
+    jest: ^26.6.3
+    pg-boss: ^4.3.4
+    prettier: ^2.2.1
+    ts-jest: ^26.4.4
+    ts-retry-promise: ^0.6.0
+    typescript: ^4.1.2
+  peerDependencies:
+    "@ovotech/laminar": "*"
+    pg-boss: "*"
+  languageName: unknown
+  linkType: soft
+
+"@ovotech/laminar@^0.11.0, @ovotech/laminar@workspace:packages/laminar":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar@workspace:packages/laminar"
   dependencies:
@@ -2012,6 +2145,79 @@ __metadata:
     typescript: ^4.1.2
   languageName: unknown
   linkType: soft
+
+"@protobufjs/aspromise@npm:^1.1.1, @protobufjs/aspromise@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@protobufjs/aspromise@npm:1.1.2"
+  checksum: 83ced0798abea0c30ed07dc6338605ddfd8dc7b8b15d84586d155980f90476a8f049e7695d7de79d35dcada29a01710d24d0aa2104e8466412c0cbc6c14d9173
+  languageName: node
+  linkType: hard
+
+"@protobufjs/base64@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@protobufjs/base64@npm:1.1.2"
+  checksum: ae9e84aaf69f5e6aedfb346153c236e6f6ca0e97612c680251fc3e48e6c60746ed553062ea97fdde9f0592fb085e467b9de377a848a224d990a4f0a5e7212fa4
+  languageName: node
+  linkType: hard
+
+"@protobufjs/codegen@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "@protobufjs/codegen@npm:2.0.4"
+  checksum: a05d5f8892eeb7696c73f7585a9c3a89eea293b37a582cd1a5d650908393287b0ca068dc55e7bbecd3ec146b2f61afaff2f61e3cb488ea67b900114247b1b717
+  languageName: node
+  linkType: hard
+
+"@protobufjs/eventemitter@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@protobufjs/eventemitter@npm:1.1.0"
+  checksum: 32a84e33f191a3ddc0ca4f8975484c0afaf10c2b27e0cb2008dabe267791420447c25d77b1409595aa6be660a908ada306d40cccb675aee7912c4bc82a9f512e
+  languageName: node
+  linkType: hard
+
+"@protobufjs/fetch@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@protobufjs/fetch@npm:1.1.0"
+  dependencies:
+    "@protobufjs/aspromise": ^1.1.1
+    "@protobufjs/inquire": ^1.1.0
+  checksum: d682e5d8a164d096d71b05866eb0852d4e1fc024900e3af96a57d9f6396402b96d81b7bd77cda6b983ebcbfd715ec12dd1c1582760b7658a9438c530f5f6f4db
+  languageName: node
+  linkType: hard
+
+"@protobufjs/float@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@protobufjs/float@npm:1.0.2"
+  checksum: eee7278de2c4550fac7ec156cba3d4227226a08470426cba6eb04671be9aea035bdf79b7839fdad624171451a4d66e1cdf01e4980e57223ba4f1e34ccd187563
+  languageName: node
+  linkType: hard
+
+"@protobufjs/inquire@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@protobufjs/inquire@npm:1.1.0"
+  checksum: 3541518cca945c2a95e2dcacacdc243fd64abc4cc51c2b691bd0534bd8a1b945c90368f57ba3fed1d6632e1e68d6dac6a7761738f89ccf60bb352b6624c8aacb
+  languageName: node
+  linkType: hard
+
+"@protobufjs/path@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@protobufjs/path@npm:1.1.2"
+  checksum: 22f10c5c22e5b3f7bb3e7f0af15bafa1fe42bad3705f27448464c6221d956d10c6c9dad96a48650ec5acba7b072a64ab94da52e21f00e6cd9612da761f02b845
+  languageName: node
+  linkType: hard
+
+"@protobufjs/pool@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@protobufjs/pool@npm:1.1.0"
+  checksum: 5fc4af9e069b58cc39cfd6fded3bfe3de7113d35c1bc3458bfc6699fa42e90c2c6d96b5ae7c274470f272135122a9ab94c708eacfd81e1b0a593917841b07ec4
+  languageName: node
+  linkType: hard
+
+"@protobufjs/utf8@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@protobufjs/utf8@npm:1.1.0"
+  checksum: 5b3fa7425fe2852f6e5643d9a53c6cfb4491630667176c0fc35ddb7a71101559241bafb6b80486144ed75da3d3624095d037c802b578dbdb4cce131cf1bcb7cf
+  languageName: node
+  linkType: hard
 
 "@sinonjs/commons@npm:^1.7.0":
   version: 1.8.1
@@ -2192,6 +2398,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/long@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@types/long@npm:4.0.1"
+  checksum: ed2a125330dbf2b425b2e58b1e1151a37106ceeec973f9f191fba0bda83ed00fae6d858254022e8b6e7165fec5f0c3872b7cb5f425c753383fed54699fb63b38
+  languageName: node
+  linkType: hard
+
 "@types/lru-cache@npm:^5.1.0":
   version: 5.1.0
   resolution: "@types/lru-cache@npm:5.1.0"
@@ -2234,6 +2447,13 @@ __metadata:
   version: 14.0.27
   resolution: "@types/node@npm:14.0.27"
   checksum: 54ecf408eb94f44685e12ef395d8d9d5789cb9e209f171153b6b951272af6b8da099778d09d66454aa5d35ce246f3922ebd7476ed768bf3bd4267306c12a6703
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^13.7.0":
+  version: 13.13.46
+  resolution: "@types/node@npm:13.13.46"
+  checksum: 3786ac15b21b489c0c807d769edf64f732788b3e8f7f66ac04d63580c658fbafd5c9352c958199a37b2393c6132b16f4bbc43ced25bf4bcb90cbae9d75e61f17
   languageName: node
   linkType: hard
 
@@ -2297,6 +2517,13 @@ __metadata:
   version: 4.0.0
   resolution: "@types/tough-cookie@npm:4.0.0"
   checksum: 5a0cccc6d073b84dbb48d603e692b55ac30cea1653a7fc813e97a3bcaa9edd97c703c15727378d632e416a90178e6da657151eba8175cbb201a9a98de22ac3a8
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^8.3.0":
+  version: 8.3.0
+  resolution: "@types/uuid@npm:8.3.0"
+  checksum: 620985aed8fdb4aed153daca5235f4303457a67a4d181efac0021712eabd9edd7e88895f79730c0e651effde7633b1b61e49a81519ac8d4e75019d2ac9b6412f
   languageName: node
   linkType: hard
 
@@ -2536,6 +2763,18 @@ __metadata:
     json-schema-traverse: ^0.4.1
     uri-js: ^4.2.2
   checksum: d9ec559bd71be2479b91d293a5b14c96d60ba89f471d8b3369443830b6c72954bdc38f480194413f45f46fc250c8bd769275584ffde033aeb3c56cc218868d95
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^7.1.0":
+  version: 7.2.1
+  resolution: "ajv@npm:7.2.1"
+  dependencies:
+    fast-deep-equal: ^3.1.1
+    json-schema-traverse: ^1.0.0
+    require-from-string: ^2.0.2
+    uri-js: ^4.2.2
+  checksum: 34044f60ca45ef8ec850f5d09e4db340bb870639efc1694d54bec7ff4b06b12b077872949223f703d1507bbf3d553b59752f4c327ffcd25726ee27919d586037
   languageName: node
   linkType: hard
 
@@ -2815,6 +3054,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"avsc@npm:>= 5.4.13 < 6":
+  version: 5.5.3
+  resolution: "avsc@npm:5.5.3"
+  checksum: 78a29387e6213a9d3790811184b64cab05ae2fcc99212c187aec1c663c42f7a71599f91ca9b548a16dce6641fb37a3a609f8b33b4d8d6641d7c4a639474cc737
+  languageName: node
+  linkType: hard
+
 "aws-sign2@npm:~0.7.0":
   version: 0.7.0
   resolution: "aws-sign2@npm:0.7.0"
@@ -2977,7 +3223,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bluebird@npm:^3.5.1, bluebird@npm:^3.5.3, bluebird@npm:^3.5.5":
+"bluebird@npm:^3.5.1, bluebird@npm:^3.5.3, bluebird@npm:^3.5.5, bluebird@npm:^3.7.2":
   version: 3.7.2
   resolution: "bluebird@npm:3.7.2"
   checksum: 4f2288662f3d4eadbb82d4daa4a7d7976a28fa3c7eb4102c9b4033b03e5be4574ba123ac52a7c103cde4cb7b2d2afc1dbe41817ca15a29ff21ecd258d0286047
@@ -6605,6 +6851,13 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"json-schema-traverse@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "json-schema-traverse@npm:1.0.0"
+  checksum: 7a230bcd927f5bf41b33a822121730a225ac287e14d7e8abc94f4cbc36743f6e09455549abaada7029844f7e88a9fd693a023ec76296df17488746acb1e5a388
+  languageName: node
+  linkType: hard
+
 "json-schema@npm:0.2.3":
   version: 0.2.3
   resolution: "json-schema@npm:0.2.3"
@@ -6704,6 +6957,13 @@ fsevents@^2.1.2:
     jwa: ^1.4.1
     safe-buffer: ^5.0.1
   checksum: 3990b26ebb6f368bf6c53bf580cd327f207052adedeb7900dde665e143fff9ea5d96d0b4282e85a631a6e3af76ada281a1ccc450b1916d579d07e9d36b564a19
+  languageName: node
+  linkType: hard
+
+"kafkajs@npm:^1.15.0":
+  version: 1.15.0
+  resolution: "kafkajs@npm:1.15.0"
+  checksum: 0633502e7ea5244aa5a5731d5bf5af834ec92ea2c1659cb61085b9471dc34d5e8cfc991a67d9c2870964bb463a7bfba7d337fda0745600a16ab9353e317b1753
   languageName: node
   linkType: hard
 
@@ -7021,6 +7281,13 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"long@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "long@npm:4.0.0"
+  checksum: 9cebc1ee8b9ea15278c977f61250ac41becdf7216104905f0d198c147ed2a7a090a2d83bb212878d3dc3ccb0199e6428862f848ec4b0ecfeab4dfe24eccf21b3
+  languageName: node
+  linkType: hard
+
 "loud-rejection@npm:^1.0.0":
   version: 1.6.0
   resolution: "loud-rejection@npm:1.6.0"
@@ -7160,6 +7427,13 @@ fsevents@^2.1.2:
   dependencies:
     object-visit: ^1.0.0
   checksum: 9e85e6d802183927229d9ad04d70a0e0c7225451994605674d3ed4e4a21f817b4d9aba42a775e98078ffe47cf67df44a50eb07f965f14afead5015c8692503bd
+  languageName: node
+  linkType: hard
+
+"mappersmith@npm:>= 2.30.1 < 3":
+  version: 2.34.0
+  resolution: "mappersmith@npm:2.34.0"
+  checksum: a541e52db81cce6b1b662c4abe6f552e10388b243e2088d6189ebc190d6d1d6c24c8c8c04a516e7e7dc0557df0270b588c0044888b68a5fd0567e07399df6e96
   languageName: node
   linkType: hard
 
@@ -8324,6 +8598,17 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
+"pg-boss@npm:^4.3.4":
+  version: 4.3.4
+  resolution: "pg-boss@npm:4.3.4"
+  dependencies:
+    bluebird: ^3.7.2
+    pg: ^8.0.3
+    uuid: ^8.0.0
+  checksum: 5464fdefee63d5ba228c3dba37688489fa1131a9a54785715d631f25b5341c4196e649c91104643df35062b1e72bd53e385bd45445c8aa8fd87ff32458708cf3
+  languageName: node
+  linkType: hard
+
 "pg-connection-string@npm:^2.4.0":
   version: 2.4.0
   resolution: "pg-connection-string@npm:2.4.0"
@@ -8367,7 +8652,7 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
-"pg@npm:^8.5.1":
+"pg@npm:^8.0.3, pg@npm:^8.5.1":
   version: 8.5.1
   resolution: "pg@npm:8.5.1"
   dependencies:
@@ -8626,6 +8911,30 @@ fsevents@^2.1.2:
   version: 1.2.4
   resolution: "proto-list@npm:1.2.4"
   checksum: e722a11c66837cab0d5b81dd3f18717b73ea068fad0ceaf71d856e82167699c632201d0a1793ea48c997f1ac8544e9af89debc5cbd389b639370bc1adfb3abb4
+  languageName: node
+  linkType: hard
+
+"protobufjs@npm:^6.10.1":
+  version: 6.10.2
+  resolution: "protobufjs@npm:6.10.2"
+  dependencies:
+    "@protobufjs/aspromise": ^1.1.2
+    "@protobufjs/base64": ^1.1.2
+    "@protobufjs/codegen": ^2.0.4
+    "@protobufjs/eventemitter": ^1.1.0
+    "@protobufjs/fetch": ^1.1.0
+    "@protobufjs/float": ^1.0.2
+    "@protobufjs/inquire": ^1.1.0
+    "@protobufjs/path": ^1.1.2
+    "@protobufjs/pool": ^1.1.0
+    "@protobufjs/utf8": ^1.1.0
+    "@types/long": ^4.0.1
+    "@types/node": ^13.7.0
+    long: ^4.0.0
+  bin:
+    pbjs: bin/pbjs
+    pbts: bin/pbts
+  checksum: 09d629236243465a501b390742e3d0c4429a8801539116b4a3e33a833a3f95359a03adf55121fbe42323e5128e4689a9727efd5293164384104dc4057bf720a5
   languageName: node
   linkType: hard
 
@@ -9013,6 +9322,13 @@ fsevents@^2.1.2:
   version: 2.1.1
   resolution: "require-directory@npm:2.1.1"
   checksum: f495d02d89c385af2df4b26f0216ece091e99710d358d0ede424126c476d0c639e8bd77dcd237c00a6a5658f3d862e7513164f8c280263052667d06df830eb23
+  languageName: node
+  linkType: hard
+
+"require-from-string@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "require-from-string@npm:2.0.2"
+  checksum: 74fc30353e5d526879b28d480c3f25ca95e9c22dfe7ac10ca0650e03407b3aeed352ff8ca706ea145617b6482a582e4a3bd65a884fc50133ebe586d47fa085c6
   languageName: node
   linkType: hard
 
@@ -10539,7 +10855,7 @@ typescript@^4.1.2:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.3.0":
+"uuid@npm:^8.0.0, uuid@npm:^8.3.0":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:

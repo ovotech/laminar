@@ -1,6 +1,6 @@
-import { HttpMiddleware, HttpApp, textForbidden, textOk, HttpServer } from '@ovotech/laminar';
+import { HttpMiddleware, HttpApp, textForbidden, textOk, HttpServer, start } from '@ovotech/laminar';
 
-const auth: HttpMiddleware = (next) => (req) =>
+const auth: HttpMiddleware = (next) => async (req) =>
   req.headers.authorization === 'Me' ? next(req) : textForbidden('Not Me');
 
 const log: HttpMiddleware = (next) => (req) => {
@@ -10,7 +10,8 @@ const log: HttpMiddleware = (next) => (req) => {
   return response;
 };
 
-const app: HttpApp = (req) => textOk(req.body);
+const app: HttpApp = async (req) => textOk(req.body);
 
 const server = new HttpServer({ app: log(auth(app)) });
-server.start().then((server) => console.log(server.describe()));
+
+start([server], console);

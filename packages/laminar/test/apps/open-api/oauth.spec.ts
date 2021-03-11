@@ -11,7 +11,7 @@ const tokenSecret = 'oauth2-token';
 describe('Oauth', () => {
   it('Should implement oauth2 security', async () => {
     const authorizationServer = new HttpServer({
-      app: ({ query: { redirectUrl, original, scopes } }) => {
+      app: async ({ query: { redirectUrl, original, scopes } }) => {
         const code = sign({ email: 'me@example.com', scopes }, globalSecret);
         const url = new URL(redirectUrl);
         url.search = new URLSearchParams({ code, original }).toString();
@@ -42,7 +42,7 @@ describe('Oauth', () => {
       },
       paths: {
         '/oauth.access': {
-          get: ({ query: { code, original } }) => {
+          get: async ({ query: { code, original } }) => {
             try {
               const user = verify(code, globalSecret);
               return setCookie({ auth: sign(user, tokenSecret) }, redirect(original));
@@ -52,8 +52,8 @@ describe('Oauth', () => {
           },
         },
         '/user': {
-          post: ({ body }) => jsonOk({ result: 'ok', user: body }),
-          get: ({ authInfo }) => jsonOk({ email: 'me@example.com', authInfo }),
+          post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
+          get: async ({ authInfo }) => jsonOk({ email: 'me@example.com', authInfo }),
         },
       },
     };

@@ -1,11 +1,12 @@
-import { start, stop } from '@ovotech/laminar';
+import { HttpServer, start, stop } from '@ovotech/laminar';
 import { createApp } from '../src/app';
 import { sign } from 'jsonwebtoken';
 import axios from 'axios';
 import { Pool } from 'pg';
+import { PgPoolService } from '@ovotech/laminar-pg';
 
 const secret = 'TEST_SECRET';
-const logger = { info: jest.fn(), error: jest.fn() };
+const logger = { info: jest.fn(), error: jest.fn(), warn: jest.fn(), log: jest.fn(), debug: jest.fn() };
 const port = 4400;
 const hostname = 'localhost';
 const connectionString = 'postgres://example-admin:example-pass@localhost:5432/example';
@@ -17,10 +18,10 @@ const client = axios.create({
 
 describe('Petstore Integration Tests', () => {
   it('Should work as a petstore', async () => {
-    const pool = new Pool({ connectionString });
-    const petstore = await createApp({ secret, pool, logger, port, hostname });
-    await pool.query('DELETE FROM pets');
-    await start(petstore);
+    const pool = new PgPoolService(new Pool({ connectionString }));
+    const petstore = new HttpServer({ app: await createApp({ secret, pool, logger }), port, hostname });
+    await pool.pg.query('DELETE FROM pets');
+    await start([pool, petstore], logger);
 
     try {
       await expect(client.get('/pets')).resolves.toMatchObject({
@@ -82,8 +83,7 @@ describe('Petstore Integration Tests', () => {
         data: [],
       });
     } finally {
-      await pool.end();
-      await stop(petstore);
+      await stop([pool, petstore], logger);
     }
   });
 });

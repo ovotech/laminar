@@ -1,17 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Types Content Test api-with-examples.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export type ResponseGet = ResponseOapi<unknown, 200, \\"application/json\\"> | ResponseOapi<unknown, 300, \\"application/json\\">;
 
-export type PathGet<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseGet | Promise<ResponseGet>;
+export type PathGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseGet>;
 
 export type ResponseV2Get = ResponseOapi<unknown, 200, \\"application/json\\"> | ResponseOapi<unknown, 203, \\"application/json\\">;
 
-export type PathV2Get<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseV2Get | Promise<ResponseV2Get>;
+export type PathV2Get<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseV2Get>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -27,9 +27,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test balance-service.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
 
 export type ResponseInternalStatusGet = ResponseOapi<unknown, 200, string>;
 
@@ -44,7 +44,7 @@ export interface RequestInternalStatusGet<TAuthInfo> extends RequestOapi {
 /**
  * Returns 200 if the application is up. It does not do deep check. Always gives back 200.
  */
-export type PathInternalStatusGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestInternalStatusGet<TAuthInfo> & R) => ResponseInternalStatusGet | Promise<ResponseInternalStatusGet>;
+export type PathInternalStatusGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestInternalStatusGet<TAuthInfo> & R) => Promise<ResponseInternalStatusGet>;
 
 export type ResponseInternalSwaggeryamlGet = ResponseOapi<unknown, 200, string>;
 
@@ -55,7 +55,7 @@ export interface RequestInternalSwaggeryamlGet<TAuthInfo> extends RequestOapi {
     authInfo: TAuthInfo;
 }
 
-export type PathInternalSwaggeryamlGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestInternalSwaggeryamlGet<TAuthInfo> & R) => ResponseInternalSwaggeryamlGet | Promise<ResponseInternalSwaggeryamlGet>;
+export type PathInternalSwaggeryamlGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestInternalSwaggeryamlGet<TAuthInfo> & R) => Promise<ResponseInternalSwaggeryamlGet>;
 
 export interface BalanceSummaryHttpResponse {
     balance?: number;
@@ -98,7 +98,7 @@ export interface RequestApiV2AccountsAccountIdBalanceGet<TAuthInfo> extends Requ
 /**
  * Returns the balance
  */
-export type PathApiV2AccountsAccountIdBalanceGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV2AccountsAccountIdBalanceGet<TAuthInfo> & R) => ResponseApiV2AccountsAccountIdBalanceGet | Promise<ResponseApiV2AccountsAccountIdBalanceGet>;
+export type PathApiV2AccountsAccountIdBalanceGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV2AccountsAccountIdBalanceGet<TAuthInfo> & R) => Promise<ResponseApiV2AccountsAccountIdBalanceGet>;
 
 export interface TransactionHistoryHttpResponseV2 {
     summary?: TransactionHistorySummary;
@@ -175,7 +175,7 @@ export interface RequestApiV2AccountsAccountIdTransactionsGet<TAuthInfo> extends
 /**
  * Returns the transaction history
  */
-export type PathApiV2AccountsAccountIdTransactionsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV2AccountsAccountIdTransactionsGet<TAuthInfo> & R) => ResponseApiV2AccountsAccountIdTransactionsGet | Promise<ResponseApiV2AccountsAccountIdTransactionsGet>;
+export type PathApiV2AccountsAccountIdTransactionsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV2AccountsAccountIdTransactionsGet<TAuthInfo> & R) => Promise<ResponseApiV2AccountsAccountIdTransactionsGet>;
 
 export interface AdjustBalanceRequest {
     transactionId?: string;
@@ -214,7 +214,7 @@ export interface RequestApiV2AccountsAccountIdAdjustbalancePost<TAuthInfo> exten
 /**
  * Returns with the adjusted balance
  */
-export type PathApiV2AccountsAccountIdAdjustbalancePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV2AccountsAccountIdAdjustbalancePost<TAuthInfo> & R) => ResponseApiV2AccountsAccountIdAdjustbalancePost | Promise<ResponseApiV2AccountsAccountIdAdjustbalancePost>;
+export type PathApiV2AccountsAccountIdAdjustbalancePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV2AccountsAccountIdAdjustbalancePost<TAuthInfo> & R) => Promise<ResponseApiV2AccountsAccountIdAdjustbalancePost>;
 
 export type ResponseApiV3AccountsAccountIdBalanceGet = ResponseOapi<BalanceSummaryHttpResponse, 200, \\"application/json\\"> | ResponseOapi<HttpErrorResponse, 400, \\"application/json\\"> | ResponseOapi<unknown, 404, string> | ResponseOapi<HttpErrorResponse, 500, \\"application/json\\">;
 
@@ -235,7 +235,7 @@ export interface RequestApiV3AccountsAccountIdBalanceGet<TAuthInfo> extends Requ
 /**
  * Returns the balance
  */
-export type PathApiV3AccountsAccountIdBalanceGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV3AccountsAccountIdBalanceGet<TAuthInfo> & R) => ResponseApiV3AccountsAccountIdBalanceGet | Promise<ResponseApiV3AccountsAccountIdBalanceGet>;
+export type PathApiV3AccountsAccountIdBalanceGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV3AccountsAccountIdBalanceGet<TAuthInfo> & R) => Promise<ResponseApiV3AccountsAccountIdBalanceGet>;
 
 export interface TransactionHistoryHttpResponseV3 {
     summary?: TransactionHistorySummary;
@@ -307,7 +307,7 @@ export interface RequestApiV3AccountsAccountIdTransactionsGet<TAuthInfo> extends
 /**
  * Returns the transaction history
  */
-export type PathApiV3AccountsAccountIdTransactionsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV3AccountsAccountIdTransactionsGet<TAuthInfo> & R) => ResponseApiV3AccountsAccountIdTransactionsGet | Promise<ResponseApiV3AccountsAccountIdTransactionsGet>;
+export type PathApiV3AccountsAccountIdTransactionsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV3AccountsAccountIdTransactionsGet<TAuthInfo> & R) => Promise<ResponseApiV3AccountsAccountIdTransactionsGet>;
 
 export type ResponseApiV3AccountsAccountIdAdjustbalancePost = ResponseOapi<BalanceSummaryHttpResponse, 200, \\"application/json\\"> | ResponseOapi<HttpErrorResponse, 400, \\"application/json\\"> | ResponseOapi<unknown, 404, string> | ResponseOapi<HttpErrorResponse, 500, \\"application/json\\">;
 
@@ -329,7 +329,7 @@ export interface RequestApiV3AccountsAccountIdAdjustbalancePost<TAuthInfo> exten
 /**
  * Returns with the adjusted balance
  */
-export type PathApiV3AccountsAccountIdAdjustbalancePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV3AccountsAccountIdAdjustbalancePost<TAuthInfo> & R) => ResponseApiV3AccountsAccountIdAdjustbalancePost | Promise<ResponseApiV3AccountsAccountIdAdjustbalancePost>;
+export type PathApiV3AccountsAccountIdAdjustbalancePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestApiV3AccountsAccountIdAdjustbalancePost<TAuthInfo> & R) => Promise<ResponseApiV3AccountsAccountIdAdjustbalancePost>;
 
 export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> extends OapiConfig<R> {
     paths: {
@@ -389,9 +389,9 @@ export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo 
 `;
 
 exports[`Types Content Test cloudtasks.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
 
 export interface Empty {
     [key: string]: unknown;
@@ -470,7 +470,7 @@ export interface RequestV2NameDelete<TAuthInfo> extends RequestOapi {
  * cannot be deleted if it has executed successfully or permanently
  * failed.
  */
-export type PathV2NameDelete<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameDelete<TAuthInfo> & R) => ResponseV2NameDelete | Promise<ResponseV2NameDelete>;
+export type PathV2NameDelete<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameDelete<TAuthInfo> & R) => Promise<ResponseV2NameDelete>;
 
 export interface Task {
     appEngineHttpRequest?: AppEngineHttpRequest;
@@ -836,7 +836,7 @@ export interface RequestV2NameGet<TAuthInfo> extends RequestOapi {
 /**
  * Gets a task.
  */
-export type PathV2NameGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameGet<TAuthInfo> & R) => ResponseV2NameGet | Promise<ResponseV2NameGet>;
+export type PathV2NameGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameGet<TAuthInfo> & R) => Promise<ResponseV2NameGet>;
 
 export interface Queue {
     appEngineRoutingOverride?: AppEngineRouting;
@@ -1187,7 +1187,7 @@ export interface RequestV2NamePatch<TAuthInfo> extends RequestOapi {
  * queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
  * this method.
  */
-export type PathV2NamePatch<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamePatch<TAuthInfo> & R) => ResponseV2NamePatch | Promise<ResponseV2NamePatch>;
+export type PathV2NamePatch<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamePatch<TAuthInfo> & R) => Promise<ResponseV2NamePatch>;
 
 export interface ListLocationsResponse {
     /**
@@ -1306,7 +1306,7 @@ export interface RequestV2NameLocationsGet<TAuthInfo> extends RequestOapi {
 /**
  * Lists information about the supported locations for this service.
  */
-export type PathV2NameLocationsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameLocationsGet<TAuthInfo> & R) => ResponseV2NameLocationsGet | Promise<ResponseV2NameLocationsGet>;
+export type PathV2NameLocationsGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameLocationsGet<TAuthInfo> & R) => Promise<ResponseV2NameLocationsGet>;
 
 export interface PauseQueueRequest {
     [key: string]: unknown;
@@ -1390,7 +1390,7 @@ export interface RequestV2NamepausePost<TAuthInfo> extends RequestOapi {
  * when the queue is paused. A queue is paused if its
  * state is PAUSED.
  */
-export type PathV2NamepausePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamepausePost<TAuthInfo> & R) => ResponseV2NamepausePost | Promise<ResponseV2NamepausePost>;
+export type PathV2NamepausePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamepausePost<TAuthInfo> & R) => Promise<ResponseV2NamepausePost>;
 
 export interface PurgeQueueRequest {
     [key: string]: unknown;
@@ -1472,7 +1472,7 @@ export interface RequestV2NamepurgePost<TAuthInfo> extends RequestOapi {
  * Purge operations can take up to one minute to take effect. Tasks
  * might be dispatched before the purge takes effect. A purge is irreversible.
  */
-export type PathV2NamepurgePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamepurgePost<TAuthInfo> & R) => ResponseV2NamepurgePost | Promise<ResponseV2NamepurgePost>;
+export type PathV2NamepurgePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamepurgePost<TAuthInfo> & R) => Promise<ResponseV2NamepurgePost>;
 
 export interface ResumeQueueRequest {
     [key: string]: unknown;
@@ -1568,7 +1568,7 @@ export interface RequestV2NameresumePost<TAuthInfo> extends RequestOapi {
  * [Managing Cloud Tasks Scaling
  * Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
  */
-export type PathV2NameresumePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameresumePost<TAuthInfo> & R) => ResponseV2NameresumePost | Promise<ResponseV2NameresumePost>;
+export type PathV2NameresumePost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NameresumePost<TAuthInfo> & R) => Promise<ResponseV2NameresumePost>;
 
 export interface RunTaskRequest {
     /**
@@ -1701,7 +1701,7 @@ export interface RequestV2NamerunPost<TAuthInfo> extends RequestOapi {
  * NOT_FOUND when it is called on a
  * task that has already succeeded or permanently failed.
  */
-export type PathV2NamerunPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamerunPost<TAuthInfo> & R) => ResponseV2NamerunPost | Promise<ResponseV2NamerunPost>;
+export type PathV2NamerunPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2NamerunPost<TAuthInfo> & R) => Promise<ResponseV2NamerunPost>;
 
 export interface ListQueuesResponse {
     /**
@@ -1827,7 +1827,7 @@ export interface RequestV2ParentQueuesGet<TAuthInfo> extends RequestOapi {
  *
  * Queues are returned in lexicographical order.
  */
-export type PathV2ParentQueuesGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentQueuesGet<TAuthInfo> & R) => ResponseV2ParentQueuesGet | Promise<ResponseV2ParentQueuesGet>;
+export type PathV2ParentQueuesGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentQueuesGet<TAuthInfo> & R) => Promise<ResponseV2ParentQueuesGet>;
 
 export type ResponseV2ParentQueuesPost = ResponseOapi<Queue, 200, string>;
 
@@ -1921,7 +1921,7 @@ export interface RequestV2ParentQueuesPost<TAuthInfo> extends RequestOapi {
  * queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
  * this method.
  */
-export type PathV2ParentQueuesPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentQueuesPost<TAuthInfo> & R) => ResponseV2ParentQueuesPost | Promise<ResponseV2ParentQueuesPost>;
+export type PathV2ParentQueuesPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentQueuesPost<TAuthInfo> & R) => Promise<ResponseV2ParentQueuesPost>;
 
 export interface ListTasksResponse {
     /**
@@ -2060,7 +2060,7 @@ export interface RequestV2ParentTasksGet<TAuthInfo> extends RequestOapi {
  * The tasks may be returned in any order. The ordering may change at any
  * time.
  */
-export type PathV2ParentTasksGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentTasksGet<TAuthInfo> & R) => ResponseV2ParentTasksGet | Promise<ResponseV2ParentTasksGet>;
+export type PathV2ParentTasksGet<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentTasksGet<TAuthInfo> & R) => Promise<ResponseV2ParentTasksGet>;
 
 export interface CreateTaskRequest {
     /**
@@ -2158,7 +2158,7 @@ export interface RequestV2ParentTasksPost<TAuthInfo> extends RequestOapi {
  *
  * * The maximum task size is 100KB.
  */
-export type PathV2ParentTasksPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentTasksPost<TAuthInfo> & R) => ResponseV2ParentTasksPost | Promise<ResponseV2ParentTasksPost>;
+export type PathV2ParentTasksPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ParentTasksPost<TAuthInfo> & R) => Promise<ResponseV2ParentTasksPost>;
 
 export interface GetIamPolicyRequest {
     options?: GetPolicyOptions;
@@ -2347,7 +2347,7 @@ export interface RequestV2ResourcegetIamPolicyPost<TAuthInfo> extends RequestOap
  *
  * * \`cloudtasks.queues.getIamPolicy\`
  */
-export type PathV2ResourcegetIamPolicyPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ResourcegetIamPolicyPost<TAuthInfo> & R) => ResponseV2ResourcegetIamPolicyPost | Promise<ResponseV2ResourcegetIamPolicyPost>;
+export type PathV2ResourcegetIamPolicyPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ResourcegetIamPolicyPost<TAuthInfo> & R) => Promise<ResponseV2ResourcegetIamPolicyPost>;
 
 export interface SetIamPolicyRequest {
     policy?: Policy;
@@ -2440,7 +2440,7 @@ export interface RequestV2ResourcesetIamPolicyPost<TAuthInfo> extends RequestOap
  *
  * * \`cloudtasks.queues.setIamPolicy\`
  */
-export type PathV2ResourcesetIamPolicyPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ResourcesetIamPolicyPost<TAuthInfo> & R) => ResponseV2ResourcesetIamPolicyPost | Promise<ResponseV2ResourcesetIamPolicyPost>;
+export type PathV2ResourcesetIamPolicyPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ResourcesetIamPolicyPost<TAuthInfo> & R) => Promise<ResponseV2ResourcesetIamPolicyPost>;
 
 export interface TestIamPermissionsRequest {
     /**
@@ -2540,7 +2540,7 @@ export interface RequestV2ResourcetestIamPermissionsPost<TAuthInfo> extends Requ
  * UIs and command-line tools, not for authorization checking. This operation
  * may \\"fail open\\" without warning.
  */
-export type PathV2ResourcetestIamPermissionsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ResourcetestIamPermissionsPost<TAuthInfo> & R) => ResponseV2ResourcetestIamPermissionsPost | Promise<ResponseV2ResourcetestIamPermissionsPost>;
+export type PathV2ResourcetestIamPermissionsPost<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (req: RequestV2ResourcetestIamPermissionsPost<TAuthInfo> & R) => Promise<ResponseV2ResourcetestIamPermissionsPost>;
 
 export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo> extends OapiConfig<R> {
     paths: {
@@ -2749,17 +2749,17 @@ export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo 
 `;
 
 exports[`Types Content Test converter.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export type ResponseWellknownDocsGet = ResponseOapi<unknown, 200, \\"text/html\\">;
 
-export type PathWellknownDocsGet<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseWellknownDocsGet | Promise<ResponseWellknownDocsGet>;
+export type PathWellknownDocsGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownDocsGet>;
 
 export type ResponseWellknownOpenapiyamlGet = ResponseOapi<unknown, 200, \\"text/yaml\\">;
 
-export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseWellknownOpenapiyamlGet | Promise<ResponseWellknownOpenapiyamlGet>;
+export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownOpenapiyamlGet>;
 
 export interface HttpError {
     message?: string;
@@ -2774,7 +2774,7 @@ export interface RequestHtmlPost extends RequestOapi {
     body: any;
 }
 
-export type PathHtmlPost<R extends Empty = Empty> = (req: RequestHtmlPost & R) => ResponseHtmlPost | Promise<ResponseHtmlPost>;
+export type PathHtmlPost<R extends Empty = Empty> = (req: RequestHtmlPost & R) => Promise<ResponseHtmlPost>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -2793,9 +2793,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test link-example.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export interface user {
     username?: string;
@@ -2811,7 +2811,7 @@ export interface Request20UsersUsernameGet extends RequestOapi {
     };
 }
 
-export type Path20UsersUsernameGet<R extends Empty = Empty> = (req: Request20UsersUsernameGet & R) => Response20UsersUsernameGet | Promise<Response20UsersUsernameGet>;
+export type Path20UsersUsernameGet<R extends Empty = Empty> = (req: Request20UsersUsernameGet & R) => Promise<Response20UsersUsernameGet>;
 
 export interface repository {
     slug?: string;
@@ -2827,7 +2827,7 @@ export interface Request20RepositoriesUsernameGet extends RequestOapi {
     };
 }
 
-export type Path20RepositoriesUsernameGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameGet & R) => Response20RepositoriesUsernameGet | Promise<Response20RepositoriesUsernameGet>;
+export type Path20RepositoriesUsernameGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameGet & R) => Promise<Response20RepositoriesUsernameGet>;
 
 export type Response20RepositoriesUsernameSlugGet = ResponseOapi<repository, 200, \\"application/json\\">;
 
@@ -2838,7 +2838,7 @@ export interface Request20RepositoriesUsernameSlugGet extends RequestOapi {
     };
 }
 
-export type Path20RepositoriesUsernameSlugGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugGet & R) => Response20RepositoriesUsernameSlugGet | Promise<Response20RepositoriesUsernameSlugGet>;
+export type Path20RepositoriesUsernameSlugGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugGet & R) => Promise<Response20RepositoriesUsernameSlugGet>;
 
 export interface pullrequest {
     id?: number;
@@ -2860,7 +2860,7 @@ export interface Request20RepositoriesUsernameSlugPullrequestsGet extends Reques
     };
 }
 
-export type Path20RepositoriesUsernameSlugPullrequestsGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugPullrequestsGet & R) => Response20RepositoriesUsernameSlugPullrequestsGet | Promise<Response20RepositoriesUsernameSlugPullrequestsGet>;
+export type Path20RepositoriesUsernameSlugPullrequestsGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugPullrequestsGet & R) => Promise<Response20RepositoriesUsernameSlugPullrequestsGet>;
 
 export type Response20RepositoriesUsernameSlugPullrequestsPidGet = ResponseOapi<pullrequest, 200, \\"application/json\\">;
 
@@ -2872,7 +2872,7 @@ export interface Request20RepositoriesUsernameSlugPullrequestsPidGet extends Req
     };
 }
 
-export type Path20RepositoriesUsernameSlugPullrequestsPidGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugPullrequestsPidGet & R) => Response20RepositoriesUsernameSlugPullrequestsPidGet | Promise<Response20RepositoriesUsernameSlugPullrequestsPidGet>;
+export type Path20RepositoriesUsernameSlugPullrequestsPidGet<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugPullrequestsPidGet & R) => Promise<Response20RepositoriesUsernameSlugPullrequestsPidGet>;
 
 export type Response20RepositoriesUsernameSlugPullrequestsPidMergePost = ResponseOapi<unknown, 204, string>;
 
@@ -2884,7 +2884,7 @@ export interface Request20RepositoriesUsernameSlugPullrequestsPidMergePost exten
     };
 }
 
-export type Path20RepositoriesUsernameSlugPullrequestsPidMergePost<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugPullrequestsPidMergePost & R) => Response20RepositoriesUsernameSlugPullrequestsPidMergePost | Promise<Response20RepositoriesUsernameSlugPullrequestsPidMergePost>;
+export type Path20RepositoriesUsernameSlugPullrequestsPidMergePost<R extends Empty = Empty> = (req: Request20RepositoriesUsernameSlugPullrequestsPidMergePost & R) => Promise<Response20RepositoriesUsernameSlugPullrequestsPidMergePost>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -2912,9 +2912,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test petstore.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export type Pets = Pet[];
 
@@ -2945,11 +2945,11 @@ export interface RequestPetsGet extends RequestOapi {
     };
 }
 
-export type PathPetsGet<R extends Empty = Empty> = (req: RequestPetsGet & R) => ResponsePetsGet | Promise<ResponsePetsGet>;
+export type PathPetsGet<R extends Empty = Empty> = (req: RequestPetsGet & R) => Promise<ResponsePetsGet>;
 
 export type ResponsePetsPost = ResponseOapi<unknown, 201, string> | ResponseOapi<Error, number, \\"application/json\\">;
 
-export type PathPetsPost<R extends Empty = Empty> = (req: RequestOapi & R) => ResponsePetsPost | Promise<ResponsePetsPost>;
+export type PathPetsPost<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponsePetsPost>;
 
 export type ResponsePetsPetIdGet = ResponseOapi<Pets, 200, \\"application/json\\"> | ResponseOapi<Error, number, \\"application/json\\">;
 
@@ -2965,7 +2965,7 @@ export interface RequestPetsPetIdGet extends RequestOapi {
     };
 }
 
-export type PathPetsPetIdGet<R extends Empty = Empty> = (req: RequestPetsPetIdGet & R) => ResponsePetsPetIdGet | Promise<ResponsePetsPetIdGet>;
+export type PathPetsPetIdGet<R extends Empty = Empty> = (req: RequestPetsPetIdGet & R) => Promise<ResponsePetsPetIdGet>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -2982,9 +2982,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test petstore-expanded.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export type Pet = NewPet & {
     id: number;
@@ -3032,7 +3032,7 @@ export interface RequestPetsGet extends RequestOapi {
  * Sed tempus felis lobortis leo pulvinar rutrum. Nam mattis velit nisl, eu condimentum ligula luctus nec. Phasellus semper velit eget aliquet faucibus. In a mattis elit. Phasellus vel urna viverra, condimentum lorem id, rhoncus nibh. Ut pellentesque posuere elementum. Sed a varius odio. Morbi rhoncus ligula libero, vel eleifend nunc tristique vitae. Fusce et sem dui. Aenean nec scelerisque tortor. Fusce malesuada accumsan magna vel tempus. Quisque mollis felis eu dolor tristique, sit amet auctor felis gravida. Sed libero lorem, molestie sed nisl in, accumsan tempor nisi. Fusce sollicitudin massa ut lacinia mattis. Sed vel eleifend lorem. Pellentesque vitae felis pretium, pulvinar elit eu, euismod sapien.
  *
  */
-export type PathPetsGet<R extends Empty = Empty> = (req: RequestPetsGet & R) => ResponsePetsGet | Promise<ResponsePetsGet>;
+export type PathPetsGet<R extends Empty = Empty> = (req: RequestPetsGet & R) => Promise<ResponsePetsGet>;
 
 export type ResponsePetsPost = ResponseOapi<Pet, 200, \\"application/json\\"> | ResponseOapi<Error, number, \\"application/json\\">;
 
@@ -3046,7 +3046,7 @@ export interface RequestPetsPost extends RequestOapi {
 /**
  * Creates a new pet in the store.  Duplicates are allowed
  */
-export type PathPetsPost<R extends Empty = Empty> = (req: RequestPetsPost & R) => ResponsePetsPost | Promise<ResponsePetsPost>;
+export type PathPetsPost<R extends Empty = Empty> = (req: RequestPetsPost & R) => Promise<ResponsePetsPost>;
 
 export type ResponsePetsIdGet = ResponseOapi<Pet, 200, \\"application/json\\"> | ResponseOapi<Error, number, \\"application/json\\">;
 
@@ -3065,7 +3065,7 @@ export interface RequestPetsIdGet extends RequestOapi {
 /**
  * Returns a user based on a single ID, if the user does not have access to the pet
  */
-export type PathPetsIdGet<R extends Empty = Empty> = (req: RequestPetsIdGet & R) => ResponsePetsIdGet | Promise<ResponsePetsIdGet>;
+export type PathPetsIdGet<R extends Empty = Empty> = (req: RequestPetsIdGet & R) => Promise<ResponsePetsIdGet>;
 
 export type ResponsePetsIdDelete = ResponseOapi<unknown, 204, string> | ResponseOapi<Error, number, \\"application/json\\">;
 
@@ -3084,7 +3084,7 @@ export interface RequestPetsIdDelete extends RequestOapi {
 /**
  * deletes a single pet based on the ID supplied
  */
-export type PathPetsIdDelete<R extends Empty = Empty> = (req: RequestPetsIdDelete & R) => ResponsePetsIdDelete | Promise<ResponsePetsIdDelete>;
+export type PathPetsIdDelete<R extends Empty = Empty> = (req: RequestPetsIdDelete & R) => Promise<ResponsePetsIdDelete>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -3118,9 +3118,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test statements.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export type AccountId = string;
 
@@ -3167,7 +3167,7 @@ export interface RequestAccountsAccountIdMetersGet extends RequestOapi {
     };
 }
 
-export type PathAccountsAccountIdMetersGet<R extends Empty = Empty> = (req: RequestAccountsAccountIdMetersGet & R) => ResponseAccountsAccountIdMetersGet | Promise<ResponseAccountsAccountIdMetersGet>;
+export type PathAccountsAccountIdMetersGet<R extends Empty = Empty> = (req: RequestAccountsAccountIdMetersGet & R) => Promise<ResponseAccountsAccountIdMetersGet>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -3180,11 +3180,11 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test uspto.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, App, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
 import { Readable } from \\"stream\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<App<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
 
 export interface dataSetList {
     total?: number;
@@ -3212,7 +3212,7 @@ export interface dataSetList {
 
 export type ResponseGet = ResponseOapi<dataSetList, 200, \\"application/json\\">;
 
-export type PathGet<R extends Empty = Empty> = (req: RequestOapi & R) => ResponseGet | Promise<ResponseGet>;
+export type PathGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseGet>;
 
 export type ResponseDatasetVersionFieldsGet = ResponseOapi<string | Readable | Buffer, 200, \\"application/json\\"> | ResponseOapi<string | Readable | Buffer, 404, \\"application/json\\">;
 
@@ -3236,7 +3236,7 @@ export interface RequestDatasetVersionFieldsGet extends RequestOapi {
 /**
  * This GET API returns the list of all the searchable field names that are in the oa_citations. Please see the 'fields' attribute which returns an array of field names. Each field or a combination of fields can be searched using the syntax options shown below.
  */
-export type PathDatasetVersionFieldsGet<R extends Empty = Empty> = (req: RequestDatasetVersionFieldsGet & R) => ResponseDatasetVersionFieldsGet | Promise<ResponseDatasetVersionFieldsGet>;
+export type PathDatasetVersionFieldsGet<R extends Empty = Empty> = (req: RequestDatasetVersionFieldsGet & R) => Promise<ResponseDatasetVersionFieldsGet>;
 
 export type ResponseDatasetVersionRecordsPost = ResponseOapi<any[], 200, \\"application/json\\"> | ResponseOapi<unknown, 404, string>;
 
@@ -3261,7 +3261,7 @@ export interface RequestDatasetVersionRecordsPost extends RequestOapi {
 /**
  * This API is based on Solr/Lucense Search. The data is indexed using SOLR. This GET API returns the list of all the searchable field names that are in the Solr Index. Please see the 'fields' attribute which returns an array of field names. Each field or a combination of fields can be searched using the Solr/Lucene Syntax. Please refer https://lucene.apache.org/core/3_6_2/queryparsersyntax.html#Overview for the query syntax. List of field names that are searchable can be determined using above GET api.
  */
-export type PathDatasetVersionRecordsPost<R extends Empty = Empty> = (req: RequestDatasetVersionRecordsPost & R) => ResponseDatasetVersionRecordsPost | Promise<ResponseDatasetVersionRecordsPost>;
+export type PathDatasetVersionRecordsPost<R extends Empty = Empty> = (req: RequestDatasetVersionRecordsPost & R) => Promise<ResponseDatasetVersionRecordsPost>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {

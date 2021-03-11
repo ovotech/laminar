@@ -1,4 +1,4 @@
-import { httpServer, start, router, get, stop, jsonOk, App } from '@ovotech/laminar';
+import { HttpServer, router, get, jsonOk, HttpApp } from '@ovotech/laminar';
 import axios from 'axios';
 import { keycloakAuthMiddleware, createSession } from '../src';
 import { generateKeyPair } from 'crypto';
@@ -48,19 +48,19 @@ describe('Integration', () => {
       resource_access: { 'test-service': { roles: ['test1'] } },
     }).jwt;
 
-    const app: App = router(
+    const app: HttpApp = router(
       get(
         '/test',
-        auth()(({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
+        auth()(async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
       ),
       get(
         '/test-scopes',
-        auth(['test1'])(({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
+        auth(['test1'])(async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
       ),
     );
-    const server = httpServer({ app, port: 8063 });
+    const server = new HttpServer({ app, port: 8063 });
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:8063' });
 
@@ -107,7 +107,7 @@ describe('Integration', () => {
         iat: expect.any(Number),
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

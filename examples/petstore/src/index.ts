@@ -1,4 +1,5 @@
-import { describe, start, stop } from '@ovotech/laminar';
+import { HttpServer, start, stop } from '@ovotech/laminar';
+import { PgPoolService } from '@ovotech/laminar-pg';
 import { createApp } from './app';
 import { sign } from 'jsonwebtoken';
 import { Pool } from 'pg';
@@ -11,15 +12,14 @@ const server = async (env: NodeJS.ProcessEnv): Promise<void> => {
     throw new Error('Need PG env variable');
   }
 
-  const pool = new Pool({ connectionString: env.PG });
   const port = Number(env.PORT ?? '3344');
   const hostname = env.HOST ?? 'localhost';
   const secret = env.SECRET;
 
-  const app = await createApp({ secret, port, hostname, pool, logger: console });
+  const pool = new PgPoolService(new Pool({ connectionString: env.PG }));
+  const http = new HttpServer({ app: await createApp({ secret, pool, logger: console }), port, hostname });
 
-  await start(app);
-  console.log(describe(app));
+  await start([pool, http], console);
 
   /**
    * We generate a short lived token to be able to login and interact with the service
@@ -32,11 +32,7 @@ const server = async (env: NodeJS.ProcessEnv): Promise<void> => {
    * Catch the termination event to shut down the app gracefully.
    * The app is stopped before the db so that there is now chance of starting to process a request without a db
    */
-  process.on('SIGTERM', async () => {
-    await stop(app);
-    await pool.end();
-    console.log('Stopped Successfully');
-  });
+  process.on('SIGTERM', () => stop([pool, http], console));
 };
 
 server(process.env);

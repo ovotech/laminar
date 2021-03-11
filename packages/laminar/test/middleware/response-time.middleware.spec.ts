@@ -51,7 +51,7 @@ describe('responseTimeMiddleware middleware', () => {
     const responseTime = responseTimeMiddleware({ header: 'My-Time' });
     const server = new HttpServer({
       port: 8096,
-      app: responseTime(() => textOk('OK')),
+      app: responseTime(async () => textOk('OK')),
     });
     try {
       await server.start();

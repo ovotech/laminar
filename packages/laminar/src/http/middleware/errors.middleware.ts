@@ -1,6 +1,6 @@
 import { json, jsonInternalServerError } from '../response';
 import { HttpError } from '../http-error';
-import { HttpMiddleware, HttpApp } from '../types';
+import { HttpMiddleware, HttpResponse, HttpRequest } from '../types';
 
 /**
  * Request parameters added by the {@link errorHandlerComponent}
@@ -9,7 +9,9 @@ export interface RequestError {
   error: Error;
 }
 
-export const defaultErrorHandler: HttpApp<RequestError> = ({ error }) => {
+export type HttpErrorHandler = (req: HttpRequest & RequestError) => Promise<HttpResponse>;
+
+export const defaultErrorHandler: HttpErrorHandler = async ({ error }) => {
   return error instanceof HttpError
     ? json({ body: error.body, headers: error.headers, status: error.code, stack: error.stack })
     : jsonInternalServerError({ message: error.message });

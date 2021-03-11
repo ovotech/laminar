@@ -1,4 +1,4 @@
-import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk } from '@ovotech/laminar';
+import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi-security.yaml');
@@ -14,14 +14,13 @@ const main = async () => {
     },
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
-        get: () => jsonOk({ email: 'me@example.com' }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
+        get: async () => jsonOk({ email: 'me@example.com' }),
       },
     },
   });
   const server = new HttpServer({ app });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();

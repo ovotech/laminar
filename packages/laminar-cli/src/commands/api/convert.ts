@@ -288,7 +288,7 @@ export const convertOapi = (context: AstContext, api: OpenAPIObject): Document<t
                   ]),
                 }),
               ],
-              ret: Type.Union([responseAst.type, Type.Referance('Promise', [responseAst.type])]),
+              ret: Type.Referance('Promise', [responseAst.type]),
             }),
           });
 
@@ -352,7 +352,7 @@ export const convertOapi = (context: AstContext, api: OpenAPIObject): Document<t
           { name: 'RequestOapi' },
           { name: 'OapiConfig' },
           { name: 'Empty' },
-          { name: 'App' },
+          { name: 'HttpApp' },
           { name: 'openApi' },
           ...(security ? [{ name: 'OapiSecurityResolver' }, { name: 'OapiAuthInfo' }] : []),
         ],
@@ -384,7 +384,7 @@ export const convertOapi = (context: AstContext, api: OpenAPIObject): Document<t
             type: Type.Referance('Config', [Type.Referance('R'), ...(security ? [Type.Referance('TAuthInfo')] : [])]),
           }),
         ],
-        ret: Type.Referance('Promise', [Type.Referance('App', [Type.Referance('R')])]),
+        ret: Type.Referance('Promise', [Type.Referance('HttpApp', [Type.Referance('R')])]),
         body: Node.Call({
           expression: Node.Identifier('openApi'),
           args: [Node.Identifier('config')],

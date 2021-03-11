@@ -1,7 +1,5 @@
 import {
-  httpServer,
-  start,
-  stop,
+  HttpServer,
   jsonOk,
   jsonNoContent,
   jsonNotFound,
@@ -45,20 +43,20 @@ describe('Integration', () => {
       },
       paths: {
         '/pets': {
-          get: ({ query }) =>
+          get: async ({ query }) =>
             jsonOk(db.filter((pet) => (query.tags ? (pet.tag ? query.tags.includes(pet.tag) : false) : true))),
-          post: ({ body, authInfo }) => {
+          post: async ({ body, authInfo }) => {
             const pet = { ...body, id: Math.max(...db.map((item) => item.id)) + 1 };
             db.push(pet);
             return jsonOk({ pet, user: authInfo && authInfo.user });
           },
         },
         '/pets/{id}': {
-          get: ({ path }) => {
+          get: async ({ path }) => {
             const pet = db.find((item) => item.id === Number(path.id));
             return optional(jsonOk, pet) ?? jsonNotFound({ code: 123, message: 'Not Found' });
           },
-          delete: ({ path }) => {
+          delete: async ({ path }) => {
             const index = db.findIndex((item) => item.id === Number(path.id));
             if (index !== -1) {
               db.splice(index, 1);
@@ -71,10 +69,10 @@ describe('Integration', () => {
       },
     });
 
-    const server = httpServer({ app, port: 4920 });
+    const server = new HttpServer({ app, port: 4920 });
 
     try {
-      await start(server);
+      await server.start();
 
       const api = axiosOapi(axios.create({ baseURL: 'http://localhost:4920' }));
 
@@ -174,7 +172,7 @@ describe('Integration', () => {
         ],
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

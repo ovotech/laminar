@@ -3,7 +3,7 @@
  * @module @ovotech/laminar-handlebars
  */
 
-import { Middleware, Response, response } from '@ovotech/laminar';
+import { Middleware, HttpResponse, response } from '@ovotech/laminar';
 import { readdirSync, readFileSync, existsSync } from 'fs';
 import { compile, RuntimeOptions, TemplateDelegate } from 'handlebars';
 import { join, relative } from 'path';
@@ -35,7 +35,11 @@ export interface CompileTemplatesOptions {
   extension: string;
 }
 
-export type HandlebarsRender = (view: string, data?: Record<string, unknown>, options?: Partial<Response>) => Response;
+export type HandlebarsRender = (
+  view: string,
+  data?: Record<string, unknown>,
+  options?: Partial<HttpResponse>,
+) => HttpResponse;
 
 export interface RequestHandlebars {
   hbs: HandlebarsRender;

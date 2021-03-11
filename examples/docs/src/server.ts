@@ -1,4 +1,4 @@
-import { get, jsonOk, router, httpServer, describe, start } from '@ovotech/laminar';
+import { get, jsonOk, router, HttpServer, start } from '@ovotech/laminar';
 
 /**
  * A simple function to get some data out of a data store
@@ -6,10 +6,10 @@ import { get, jsonOk, router, httpServer, describe, start } from '@ovotech/lamin
 const findUser = (id: string) => ({ id, name: 'John' });
 
 const main = async () => {
-  const server = httpServer({
+  const server = new HttpServer({
     app: router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      get('/users/{id}', ({ path }) => jsonOk(findUser(path.id))),
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      get('/users/{id}', async ({ path }) => jsonOk(findUser(path.id))),
     ),
     port: 4399,
   });
@@ -17,9 +17,7 @@ const main = async () => {
   /**
    * Now we've cerated the server, but it has not yet been started.
    */
-  await start(server);
-
-  console.log(describe(server));
+  await start([server], console);
 };
 
 main();

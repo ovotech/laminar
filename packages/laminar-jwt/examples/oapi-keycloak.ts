@@ -1,4 +1,4 @@
-import { start, httpServer, describe, jsonOk, openApi } from '@ovotech/laminar';
+import { start, HttpServer, jsonOk, openApi } from '@ovotech/laminar';
 import { jwkPublicKey, keycloakJwtSecurityResolver, createSession } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 import { readFileSync } from 'fs';
@@ -31,17 +31,16 @@ const main = async () => {
     security: { JWTSecurity: jwtSecurity },
     paths: {
       '/session': {
-        post: ({ body }) => jsonOk(createSession(jwtSign, body)),
+        post: async ({ body }) => jsonOk(createSession(jwtSign, body)),
       },
       '/test': {
-        get: ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
-        post: ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
+        get: async ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
+        post: async ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();

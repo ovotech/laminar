@@ -1,4 +1,4 @@
-import { httpServer, start, router, get, post, stop, jsonOk } from '@ovotech/laminar';
+import { HttpServer, router, get, post, jsonOk } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
 import { jwtSecurityResolver, authMiddleware, jwkPublicKey, createSession } from '../src';
@@ -18,13 +18,13 @@ describe('Integration', () => {
       security: { JWTSecurity: jwtSecurity },
       paths: {
         '/session': {
-          post: ({ body: { email, scopes } }) => jsonOk(createSession({ secret }, { email, scopes })),
+          post: async ({ body: { email, scopes } }) => jsonOk(createSession({ secret }, { email, scopes })),
         },
         '/test': {
-          get: ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo }),
+          get: async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo }),
         },
         '/test-scopes': {
-          get: ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo }),
+          get: async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo }),
         },
       },
     });
@@ -34,9 +34,10 @@ describe('Integration', () => {
     const testTokenExpires = createSession({ secret, options: { expiresIn: '1ms' } }, { email: 'tester' }).jwt;
     const testTokenNotBefore = createSession({ secret, options: { notBefore: 10000 } }, { email: 'tester' }).jwt;
 
-    const server = httpServer({ app, port: 8064 });
+    const server = new HttpServer({ app, port: 8064 });
+
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:8064' });
 
@@ -113,7 +114,7 @@ describe('Integration', () => {
         },
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -147,20 +148,20 @@ describe('Integration', () => {
     }).jwt;
 
     const app = router(
-      post('/session', ({ body: { email, scopes } }) => jsonOk(createSession(signOptions, { email, scopes }))),
+      post('/session', async ({ body: { email, scopes } }) => jsonOk(createSession(signOptions, { email, scopes }))),
       get(
         '/test',
-        auth()(({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
+        auth()(async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
       ),
       get(
         '/test-scopes',
-        auth(['test1'])(({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
+        auth(['test1'])(async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
       ),
     );
 
-    const server = httpServer({ app, port: 8063 });
+    const server = new HttpServer({ app, port: 8063 });
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:8063' });
 
@@ -219,7 +220,7 @@ describe('Integration', () => {
         },
       });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -240,19 +241,19 @@ describe('Integration', () => {
     };
     const auth = authMiddleware({ secret: publicKey });
 
-    const server = httpServer({
+    const server = new HttpServer({
       app: router(
-        post('/session', ({ body: { email, scopes } }) => jsonOk(createSession(signOptions, { email, scopes }))),
+        post('/session', async ({ body: { email, scopes } }) => jsonOk(createSession(signOptions, { email, scopes }))),
         get(
           '/test',
-          auth()(({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
+          auth()(async ({ authInfo }) => jsonOk({ text: 'Test', ...authInfo })),
         ),
       ),
       port: 8065,
     });
 
     try {
-      await start(server);
+      await server.start();
 
       const api = axios.create({ baseURL: 'http://localhost:8065' });
 
@@ -285,7 +286,7 @@ describe('Integration', () => {
 
       await api.get('/test', { headers: { authorization: `Bearer ${token.jwt}` } });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

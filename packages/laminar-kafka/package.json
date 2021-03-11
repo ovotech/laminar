@@ -1,0 +1,45 @@
+{
+  "name": "@ovotech/laminar-kafka",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "A kafka connection service using kafkajs",
+  "author": "Ivan Kerin <ikerin@gmail.com>",
+  "repository": "git@github.com:ovotech/laminar.git",
+  "homepage": "https://github.com/ovotech/laminar/tree/main/packages/laminar-kafka#readme",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc --declaration",
+    "build:readme": "build-readme README.md https://github.com/ovotech/laminar/tree/main/packages/laminar-kafka",
+    "test": "jest test --runInBand",
+    "lint": "F='{src,test}/**/*.ts' && prettier --check $F && eslint $F"
+  },
+  "jest": {
+    "preset": "../../jest.json"
+  },
+  "devDependencies": {
+    "@ikerin/build-readme": "^1.0.4",
+    "@kafkajs/confluent-schema-registry": "^2.0.0",
+    "@ovotech/laminar": "^0.11.0",
+    "@ovotech/laminar-cli": "^0.9.4",
+    "@types/jest": "^26.0.16",
+    "@types/node": "^14.14.10",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "jest": "^26.6.3",
+    "kafkajs": "^1.15.0",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "ts-retry-promise": "^0.6.0",
+    "typescript": "^4.1.2",
+    "uuid": "^8.3.0"
+  },
+  "peerDependencies": {
+    "@kafkajs/confluent-schema-registry": "^2.0.0",
+    "@ovotech/laminar": "*",
+    "kafkajs": "^1.0.0"
+  }
+}

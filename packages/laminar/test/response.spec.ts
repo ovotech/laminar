@@ -26,7 +26,7 @@ const api = axios.create({ baseURL: 'http://localhost:8052' });
 
 describe('Requests', () => {
   it('Should process response', async () => {
-    const server = new HttpServer({ port: 8052, app: () => textOk('Test') });
+    const server = new HttpServer({ port: 8052, app: async () => textOk('Test') });
     try {
       await server.start();
 
@@ -45,7 +45,7 @@ describe('Requests', () => {
   it('Should process json', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => jsonOk({ other: 'stuff', at: new Date('2020-02-02T12:00:00Z'), no: undefined }),
+      app: async () => jsonOk({ other: 'stuff', at: new Date('2020-02-02T12:00:00Z'), no: undefined }),
     });
     try {
       await server.start();
@@ -65,7 +65,7 @@ describe('Requests', () => {
   it('Should process buffer', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => binary(ok({ body: Buffer.from('test-test-maaaany-test') })),
+      app: async () => binary(ok({ body: Buffer.from('test-test-maaaany-test') })),
     });
     try {
       await server.start();
@@ -85,7 +85,7 @@ describe('Requests', () => {
   it('Should process stream', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => textOk(new ObjectReadableMock(['test-', 'test-', 'maaaany-', 'test'])),
+      app: async () => textOk(new ObjectReadableMock(['test-', 'test-', 'maaaany-', 'test'])),
     });
     try {
       await server.start();
@@ -102,7 +102,7 @@ describe('Requests', () => {
   });
 
   it('Should process laminar simple response', async () => {
-    const server = new HttpServer({ port: 8052, app: () => text({ body: '', status: 201 }) });
+    const server = new HttpServer({ port: 8052, app: async () => text({ body: '', status: 201 }) });
     try {
       await server.start();
 
@@ -122,7 +122,7 @@ describe('Requests', () => {
   it('Should process laminar response', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () =>
+      app: async () =>
         setCookie(
           { me: { value: 'test', httpOnly: true, maxAge: 1000 }, other: 'test2' },
           json({
@@ -153,7 +153,7 @@ describe('Requests', () => {
   it('Should process laminar message', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => jsonNotFound({ message: 'test' }),
+      app: async () => jsonNotFound({ message: 'test' }),
     });
     try {
       await server.start();
@@ -172,7 +172,7 @@ describe('Requests', () => {
 
     const server = new HttpServer({
       port: 8052,
-      app: () => optional(jsonOk, data) ?? jsonNotFound({ message: 'not found' }),
+      app: async () => optional(jsonOk, data) ?? jsonNotFound({ message: 'not found' }),
     });
     try {
       await server.start();
@@ -195,7 +195,7 @@ describe('Requests', () => {
   it('Should process laminar text file', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => file(join(__dirname, 'test.txt')),
+      app: async () => file(join(__dirname, 'test.txt')),
     });
     try {
       await server.start();
@@ -216,7 +216,7 @@ describe('Requests', () => {
   it('Should process laminar html file', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => file(join(__dirname, 'test.html')),
+      app: async () => file(join(__dirname, 'test.html')),
     });
     try {
       await server.start();
@@ -237,7 +237,7 @@ describe('Requests', () => {
   it('Should process laminar file with status', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => file(join(__dirname, 'test.txt'), { status: 201 }),
+      app: async () => file(join(__dirname, 'test.txt'), { status: 201 }),
     });
     try {
       await server.start();
@@ -254,7 +254,7 @@ describe('Requests', () => {
   it('Should process response type csv', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => csv(ok({ body: 'one,two' })),
+      app: async () => csv(ok({ body: 'one,two' })),
     });
     try {
       await server.start();
@@ -271,7 +271,7 @@ describe('Requests', () => {
   it('Should process response type css', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => css(ok({ body: 'html { backgroun: red; }' })),
+      app: async () => css(ok({ body: 'html { backgroun: red; }' })),
     });
     try {
       await server.start();
@@ -288,7 +288,7 @@ describe('Requests', () => {
   it('Should process response type html', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => html(ok({ body: '<html></html>' })),
+      app: async () => html(ok({ body: '<html></html>' })),
     });
     try {
       await server.start();
@@ -305,7 +305,7 @@ describe('Requests', () => {
   it('Should process response type text', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => text(ok({ body: 'txt' })),
+      app: async () => text(ok({ body: 'txt' })),
     });
     try {
       await server.start();
@@ -322,7 +322,7 @@ describe('Requests', () => {
   it('Should process response type form', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => form(ok({ body: { one: 'foo', two: 'bar' } })),
+      app: async () => form(ok({ body: { one: 'foo', two: 'bar' } })),
     });
     try {
       await server.start();
@@ -339,7 +339,7 @@ describe('Requests', () => {
   it('Should process response type xml', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => xml(ok({ body: '<xml></xml>' })),
+      app: async () => xml(ok({ body: '<xml></xml>' })),
     });
     try {
       await server.start();
@@ -356,7 +356,7 @@ describe('Requests', () => {
   it('Should process response type pdf', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => pdf(ok({ body: 'tmp' })),
+      app: async () => pdf(ok({ body: 'tmp' })),
     });
     try {
       await server.start();
@@ -372,7 +372,7 @@ describe('Requests', () => {
   it('Should process response type binary', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => binary(ok({ body: 'tmp' })),
+      app: async () => binary(ok({ body: 'tmp' })),
     });
     try {
       await server.start();
@@ -388,7 +388,7 @@ describe('Requests', () => {
   it('Should process response type yaml', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => yaml(ok({ body: 'tmp' })),
+      app: async () => yaml(ok({ body: 'tmp' })),
     });
     try {
       await server.start();
@@ -404,7 +404,7 @@ describe('Requests', () => {
   it('Should process laminar file with status', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: () => file(join(__dirname, 'test.txt'), { status: 201 }),
+      app: async () => file(join(__dirname, 'test.txt'), { status: 201 }),
     });
     try {
       await server.start();
@@ -421,7 +421,7 @@ describe('Requests', () => {
   it('Should process laminar file with range', async () => {
     const server = new HttpServer({
       port: 8052,
-      app: ({ incommingMessage }) => file(join(__dirname, 'test.txt'), { incommingMessage }),
+      app: async ({ incommingMessage }) => file(join(__dirname, 'test.txt'), { incommingMessage }),
     });
     try {
       await server.start();

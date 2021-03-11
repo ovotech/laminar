@@ -1,4 +1,4 @@
-import { httpServer, start, describe, jsonOk, openApi, corsMiddleware } from '@ovotech/laminar';
+import { HttpServer, start, jsonOk, openApi, corsMiddleware } from '@ovotech/laminar';
 import { join } from 'path';
 
 const findUser = (id: string) => ({ id, name: 'John' });
@@ -12,16 +12,15 @@ const main = async () => {
   const app = await openApi({
     api: join(__dirname, '../schema/api.yaml'),
     paths: {
-      '/user/{id}': { get: ({ path }) => jsonOk(findUser(path.id)) },
+      '/user/{id}': { get: async ({ path }) => jsonOk(findUser(path.id)) },
     },
   });
 
   /**
    * Apply cors
    */
-  const server = httpServer({ app: cors(app) });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app: cors(app) });
+  await start([server], console);
 };
 
 main();

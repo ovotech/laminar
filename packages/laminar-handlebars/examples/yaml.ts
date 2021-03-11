@@ -1,4 +1,4 @@
-import { start, router, get, httpServer, describe } from '@ovotech/laminar';
+import { start, router, get, HttpServer } from '@ovotech/laminar';
 import { handlebarsMiddleware } from '@ovotech/laminar-handlebars';
 import { join } from 'path';
 
@@ -9,13 +9,13 @@ const handlebars = handlebarsMiddleware({
   headers: { 'Content-type': 'text/yaml' },
 });
 
-const server = httpServer({
+const server = new HttpServer({
   app: handlebars(
     router(
-      get('/', ({ hbs }) => hbs('index.yaml', {}, { status: 400, headers: { 'X-Index': 'true' } })),
-      get('/swagger.yaml', ({ hbs }) => hbs('swagger.yaml', { version: 10 })),
+      get('/', async ({ hbs }) => hbs('index.yaml', {}, { status: 400, headers: { 'X-Index': 'true' } })),
+      get('/swagger.yaml', async ({ hbs }) => hbs('swagger.yaml', { version: 10 })),
     ),
   ),
 });
 
-start(server).then(() => console.log(describe(server)));
+start([server], console);

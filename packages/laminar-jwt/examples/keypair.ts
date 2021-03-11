@@ -1,4 +1,4 @@
-import { get, post, httpServer, router, start, jsonOk, App, describe } from '@ovotech/laminar';
+import { get, post, HttpServer, router, start, jsonOk, HttpApp } from '@ovotech/laminar';
 import { authMiddleware, createSession } from '@ovotech/laminar-jwt';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -15,18 +15,20 @@ const auth = authMiddleware({ secret: publicKey, options: { clockTolerance: 2 } 
 const onlyLoggedIn = auth();
 const onlyAdmin = auth(['admin']);
 
-const app: App = router(
-  get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-  post('/session', ({ body }) => jsonOk(createSession({ secret: privateKey, options: { algorithm: 'RS256' } }, body))),
+const app: HttpApp = router(
+  get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+  post('/session', async ({ body }) =>
+    jsonOk(createSession({ secret: privateKey, options: { algorithm: 'RS256' } }, body)),
+  ),
   post(
     '/test',
-    onlyAdmin(({ authInfo }) => jsonOk({ result: 'ok', user: authInfo })),
+    onlyAdmin(async ({ authInfo }) => jsonOk({ result: 'ok', user: authInfo })),
   ),
   get(
     '/test',
-    onlyLoggedIn(() => jsonOk('index')),
+    onlyLoggedIn(async () => jsonOk('index')),
   ),
 );
 
-const server = httpServer({ app });
-start(server).then(() => console.log(describe(server)));
+const server = new HttpServer({ app });
+start([server], console);

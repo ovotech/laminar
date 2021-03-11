@@ -1,25 +1,22 @@
 import { openApiTyped } from './__generated__/petstore';
 import { pathPetsGet, pathPetsIdGet, pathPetsIdDelete, pathPetsPost } from './paths';
-import { pgPoolMiddleware, RequestPgPool } from './middleware/pg-pool.middleware';
 import { join } from 'path';
 import { jwtSecurityResolver, verifyToken } from '@ovotech/laminar-jwt';
-import { httpServer, HttpServer, Logger, loggingMiddleware } from '@ovotech/laminar';
+import { HttpApp, LoggerLike, loggingMiddleware } from '@ovotech/laminar';
 import { petsDbMiddleware, RequestPetsDb } from './middleware';
-import { Pool } from 'pg';
+import { PgPoolService, pgPoolMiddleware, RequestPgPool } from '@ovotech/laminar-pg';
 
 export interface Options {
-  pool: Pool;
+  pool: PgPoolService;
   secret: string;
-  port: number;
-  hostname: string;
-  logger: Logger;
+  logger: LoggerLike;
 }
 
 /**
  * Create the http server to be started and stopped by the main executor
  * Separating it this way allows us to test it easily
  */
-export const createApp = async (options: Options): Promise<HttpServer> => {
+export const createApp = async (options: Options): Promise<HttpApp> => {
   const jwtVerify = { secret: options.secret };
 
   const oapi = await openApiTyped<RequestPgPool & RequestPetsDb>({
@@ -68,7 +65,5 @@ export const createApp = async (options: Options): Promise<HttpServer> => {
 
   // Apply the middlewares.
   // The typescript types will ensure they are applied in the right order, and no dependencies are missing
-  const app = logging(pgPool(petsDb(oapi)));
-
-  return httpServer({ app, port: options.port, hostname: options.hostname });
+  return logging(pgPool(petsDb(oapi)));
 };

@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import { join } from 'path';
 import axios from 'axios';
 import { Client } from 'pg';
@@ -7,6 +7,8 @@ const PORT = '4700';
 const PG = 'postgres://example-admin:example-pass@localhost:5432/example';
 
 describe('Split App Integration Tests', () => {
+  beforeAll(() => execSync('yarn tsc', { cwd: join(__dirname, '..') }));
+
   it('Should work as an app', async () => {
     const pg = new Client(PG);
     await pg.connect();
@@ -14,7 +16,7 @@ describe('Split App Integration Tests', () => {
     await pg.query(`INSERT INTO users (id, name) VALUES (1, 'Ben'), (2, 'Michael');`);
     await pg.end();
 
-    const service = spawn('yarn', ['ts-node', 'src/index.ts'], {
+    const service = spawn('yarn', ['node', 'dist/index.js'], {
       cwd: join(__dirname, '..'),
       env: { ...process.env, PG, PORT },
       detached: true,
@@ -23,9 +25,7 @@ describe('Split App Integration Tests', () => {
     try {
       service.stderr.on('data', (data) => console.error(String(data)));
       await new Promise((resolve) => {
-        service.stdout.on('data', (data) =>
-          String(data).includes('Laminar: Running') ? resolve(undefined) : undefined,
-        );
+        service.stdout.on('data', (data) => (String(data).includes('Started') ? resolve(undefined) : undefined));
       });
 
       const api = axios.create({ baseURL: `http://localhost:${PORT}` });

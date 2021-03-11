@@ -1,4 +1,4 @@
-import { router, jsonOk, get, put, route, start, httpServer, describe } from '@ovotech/laminar';
+import { router, jsonOk, get, put, route, start, HttpServer } from '@ovotech/laminar';
 
 // << app
 
@@ -12,24 +12,24 @@ const app = router(
   /**
    * You match pathnames with strings
    */
-  get('/authors', () => jsonOk(authors)),
+  get('/authors', async () => jsonOk(authors)),
 
   /**
    * If a pathname has a {some_name} in it it would be captured and accessible with the `path` paramters
    */
-  get('/authors/{id}', ({ path: { id } }) => jsonOk(authors[id])),
+  get('/authors/{id}', async ({ path: { id } }) => jsonOk(authors[id])),
 
   /**
    * You can have multiple parameters in the path, all of them will be extracted
    */
-  get('/blog/{articleId}/authors/{authorId}', ({ path: { authorId, articleId } }) =>
+  get('/blog/{articleId}/authors/{authorId}', async ({ path: { authorId, articleId } }) =>
     jsonOk([articles[articleId], authors[authorId]]),
   ),
 
   /**
    * You have helpers available for all the HTTP methods: get, post, del, patch, put, options
    */
-  put('/authors', ({ body }) => {
+  put('/authors', async ({ body }) => {
     authors[body.id] = body.name;
     return jsonOk({ success: true });
   }),
@@ -40,7 +40,7 @@ const app = router(
   route({
     path: '/blog',
     method: 'DRAFT',
-    app: ({ body }) => {
+    app: async ({ body }) => {
       articles[body.id] = body.name;
       return jsonOk({ success: true });
     },
@@ -52,4 +52,4 @@ const app = router(
 /**
  * Start the http service
  */
-start(httpServer({ app })).then((http) => console.log(describe(http)));
+start([new HttpServer({ app })], console);

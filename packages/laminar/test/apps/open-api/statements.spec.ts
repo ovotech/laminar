@@ -8,7 +8,7 @@ describe('Statements', () => {
       api: join(__dirname, 'statements.yaml'),
       paths: {
         '/accounts/{accountId}/meters': {
-          get: () =>
+          get: async () =>
             jsonOk([
               {
                 meterType: 'gas',

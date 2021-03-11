@@ -1,4 +1,4 @@
-import { HttpServer, jsonOk, router, get, redirect, openApi } from '@ovotech/laminar';
+import { HttpServer, jsonOk, router, get, redirect, openApi, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi.yaml');
@@ -8,21 +8,20 @@ const main = async () => {
     api,
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
-        get: () => jsonOk({ email: 'me@example.com' }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
+        get: async () => jsonOk({ email: 'me@example.com' }),
       },
     },
     notFound: router(
-      get('/old/{id}', ({ path: { id } }) => redirect(`http://example.com/new/${id}`)),
-      get('/old/{id}/pdf', ({ path: { id } }) => redirect(`http://example.com/new/${id}/pdf`)),
+      get('/old/{id}', async ({ path: { id } }) => redirect(`http://example.com/new/${id}`)),
+      get('/old/{id}/pdf', async ({ path: { id } }) => redirect(`http://example.com/new/${id}/pdf`)),
     ),
   });
 
   const server = new HttpServer({
     app,
   });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();

@@ -75,9 +75,9 @@ describe('Integration', () => {
             : jsonForbidden({ message: 'Forbidden user' }),
       },
       paths: {
-        '/about': { get: () => file(join(__dirname, 'about.html')) },
+        '/about': { get: async () => file(join(__dirname, 'about.html')) },
         '/pets': {
-          get: ({ logger, query: { limit, price, isKitten, pagination } }) => {
+          get: async ({ logger, query: { limit, price, isKitten, pagination } }) => {
             logger('Get all');
             let pets = db;
 
@@ -99,7 +99,7 @@ describe('Integration', () => {
 
             return jsonOk(pets);
           },
-          post: ({ body, authInfo, logger, headers }) => {
+          post: async ({ body, authInfo, logger, headers }) => {
             if (!isBodyNewPet(body)) {
               return jsonBadRequest({ message: 'Wrong body' });
             }
@@ -111,7 +111,7 @@ describe('Integration', () => {
           },
         },
         '/pets/{id}': {
-          get: ({ path }) => {
+          get: async ({ path }) => {
             if (!isPathWithId(path)) {
               return jsonBadRequest({ message: 'Missing id in path' });
             }
@@ -121,7 +121,7 @@ describe('Integration', () => {
             const item = db.find((item) => item.id === Number(path.id));
             return optional(jsonOk, item) ?? jsonNotFound({ code: 123, message: 'Not Found' });
           },
-          delete: ({ path }) => {
+          delete: async ({ path }) => {
             if (!isPathWithId(path)) {
               return jsonBadRequest({ message: 'Missing id in path' });
             }
@@ -555,8 +555,8 @@ describe('Invalid Schema', () => {
     await expect(
       openApi({
         paths: {
-          '/pets': { get: () => response(), post: () => response() },
-          '/pets/{id}': { get: () => response(), delete: () => response() },
+          '/pets': { get: async () => response(), post: async () => response() },
+          '/pets/{id}': { get: async () => response(), delete: async () => response() },
         },
         api: join(__dirname, 'invalid-security.yaml'),
       }),
@@ -569,8 +569,8 @@ describe('Invalid Schema', () => {
     await expect(
       openApi({
         paths: {
-          '/about': { get: () => response() },
-          '/pets': { get: () => response() },
+          '/about': { get: async () => response() },
+          '/pets': { get: async () => response() },
         },
         security: {
           BasicAuth: () => securityOk({}),

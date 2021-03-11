@@ -1,4 +1,4 @@
-import { httpServer, start, describe, jsonOk } from '@ovotech/laminar';
+import { HttpServer, start, jsonOk } from '@ovotech/laminar';
 import { openApiTyped } from './__generated__/convertion.yaml';
 import { join } from 'path';
 
@@ -9,12 +9,12 @@ const main = async () => {
     api,
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
         /**
          * The Date object will be converted to a string
          * undefined values will be cleaned up
          */
-        get: () =>
+        get: async () =>
           jsonOk({
             email: 'me@example.com',
             createdAt: new Date('2020-01-01T12:00:00Z'),
@@ -23,9 +23,8 @@ const main = async () => {
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();

@@ -1,6 +1,6 @@
 {
   "name": "@ovotech/laminar",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "A minimal nodejs http server, built around the concept of strictly typed middlewares",

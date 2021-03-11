@@ -4,6 +4,7 @@ import axios from 'axios';
 
 describe('Simple App Integration Tests', () => {
   it('Should work as an app', async () => {
+    jest.setTimeout(10000);
     const service = spawn('yarn', ['ts-node', 'src/index.ts'], {
       cwd: join(__dirname, '..'),
       detached: true,
@@ -13,9 +14,7 @@ describe('Simple App Integration Tests', () => {
     try {
       service.stderr.on('data', (data) => console.error(String(data)));
       await new Promise((resolve) => {
-        service.stdout.on('data', (data) =>
-          String(data).includes('Laminar: Running') ? resolve(undefined) : undefined,
-        );
+        service.stdout.on('data', (data) => (String(data).includes('Started') ? resolve(undefined) : undefined));
       });
 
       const api = axios.create({ baseURL: `http://localhost:4600` });

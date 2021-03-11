@@ -1,4 +1,4 @@
-import { httpServer, start, describe, openApi, textOk, setCookie } from '@ovotech/laminar';
+import { HttpServer, start, openApi, textOk, setCookie } from '@ovotech/laminar';
 import { createSession, verifyToken } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 
@@ -14,17 +14,16 @@ const main = async () => {
     },
     paths: {
       '/session': {
-        post: ({ body }) => setCookie({ auth: createSession({ secret }, body).jwt }, textOk('Cookie Set')),
+        post: async ({ body }) => setCookie({ auth: createSession({ secret }, body).jwt }, textOk('Cookie Set')),
       },
       '/test': {
-        get: () => textOk('OK'),
-        post: ({ authInfo }) => textOk(`OK ${authInfo.email}`),
+        get: async () => textOk('OK'),
+        post: async ({ authInfo }) => textOk(`OK ${authInfo.email}`),
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();

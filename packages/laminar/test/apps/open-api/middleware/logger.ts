@@ -1,4 +1,4 @@
-import { Middleware } from '@ovotech/laminar';
+import { Middleware } from '../../../../src';
 
 export type LoggerFunc = (message: string) => void;
 export interface LoggerContext {

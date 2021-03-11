@@ -11,22 +11,22 @@ describe('router middleware', () => {
         route({
           path: /^\/one/,
           app: router(
-            get('/one/foo/{id}', ({ path: { id } }) => textOk(`One foo ${id}`)),
-            post('/one/bar/{id}', ({ path: { id } }) => textOk(`One bar ${id}`)),
-            () => textOk('one not found'),
+            get('/one/foo/{id}', async ({ path: { id } }) => textOk(`One foo ${id}`)),
+            post('/one/bar/{id}', async ({ path: { id } }) => textOk(`One bar ${id}`)),
+            async () => textOk('one not found'),
           ),
         }),
         route({
           path: /^\/two/,
           app: router(
-            get(/^\/two\/foo\/(\d+)/, ({ path: [id] }) => textOk(`two foo ${id}`)),
-            get(/^\/two\/bar\/(\d+)$/, ({ path: [id] }) => textOk(`two bar ${id}`)),
-            get(/^\/two\/bar\/(\d+)\/(\d+)/, ({ path: [id, serial] }) => textOk(`two bar ${id}:${serial}`)),
-            () => textOk('two not found'),
+            get(/^\/two\/foo\/(\d+)/, async ({ path: [id] }) => textOk(`two foo ${id}`)),
+            get(/^\/two\/bar\/(\d+)$/, async ({ path: [id] }) => textOk(`two bar ${id}`)),
+            get(/^\/two\/bar\/(\d+)\/(\d+)/, async ({ path: [id, serial] }) => textOk(`two bar ${id}:${serial}`)),
+            async () => textOk('two not found'),
           ),
         }),
 
-        () => textOk('nothing'),
+        async () => textOk('nothing'),
       ),
     });
     try {

@@ -3,7 +3,7 @@ import { HttpServer, corsMiddleware, jsonOk, HttpApp } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8095' });
 
-const app: HttpApp = () => jsonOk({ health: 'ok' });
+const app: HttpApp = async () => jsonOk({ health: 'ok' });
 const asyncApp: HttpApp = () => Promise.resolve(jsonOk({ health: 'ok' }));
 
 describe('Cors middleware', () => {
@@ -339,7 +339,7 @@ describe('Cors middleware', () => {
   });
 
   it('Should assign headers even if there is an error', async () => {
-    const app: HttpApp = () => jsonOk(JSON.parse('{'));
+    const app: HttpApp = async () => jsonOk(JSON.parse('{'));
     const cors = corsMiddleware({ allowOrigin: '*' });
     const server = new HttpServer({ port: 8095, app: cors(app) });
 

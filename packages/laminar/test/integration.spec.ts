@@ -15,12 +15,14 @@ import {
   staticAssets,
   jsonOk,
   textOk,
-  Logger,
+  LoggerLike,
   RequestLogging,
   jsonNotFound,
   file,
   HttpError,
   HttpApp,
+  start,
+  stop,
 } from '../src';
 import { join } from 'path';
 import { readFileSync, createReadStream } from 'fs';
@@ -34,12 +36,12 @@ describe('Integration', () => {
 
     const server = new HttpServer({ port, app, timeout: 50 });
     try {
-      await server.start();
+      await start([server]);
 
       const error = await axios.get(`http://localhost:${port}`).catch((error) => error);
       expect(error.message).toEqual('socket hang up');
     } finally {
-      await server.stop();
+      await stop([server]);
     }
   });
 
@@ -64,8 +66,14 @@ describe('Integration', () => {
   });
 
   it('Should process response', async () => {
-    const loggerMock = { info: jest.fn(), error: jest.fn() };
-    const logging = loggingMiddleware(loggerMock as Logger);
+    const loggerMock: LoggerLike = {
+      info: jest.fn(),
+      error: jest.fn(),
+      log: jest.fn(),
+      debug: jest.fn(),
+      warn: jest.fn(),
+    };
+    const logging = loggingMiddleware(loggerMock);
     const responseTime = responseTimeMiddleware();
 
     interface DBRequest {
@@ -95,31 +103,31 @@ describe('Integration', () => {
 
     const app = router<RequestLogging & DBRequest>(
       staticAssets('/assets', join(__dirname, '../examples/assets')),
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      get('/link', () => redirect('http://localhost:8050/destination')),
-      get('/http-error', () => {
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      get('/link', async () => redirect('http://localhost:8050/destination')),
+      get('/http-error', async () => {
         throw new HttpError(
           302,
           { message: 'Redirect to http://localhost:8050/destination' },
           { location: 'http://localhost:8050/destination' },
         );
       }),
-      get('/link-other', () =>
+      get('/link-other', async () =>
         redirect('http://localhost:8050/destination', { headers: { Authorization: 'Bearer 123' } }),
       ),
-      get('/destination', () => jsonOk({ arrived: true })),
-      get('/stream-file', () => textOk(createReadStream(join(__dirname, '../examples/assets/texts/one.txt')))),
-      get('/return-file', () => file(join(__dirname, '../examples/assets/texts/one.txt'), {})),
+      get('/destination', async () => jsonOk({ arrived: true })),
+      get('/stream-file', async () => textOk(createReadStream(join(__dirname, '../examples/assets/texts/one.txt')))),
+      get('/return-file', async () => file(join(__dirname, '../examples/assets/texts/one.txt'), {})),
       get('/error', () => {
         throw new Error('unknown');
       }),
-      options('/users/{id}', () =>
+      options('/users/{id}', async () =>
         textOk('', {
           'Access-Control-Allow-Origin': 'http://localhost:8050',
           'Access-Control-Allow-Methods': 'GET,POST,DELETE',
         }),
       ),
-      get('/users/{id}', ({ path, logger, getUser }) => {
+      get('/users/{id}', async ({ path, logger, getUser }) => {
         logger.info(`Getting id ${path.id}`);
         const user = getUser(path.id);
 
@@ -129,12 +137,12 @@ describe('Integration', () => {
           return jsonNotFound({ message: 'No User Found' });
         }
       }),
-      put('/users', ({ body, logger, setUser }) => {
+      put('/users', async ({ body, logger, setUser }) => {
         logger.info(`Test Body ${body.name}`);
         setUser(body.id, body.name);
         return jsonOk({ added: true });
       }),
-      patch('/users/{id}', ({ path, body, getUser, setUser }) => {
+      patch('/users/{id}', async ({ path, body, getUser, setUser }) => {
         const user = getUser(path.id);
         if (user) {
           setUser(body.id, body.name);
@@ -143,7 +151,7 @@ describe('Integration', () => {
           return jsonNotFound({ message: 'No User Found' });
         }
       }),
-      post('/users/{id}', ({ path, body, getUser, setUser }) => {
+      post('/users/{id}', async ({ path, body, getUser, setUser }) => {
         const user = getUser(path.id);
         if (user) {
           setUser(path.id, body.name);
@@ -152,7 +160,7 @@ describe('Integration', () => {
           return jsonNotFound({ message: 'No User Found' });
         }
       }),
-      del('/users/{id}', ({ path, getUser, delUser }) => {
+      del('/users/{id}', async ({ path, getUser, delUser }) => {
         const user = getUser(path.id);
         if (user) {
           delUser(path.id);
@@ -161,7 +169,7 @@ describe('Integration', () => {
           return jsonNotFound({ message: 'No User Found' });
         }
       }),
-      ({ url }) => jsonNotFound(`Test url ${url.pathname} not found`),
+      async ({ url }) => jsonNotFound(`Test url ${url.pathname} not found`),
     );
 
     const server = new HttpServer({ port: 8050, app: responseTime(db(logging(app))) });

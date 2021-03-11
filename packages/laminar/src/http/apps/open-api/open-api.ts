@@ -33,7 +33,7 @@ function toRequestError<TRequest>(result: ResultError, route: Route<TRequest>, r
 /**
  * If no path is found, this function would be called by default, Returning a 404 error
  */
-export const defaultOapiNotFound: HttpApp = (req) =>
+export const defaultOapiNotFound: HttpApp = async (req) =>
   jsonNotFound({
     message: `Request for "${req.method} ${req.url.pathname}" did not match any of the paths defined in the OpenApi Schema`,
   });

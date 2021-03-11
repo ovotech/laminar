@@ -1,4 +1,4 @@
-import { get, post, router, httpServer, start, stop } from '@ovotech/laminar';
+import { get, post, router, HttpServer } from '@ovotech/laminar';
 import axios, { AxiosResponse } from 'axios';
 import { writeFileSync, mkdirSync } from 'fs';
 import { retry } from 'ts-retry-promise';
@@ -20,12 +20,12 @@ describe('Integration', () => {
       helpers: { capitalizeName },
     });
 
-    const server = httpServer({
+    const server = new HttpServer({
       port: 8062,
       app: handlebars(
         router(
-          get('/', ({ hbs }) => hbs('index')),
-          post('/result', ({ hbs, body: { name } }) => hbs('result', { name }, { status: 201 })),
+          get('/', async ({ hbs }) => hbs('index')),
+          post('/result', async ({ hbs, body: { name } }) => hbs('result', { name }, { status: 201 })),
         ),
       ),
     });
@@ -33,12 +33,12 @@ describe('Integration', () => {
     const api = axios.create({ baseURL: 'http://localhost:8062' });
 
     try {
-      await start(server);
+      await server.start();
 
       expect(await api.get('/')).toMatchSnapshot<AxiosResponse>(axiosSnapshot);
       expect(await api.post('/result', { name: 'John Smith' })).toMatchSnapshot<AxiosResponse>(axiosSnapshot);
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 
@@ -60,15 +60,15 @@ describe('Integration', () => {
 
     const handlebars = handlebarsMiddleware({ dir, extension: 'hbs', cacheType });
 
-    const server = httpServer({
+    const server = new HttpServer({
       port: 8062,
-      app: handlebars(router(get('/', ({ hbs }) => hbs('index')))),
+      app: handlebars(router(get('/', async ({ hbs }) => hbs('index')))),
     });
 
     const api = axios.create({ baseURL: 'http://localhost:8062' });
 
     try {
-      await start(server);
+      await server.start();
 
       expect((await api.get('/')).data).toEqual('<html><body>Layout <span>Generated</span></body></html>');
 
@@ -77,7 +77,7 @@ describe('Integration', () => {
 
       await retry(async () => expect((await api.get('/')).data).toEqual(expectedData), { delay: 500, retries: 10 });
     } finally {
-      await stop(server);
+      await server.stop();
     }
   });
 });

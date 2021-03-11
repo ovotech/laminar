@@ -17,7 +17,7 @@ const withTwo: HttpMiddleware<Two, One> = (next) => (req) => next({ ...req, two:
 
 const withThree: HttpMiddleware<Three> = (next) => async (req) => next({ ...req, three: false });
 
-const httpApp: HttpApp<One & Two & Three> = (req) => {
+const httpApp: HttpApp<One & Two & Three> = async (req) => {
   const { one, two, three, url } = req;
   return jsonOk({ one, two, three, url: url.pathname });
 };
@@ -26,7 +26,7 @@ const app: HttpApp = withOne(withTwo(withThree(httpApp)));
 
 const appWithAutoAssign: HttpApp = withOne(
   withTwo(
-    withThree((req) => {
+    withThree(async (req) => {
       const { one, two, three, url } = req;
       return jsonOk({ one, two, three, url: url.pathname });
     }),

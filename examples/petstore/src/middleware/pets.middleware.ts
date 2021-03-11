@@ -1,7 +1,7 @@
 import { Middleware } from '@ovotech/laminar';
 import { PoolClient } from 'pg';
 import { NewPet, Pet } from '../__generated__/petstore';
-import { RequestPgPool } from './pg-pool.middleware';
+import { RequestPgPool } from '@ovotech/laminar-pg';
 
 /**
  * A simple repository for handling pets
