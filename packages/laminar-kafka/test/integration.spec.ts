@@ -213,7 +213,7 @@ describe('Integration', () => {
             commitedOffset: expect.arrayContaining([{ partition: 0, offset: 4 }]),
           });
         },
-        { delay: 1000, retries: 10 },
+        { delay: 1000, retries: 20 },
       );
     } finally {
       await admin.disconnect();
