@@ -1,6 +1,6 @@
 {
   "name": "@ovotech/laminar-queue",
-  "version": "0.1.0",
+  "version": "0.11.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "A queue implementation based on pg-boss for laminar",

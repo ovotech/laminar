@@ -527,8 +527,8 @@ __metadata:
   dependencies:
     "@ovotech/laminar": ^0.11.0
     "@ovotech/laminar-cli": ^0.11.0
-    "@ovotech/laminar-jwt": ^0.9.2
-    "@ovotech/laminar-pg": ^0.1.0
+    "@ovotech/laminar-jwt": ^0.11.0
+    "@ovotech/laminar-pg": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/jsonwebtoken": ^8.5.0
     "@types/node": ^14.14.10
@@ -1873,16 +1873,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/json-schema@npm:^0.5.3, @ovotech/json-schema@npm:^0.5.4":
-  version: 0.5.4
-  resolution: "@ovotech/json-schema@npm:0.5.4"
-  dependencies:
-    node-fetch: ^2.6.1
-    yaml: ^1.10.0
-  checksum: d9151e4bcb91e61b1b6c877a2c9908bbc0c674db13b399a1ae0695c681e69b70fe0af95d439ebce2b1612a4fe147f3fe4531f52e22599ddaf8257a54da25f2f8
-  languageName: node
-  linkType: hard
-
 "@ovotech/laminar-cli@^0.11.0, @ovotech/laminar-cli@workspace:packages/laminar-cli":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-cli@workspace:packages/laminar-cli"
@@ -1913,22 +1903,6 @@ __metadata:
     laminar: ./scripts/laminar
   languageName: unknown
   linkType: soft
-
-"@ovotech/laminar-cli@npm:^0.9.4":
-  version: 0.9.4
-  resolution: "@ovotech/laminar-cli@npm:0.9.4"
-  dependencies:
-    "@ovotech/json-schema": ^0.5.4
-    "@ovotech/ts-compose": ^0.16.0
-    chalk: ^4.0.0
-    commander: ^6.2.0
-    openapi-schemas: ^2.0.3
-    openapi3-ts: ^2.0.0
-  bin:
-    laminar: scripts/laminar
-  checksum: 9158b5d1e08bb83bf3105465d7e0e0b1cc308c281a7835ae77ad9d0733a32293a389d192e24f9fb350a3f3f5828c0360a9845094e67d6489cef99492e1932167
-  languageName: node
-  linkType: hard
 
 "@ovotech/laminar-handlebars@workspace:packages/laminar-handlebars":
   version: 0.0.0-use.local
@@ -1986,20 +1960,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/laminar-jwt@npm:^0.9.2":
-  version: 0.9.3
-  resolution: "@ovotech/laminar-jwt@npm:0.9.3"
-  dependencies:
-    "@ovotech/json-schema": ^0.5.3
-    axios: ^0.21.0
-    jsonwebtoken: ^8.5.1
-    lru-cache: ^6.0.0
-  peerDependencies:
-    "@ovotech/laminar": "*"
-  checksum: 311ef128955d0d009c54e8b87e23bae0f1f82e3e861b6014ede349afd858df8cc90297ed0fca7fd152bb739f6a2bef24d05747d8b6178f68c02ac4e1aab71e4e
-  languageName: node
-  linkType: hard
-
 "@ovotech/laminar-kafka@workspace:packages/laminar-kafka":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-kafka@workspace:packages/laminar-kafka"
@@ -2007,7 +1967,7 @@ __metadata:
     "@ikerin/build-readme": ^1.0.4
     "@kafkajs/confluent-schema-registry": ^2.0.0
     "@ovotech/laminar": ^0.11.0
-    "@ovotech/laminar-cli": ^0.9.4
+    "@ovotech/laminar-cli": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
     "@types/uuid": ^8.3.0
@@ -2042,7 +2002,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/laminar-pg@^0.1.0, @ovotech/laminar-pg@workspace:packages/laminar-pg":
+"@ovotech/laminar-pg@^0.11.0, @ovotech/laminar-pg@workspace:packages/laminar-pg":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-pg@workspace:packages/laminar-pg"
   dependencies:
