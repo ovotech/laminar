@@ -95,12 +95,14 @@ describe('Integration', () => {
     const event1Service = new ConsumerService<Event1>(kafka, schemaRegistry, {
       topic: topic1,
       groupId: groupId1,
+      fromBeginning: true,
       eachMessage: logging(eachEvent1),
     });
 
     const event2Service = new ConsumerService<Event2>(kafka, schemaRegistry, {
       topic: topic2,
       groupId: groupId2,
+      fromBeginning: true,
       eachBatch: logging(eachEvent2),
     });
 
