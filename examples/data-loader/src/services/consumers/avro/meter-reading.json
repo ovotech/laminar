@@ -1,0 +1,57 @@
+{
+  "type": "record",
+  "name": "MeterReading",
+  "namespace": "com.example.events",
+  "doc": "A meter reading",
+  "fields": [
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "EventMetadata",
+        "namespace": "com.example.metadata",
+        "doc": "Metadata, to be used in each event class",
+        "fields": [
+          {
+            "name": "eventId",
+            "type": "string",
+            "doc": "A globally unique ID for this Kafka message"
+          },
+          {
+            "name": "traceToken",
+            "type": "string",
+            "doc": "An ID that can be used to link all the requests and Kafka messages in a given transaction. If you already have a trace token from a previous event/request, you should copy it here. If this is the very start of a transaction, you should generate a fresh trace token and put it here. A UUID is suitable"
+          },
+          {
+            "name": "createdAt",
+            "type": {
+              "type": "long",
+              "logicalType": "timestamp-millis"
+            },
+            "doc": "A timestamp for when the event was created (in epoch millis)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "serialNumber",
+      "type": "string"
+    },
+    {
+      "name": "date",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "value",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 16,
+        "scale": 8
+      }
+    }
+  ]
+}

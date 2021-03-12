@@ -1,0 +1,200 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: Data Loader
+  description: An app for loading data from different sources
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:3100
+
+paths:
+  '/.well-known/health-check':
+    get:
+      summary: Health Check
+      description: Health check endpoint
+      tags:
+        - well-known
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthCheck' }
+      operationId: get-well-known-health-check
+
+  '/.well-known/openapi.yaml':
+    get:
+      summary: API Docs
+      description: The open api spec for the service. OpenAPI v3.
+      tags:
+        - well-known
+      responses:
+        '200':
+          description: HTML Representation of the reset API
+          content:
+            application/yaml:
+              schema: { type: string }
+
+  '/v1/status':
+    get:
+      summary: Status data
+      description: Status data for the hydrators and kafka consumers
+      responses:
+        '200':
+          description: Status Data
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Status' }
+
+  '/v1/hydration/meter-reads':
+    parameters:
+      - { $ref: '#/components/parameters/traceToken' }
+    post:
+      security: [{ BearerAuth: ['update'] }]
+      summary: Meter reads csv upload
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              type: string
+              format: binary
+      description: |
+        Upload a csv meter reads.
+      responses:
+        '500': { $ref: '#/components/responses/HttpErrorResponse' }
+        '200': { $ref: '#/components/responses/SuccessResponse' }
+
+components:
+  # Responses
+  # ==================================================================
+
+  responses:
+    HttpErrorResponse:
+      description: Unkown Error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/HttpError' }
+
+    SuccessResponse:
+      description: |
+        A generic success response
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            properties:
+              success:
+                type: boolean
+            required:
+              - success
+  # Parameters
+  # ==================================================================
+
+  parameters:
+    traceToken:
+      name: X-Trace-Token
+      in: header
+      description: An optional trace token to be passed to the service and used for logging
+      schema:
+        type: string
+        format: uuid
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    HttpError:
+      additionalProperties: false
+      properties:
+        message: { type: 'string' }
+
+    HealthCheck:
+      additionalProperties: false
+      properties:
+        healthy: { type: 'boolean' }
+      required:
+        - healthy
+
+    Status:
+      additionalProperties: false
+      properties:
+        isOutOfDate: { type: boolean }
+        data:
+          items:
+            additionalProperties: false
+            properties:
+              name: { type: string }
+              type: { enum: ['bigquery', 'kafka'] }
+              isOutOfDate: { type: boolean }
+              freshness: { type: 'string', format: 'date-time' }
+              freshnessText: { type: 'string' }
+            required:
+              - type
+              - name
+        consumptions:
+          items:
+            additionalProperties: false
+            properties:
+              id: { type: 'number' }
+              topic: { type: 'string' }
+              state: { enum: ['started', 'running', 'error'] }
+              updatedAt: { type: 'string', format: 'date-time' }
+              lag:
+                items:
+                  additionalProperties: false
+                  properties:
+                    partition: { type: 'integer' }
+                    lag: { type: 'string' }
+                  required:
+                    - partition
+                    - lag
+              error: { type: 'string' }
+              errorAt: { type: 'string', format: 'date-time' }
+            required:
+              - id
+              - topic
+
+        hydrations:
+          items:
+            additionalProperties: false
+            properties:
+              id: { type: 'number' }
+              createdAt: { type: 'string', format: 'date-time' }
+              name: { type: 'string' }
+              state: { enum: ['started', 'job_started', 'job_finished', 'loading', 'finished', 'error'] }
+              interval: { $ref: '#/components/schemas/Interval' }
+              jobFinishedAt: { type: 'string', format: 'date-time' }
+              finishedAt: { type: 'string', format: 'date-time' }
+              totalItems: { type: 'number' }
+              processedItems: { type: 'number' }
+              errorAt: { type: 'string', format: 'date-time' }
+              error: { type: 'string' }
+            required:
+              - id
+              - name
+              - createdAt
+              - state
+              - interval
+      required:
+        - data
+        - consumptions
+        - hydrations
+
+    Interval:
+      additionalProperties: false
+      properties:
+        start:
+          oneOf:
+            - { type: 'string', format: 'date-time' }
+            - { type: 'string', format: 'date' }
+        end:
+          oneOf:
+            - { type: 'string', format: 'date-time' }
+            - { type: 'string', format: 'date' }
+      required:
+        - start
+        - end

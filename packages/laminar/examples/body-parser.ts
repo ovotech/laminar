@@ -1,4 +1,4 @@
-import { HttpServer, HttpApp, textOk, BodyParser, concatStream, defaultBodyParsers, start } from '@ovotech/laminar';
+import { HttpServer, HttpApp, textOk, BodyParser, concatStream, defaultBodyParsers, init } from '@ovotech/laminar';
 
 const csvParser: BodyParser = {
   match: (contentType) => contentType === 'text/csv',
@@ -12,4 +12,4 @@ const server = new HttpServer({
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-start([server], console);
+init([server], console);

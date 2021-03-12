@@ -1,0 +1,55 @@
+{
+  "name": "@examples/data-loader",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "This is a simple but functional example of building a todo api.",
+  "author": "Ivan Kerin <ikerin@gmail.com>",
+  "repository": "git@github.com:ovotech/laminar.git",
+  "homepage": "https://github.com/ovotech/laminar/tree/main/examples/todo#readme",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@ovotech/avro-ts-cli": "^3.4.3",
+    "@ovotech/laminar-cli": "^0.11.0",
+    "@types/jest": "^26.0.16",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/node": "^14.14.10",
+    "@types/pg": "^7.14.9",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "axios": "^0.21.0",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "jest": "^26.6.3",
+    "jsonwebtoken": "^8.5.1",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.1.2"
+  },
+  "jest": {
+    "preset": "../../jest.json"
+  },
+  "scripts": {
+    "start": "SECRET=123 PG=postgres://example-admin:example-pass@localhost:5432/example ts-node src/index.ts",
+    "build:schema": "laminar api --file schema.yaml | prettier --stdin-filepath schema.ts > src/__generated__/schema.ts",
+    "build:avro": "avro-ts src/consumers/avro/*.json --output-dir src/__generated__ --logical-type-import-default decimal=Decimal:decimal.js  --logical-type timestamp-millis=Date --logical-type date=Date",
+    "build:ts": "tsc --declaration",
+    "build": "yarn build:types && yarn build:ts",
+    "test": "jest test --runInBand",
+    "lint": "F='{src,test}/**/*.ts' && prettier --check $F && eslint $F"
+  },
+  "dependencies": {
+    "@kafkajs/confluent-schema-registry": "^2.0.0",
+    "@ovotech/laminar": "^0.11.0",
+    "@ovotech/laminar-jwt": "^0.11.0",
+    "@ovotech/laminar-kafka": "^0.11.0",
+    "@ovotech/laminar-pg": "^0.11.0",
+    "@ovotech/laminar-queue": "^0.11.0",
+    "kafkajs": "^1.15.0",
+    "pg": "^8.5.1",
+    "runtypes": "^5.0.1",
+    "winston": "^3.3.3"
+  }
+}

@@ -1,4 +1,4 @@
-import { jsonOk, get, put, HttpServer, router, corsMiddleware, start } from '@ovotech/laminar';
+import { jsonOk, get, put, HttpServer, router, corsMiddleware, init } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -22,4 +22,4 @@ const server = new HttpServer({
     ),
   ),
 });
-start([server], console);
+init([server], console);

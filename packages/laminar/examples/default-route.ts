@@ -1,4 +1,4 @@
-import { get, router, start, jsonOk, textNotFound, HttpServer } from '@ovotech/laminar';
+import { get, router, init, jsonOk, textNotFound, HttpServer } from '@ovotech/laminar';
 
 const server = new HttpServer({
   app: router(
@@ -7,4 +7,4 @@ const server = new HttpServer({
   ),
 });
 
-start([server], console);
+init([server], console);

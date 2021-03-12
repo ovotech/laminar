@@ -1,4 +1,4 @@
-import { get, put, HttpServer, router, jsonOk, jsonNotFound, start } from '@ovotech/laminar';
+import { get, put, HttpServer, router, jsonOk, jsonNotFound, init } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -19,4 +19,4 @@ const server = new HttpServer({
   ),
 });
 
-start([server], console);
+init([server], console);

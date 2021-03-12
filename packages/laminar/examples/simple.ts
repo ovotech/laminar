@@ -1,4 +1,4 @@
-import { get, post, HttpServer, router, jsonOk, textOk, start } from '@ovotech/laminar';
+import { get, post, HttpServer, router, jsonOk, textOk, init } from '@ovotech/laminar';
 
 const main = async () => {
   const server = new HttpServer({
@@ -8,7 +8,7 @@ const main = async () => {
       get('/test', async () => textOk('index')),
     ),
   });
-  await start([server], console);
+  await init([server], console);
 };
 
 main();

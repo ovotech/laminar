@@ -1,4 +1,4 @@
-import { HttpServer, HttpApp, BodyParser, defaultBodyParsers, csv, ok, start } from '@ovotech/laminar';
+import { HttpServer, HttpApp, BodyParser, defaultBodyParsers, csv, ok, init } from '@ovotech/laminar';
 import { pipeline, Readable, Transform } from 'stream';
 import * as parse from 'csv-parse';
 import * as stringify from 'csv-stringify';
@@ -31,4 +31,4 @@ const server = new HttpServer({
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-start([server], console);
+init([server], console);

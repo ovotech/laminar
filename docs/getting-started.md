@@ -62,7 +62,7 @@ yarn laminar api --file api.yaml --output __generated__/api.ts
 > [examples/simple/src/index.ts](https://github.com/ovotech/laminar/tree/main/examples/simple/src/index.ts)
 
 ```typescript
-import { httpServer, start, describe, jsonOk } from '@ovotech/laminar';
+import { HttpServer, start, jsonOk } from '@ovotech/laminar';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/api';
 
@@ -80,7 +80,7 @@ const main = async () => {
     api: join(__dirname, 'api.yaml'),
     paths: {
       '/user/{id}': {
-        get: ({ path }) => {
+        get: async ({ path }) => {
           /**
            * Our types would require us to return a json response specifically,
            * otherwise it would not compile
@@ -95,17 +95,12 @@ const main = async () => {
    * Now we've cerated the server, but it has not yet been started.
    * Default port is 3300
    */
-  const server = httpServer({ app });
+  const server = new HttpServer({ app });
 
   /**
-   * The http server now should be running
+   * The http server now should be running and indicate that the server is now running
    */
-  await start(server);
-
-  /**
-   * We indicate that the server is now running
-   */
-  console.log(describe(server));
+  await start([server], console);
 };
 
 main();

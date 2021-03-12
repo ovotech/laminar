@@ -30,3 +30,16 @@ export async function stop(contextItems: ContextItem[], logger?: LoggerLike): Pr
       : Promise.all(item.map((child) => ('stop' in child ? stopService(child, logger) : start(child, logger)))));
   }
 }
+
+export function stopOnSignal(signal: NodeJS.Signals, contextItems: ContextItem[], logger?: LoggerLike): void {
+  const onSIGTERM = () => {
+    stop(contextItems, logger);
+    process.off(signal, onSIGTERM);
+  };
+  process.on(signal, onSIGTERM);
+}
+
+export async function init(contextItems: ContextItem[], logger?: LoggerLike): Promise<void> {
+  await start(contextItems, logger);
+  stopOnSignal('SIGTERM', contextItems, logger);
+}

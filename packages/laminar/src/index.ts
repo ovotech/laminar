@@ -87,9 +87,10 @@ export {
   ResponseTimeConfig,
   defaultResponseTimeHeader,
 } from './http/middleware/response-time.middleware';
-export { loggingMiddleware, RequestLogging, LoggerFormatters } from './http/middleware/logging.middleware';
-export { LoggerMetadata, LoggerLike, LoggerWithMetadata } from './logger';
-export { start, stop, ContextItem } from './lifecycle';
+export { httpLoggingMiddleware } from './http/middleware/http-logging.middleware';
+export { loggingMiddleware } from './middleware/logging.middleware';
+export { LoggerMetadata, LoggerLike, withStaticMetadata, RequestLogging } from './logger';
+export { start, stop, ContextItem, init, stopOnSignal } from './lifecycle';
 export {
   responseParserMiddleware,
   defaultResponseParsers,

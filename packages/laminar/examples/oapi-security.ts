@@ -1,4 +1,4 @@
-import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk, start } from '@ovotech/laminar';
+import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk, init } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi-security.yaml');
@@ -20,7 +20,7 @@ const main = async () => {
     },
   });
   const server = new HttpServer({ app });
-  await start([server], console);
+  await init([server], console);
 };
 
 main();

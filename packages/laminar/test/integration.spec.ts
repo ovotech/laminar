@@ -11,7 +11,7 @@ import {
   router,
   responseTimeMiddleware,
   HttpMiddleware,
-  loggingMiddleware,
+  httpLoggingMiddleware,
   staticAssets,
   jsonOk,
   textOk,
@@ -66,14 +66,8 @@ describe('Integration', () => {
   });
 
   it('Should process response', async () => {
-    const loggerMock: LoggerLike = {
-      info: jest.fn(),
-      error: jest.fn(),
-      log: jest.fn(),
-      debug: jest.fn(),
-      warn: jest.fn(),
-    };
-    const logging = loggingMiddleware(loggerMock);
+    const loggerMock: LoggerLike = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
+    const logging = httpLoggingMiddleware(loggerMock);
     const responseTime = responseTimeMiddleware();
 
     interface DBRequest {

@@ -50,7 +50,7 @@ If the user is authenticated, then laminar will add the user auth info in the `u
 > [examples/security/src/index.ts](https://github.com/ovotech/laminar/tree/main/examples/security/src/index.ts)
 
 ```typescript
-import { httpServer, start, jsonOk, describe, jsonForbidden, securityOk } from '@ovotech/laminar';
+import { HttpServer, start, jsonOk, jsonForbidden, securityOk } from '@ovotech/laminar';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/api';
 
@@ -80,13 +80,12 @@ const main = async () => {
     },
     paths: {
       '/user/{id}': {
-        get: ({ path }) => jsonOk(findUser(path.id)),
+        get: async ({ path }) => jsonOk(findUser(path.id)),
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();
@@ -186,7 +185,7 @@ And then implement it using the helper `jwtSecurityResolver`. That function woul
 > [packages/laminar-jwt/examples/oapi.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar-jwt/examples/oapi.ts)
 
 ```typescript
-import { httpServer, start, describe, jsonOk, openApi } from '@ovotech/laminar';
+import { HttpServer, start, jsonOk, openApi } from '@ovotech/laminar';
 import { createSession, jwtSecurityResolver } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 
@@ -197,17 +196,16 @@ const main = async () => {
     security: { JWTSecurity: jwtSecurityResolver({ secret }) },
     paths: {
       '/session': {
-        post: ({ body }) => jsonOk(createSession({ secret }, body)),
+        post: async ({ body }) => jsonOk(createSession({ secret }, body)),
       },
       '/test': {
-        get: ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
-        post: ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
+        get: async ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
+        post: async ({ authInfo }) => jsonOk({ text: 'ok', user: authInfo }),
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();
@@ -292,7 +290,7 @@ Implementing it involves reading the cookie and validating its contents.
 > [packages/laminar-jwt/examples/oapi-api-key.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar-jwt/examples/oapi-api-key.ts)
 
 ```typescript
-import { httpServer, start, describe, openApi, textOk, setCookie } from '@ovotech/laminar';
+import { HttpServer, start, openApi, textOk, setCookie } from '@ovotech/laminar';
 import { createSession, verifyToken } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 
@@ -308,17 +306,16 @@ const main = async () => {
     },
     paths: {
       '/session': {
-        post: ({ body }) => setCookie({ auth: createSession({ secret }, body).jwt }, textOk('Cookie Set')),
+        post: async ({ body }) => setCookie({ auth: createSession({ secret }, body).jwt }, textOk('Cookie Set')),
       },
       '/test': {
-        get: () => textOk('OK'),
-        post: ({ authInfo }) => textOk(`OK ${authInfo.email}`),
+        get: async () => textOk('OK'),
+        post: async ({ authInfo }) => textOk(`OK ${authInfo.email}`),
       },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();
@@ -417,9 +414,8 @@ components:
 
 ```typescript
 import {
-  httpServer,
+  HttpServer,
   start,
-  describe,
   openApi,
   redirect,
   isSecurityOk,
@@ -453,18 +449,17 @@ const main = async () => {
     },
     paths: {
       '/session': {
-        post: ({ body }) => setCookie({ auth: createSession({ secret }, body).jwt }, textOk('Cookie Set')),
+        post: async ({ body }) => setCookie({ auth: createSession({ secret }, body).jwt }, textOk('Cookie Set')),
       },
       '/test': {
-        get: () => textOk('OK'),
-        post: ({ authInfo }) => textOk(`OK ${authInfo.email}`),
+        get: async () => textOk('OK'),
+        post: async ({ authInfo }) => textOk(`OK ${authInfo.email}`),
       },
-      '/unauthorized': { get: () => textForbidden('Forbidden!') },
+      '/unauthorized': { get: async () => textForbidden('Forbidden!') },
     },
   });
-  const server = httpServer({ app });
-  await start(server);
-  console.log(describe(server));
+  const server = new HttpServer({ app });
+  await start([server], console);
 };
 
 main();

@@ -1,4 +1,4 @@
-import { HttpMiddleware, HttpApp, textForbidden, jsonOk, HttpServer, start } from '@ovotech/laminar';
+import { HttpMiddleware, HttpApp, textForbidden, jsonOk, HttpServer, init } from '@ovotech/laminar';
 
 /**
  * Its a very simple database, that only has one function:
@@ -42,4 +42,4 @@ const db = createDbMiddleware();
 
 const server = new HttpServer({ app: log(db(auth(app))) });
 
-start([server], console);
+init([server], console);

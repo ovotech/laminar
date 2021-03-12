@@ -17,7 +17,7 @@ import {
   ok,
   badRequest,
   textOk,
-  start,
+  init,
 } from '@ovotech/laminar';
 import { createReadStream } from 'fs';
 import { join } from 'path';
@@ -55,4 +55,4 @@ const server = new HttpServer({
   ),
 });
 
-start([server], console);
+init([server], console);

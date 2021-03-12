@@ -1,4 +1,4 @@
-import { get, HttpServer, router, staticAssets, jsonOk, start } from '@ovotech/laminar';
+import { get, HttpServer, router, staticAssets, jsonOk, init } from '@ovotech/laminar';
 import { join } from 'path';
 
 const main = async () => {
@@ -8,7 +8,7 @@ const main = async () => {
       get('/', async () => jsonOk({ health: 'ok' })),
     ),
   });
-  await start([server], console);
+  await init([server], console);
 };
 
 main();

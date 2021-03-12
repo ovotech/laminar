@@ -1,8 +1,8 @@
 import {
   ConsumerService,
   ProducerService,
-  DecodedEachBatch,
-  DecodedEachMessage,
+  EachBatchConsumer,
+  EachMessageConsumer,
   chunkBatchMiddleware,
   toLogCreator,
   produce,
@@ -57,14 +57,14 @@ const sendEvent3 = produce<Event2>({
   schema: { type: SchemaType.AVRO, schema: JSON.stringify(Event2Schema) },
 });
 
-const eachEvent1: DecodedEachMessage<Event1, LoggerContext> = async ({ message, partition, logger }) => {
+const eachEvent1: EachMessageConsumer<Event1, LoggerContext> = async ({ message, partition, logger }) => {
   if (message.decodedValue) {
     data[partition].push(message.decodedValue.field1);
     logger.info(message.decodedValue.field1);
   }
 };
 
-const eachEvent2: DecodedEachBatch<Event2, LoggerContext> = async ({ batch, logger }) => {
+const eachEvent2: EachBatchConsumer<Event2, LoggerContext> = async ({ batch, logger }) => {
   for (const msg of batch.messages) {
     if (msg.decodedValue) {
       data[batch.partition].push(msg.decodedValue.field2);
@@ -77,9 +77,9 @@ const myLogger = {
   info: jest.fn(),
   debug: jest.fn(),
   error: jest.fn(),
-  log: jest.fn(),
   warn: jest.fn(),
 };
+
 const logging = loggerMiddleware(myLogger);
 const logCreator = toLogCreator(myLogger);
 

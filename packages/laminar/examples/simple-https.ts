@@ -1,4 +1,4 @@
-import { get, post, HttpServer, router, textOk, jsonOk, start } from '@ovotech/laminar';
+import { get, post, HttpServer, router, textOk, jsonOk, init } from '@ovotech/laminar';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -15,7 +15,7 @@ const main = async () => {
       get('/test', async () => textOk('index')),
     ),
   });
-  await start([server], console);
+  await init([server], console);
 };
 
 main();

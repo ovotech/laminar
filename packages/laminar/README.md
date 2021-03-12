@@ -66,7 +66,7 @@ components:
 > [examples/oapi.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/oapi.ts)
 
 ```typescript
-import { HttpServer, jsonOk, openApi } from '@ovotech/laminar';
+import { HttpServer, jsonOk, openApi, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi.yaml');
@@ -76,14 +76,13 @@ const main = async () => {
     api,
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
-        get: () => jsonOk({ email: 'me@example.com' }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
+        get: async () => jsonOk({ email: 'me@example.com' }),
       },
     },
   });
   const server = new HttpServer({ app });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();
@@ -170,7 +169,7 @@ components:
 > [examples/oapi-security.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/oapi-security.ts)
 
 ```typescript
-import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk } from '@ovotech/laminar';
+import { HttpServer, jsonOk, jsonUnauthorized, openApi, securityOk, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi-security.yaml');
@@ -186,14 +185,13 @@ const main = async () => {
     },
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
-        get: () => jsonOk({ email: 'me@example.com' }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
+        get: async () => jsonOk({ email: 'me@example.com' }),
       },
     },
   });
   const server = new HttpServer({ app });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();
@@ -215,12 +213,12 @@ You can use [@ovotech/lamina-cli](../lamina-cli) package to generate types.
 
 JSON and JS object are not _exactly_ the same, as you can [read to your horror at MDN docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description). Laminar tries to follow that spec, converting your JS objects into stuff that your json-schema can validate. For example Date objects are converted to iso strings and undefined fields are omitted from the object.
 
-This works on type level too. If the types generated from the OpenApi schema would match JS objects passed to the helper functions `jsonOk`, `jsonNotFound` etc.
+This works on type level too. The types generated from the OpenApi schema would match JS objects passed to the helper functions `jsonOk`, `jsonNotFound` etc.
 
 > [examples/convertion.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/convertion.ts)
 
 ```typescript
-import { HttpServer, jsonOk, openApi } from '@ovotech/laminar';
+import { HttpServer, jsonOk, openApi, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'convertion.yaml');
@@ -230,12 +228,12 @@ const main = async () => {
     api,
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
         /**
          * The Date object will be converted to a string
          * undefined values will be cleaned up
          */
-        get: () =>
+        get: async () =>
           jsonOk({
             email: 'me@example.com',
             createdAt: new Date('2020-01-01T12:00:00Z'),
@@ -245,21 +243,20 @@ const main = async () => {
     },
   });
   const server = new HttpServer({ app });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();
 ```
 
-### Undocumented types
+### Undocumented paths
 
-You can define additional types that are not defined by openapi schema. You can use the laminar router for that, by placing the routes before the app, so they take precedence.
+You can define additional paths that are not defined by openapi schema. To do that you can use the `notFound` property, which accepts any laminar app.
 
 > [examples/oapi-undocumented-routes.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/oapi-undocumented-routes.ts)
 
 ```typescript
-import { HttpServer, jsonOk, router, get, redirect, openApi } from '@ovotech/laminar';
+import { HttpServer, jsonOk, router, get, redirect, openApi, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi.yaml');
@@ -269,21 +266,20 @@ const main = async () => {
     api,
     paths: {
       '/user': {
-        post: ({ body }) => jsonOk({ result: 'ok', user: body }),
-        get: () => jsonOk({ email: 'me@example.com' }),
+        post: async ({ body }) => jsonOk({ result: 'ok', user: body }),
+        get: async () => jsonOk({ email: 'me@example.com' }),
       },
     },
     notFound: router(
-      get('/old/{id}', ({ path: { id } }) => redirect(`http://example.com/new/${id}`)),
-      get('/old/{id}/pdf', ({ path: { id } }) => redirect(`http://example.com/new/${id}/pdf`)),
+      get('/old/{id}', async ({ path: { id } }) => redirect(`http://example.com/new/${id}`)),
+      get('/old/{id}/pdf', async ({ path: { id } }) => redirect(`http://example.com/new/${id}/pdf`)),
     ),
   });
 
   const server = new HttpServer({
     app,
   });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();
@@ -296,19 +292,17 @@ To create an http server that responds to `GET .well-known/health-check`, `GET t
 > [examples/simple.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/simple.ts)
 
 ```typescript
-import { get, post, HttpServer, router, jsonOk, textOk } from '@ovotech/laminar';
+import { get, post, HttpServer, router, jsonOk, textOk, start } from '@ovotech/laminar';
 
 const main = async () => {
   const server = new HttpServer({
     app: router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      post('/test', () => textOk('submited')),
-      get('/test', () => textOk('index')),
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      post('/test', async () => textOk('submited')),
+      get('/test', async () => textOk('index')),
     ),
   });
-  await server.start();
-
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();
@@ -323,11 +317,11 @@ Lets see the simplest possible app with laminar, a very simple echo app
 > [examples/echo.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/echo.ts)
 
 ```typescript
-import { HttpServer, response } from '@ovotech/laminar';
+import { HttpServer, response, start } from '@ovotech/laminar';
 
-const server = new HttpServer({ app: ({ body }) => response({ body }) });
+const server = new HttpServer({ app: async ({ body }) => response({ body }) });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 It consists of a function that gets the body of the request from the current request context, and returns it as a response. Echo.
@@ -341,16 +335,16 @@ We can go ahead and write a middleware, that would do stuff just before passing 
 > [examples/echo-auth.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/echo-auth.ts)
 
 ```typescript
-import { HttpServer, textForbidden, textOk, HttpApp, HttpMiddleware } from '@ovotech/laminar';
+import { HttpServer, textForbidden, textOk, HttpApp, HttpMiddleware, start } from '@ovotech/laminar';
 
-const auth: HttpMiddleware = (next) => (req) =>
+const auth: HttpMiddleware = (next) => async (req) =>
   req.headers.authorization === 'Me' ? next(req) : textForbidden('Not Me');
 
-const app: HttpApp = (req) => textOk(req.url.toString());
+const app: HttpApp = async (req) => textOk(req.url.toString());
 
 const server = new HttpServer({ app: auth(app) });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 Notice that we actually execute the next middleware _inside_ our auth middleware. This allows us to do stuff before and after whatever follows. For example say we wanted to log what the request and response was.
@@ -358,9 +352,9 @@ Notice that we actually execute the next middleware _inside_ our auth middleware
 > [examples/echo-auth-log.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/echo-auth-log.ts)
 
 ```typescript
-import { HttpMiddleware, HttpApp, textForbidden, textOk, HttpServer } from '@ovotech/laminar';
+import { HttpMiddleware, HttpApp, textForbidden, textOk, HttpServer, start } from '@ovotech/laminar';
 
-const auth: HttpMiddleware = (next) => (req) =>
+const auth: HttpMiddleware = (next) => async (req) =>
   req.headers.authorization === 'Me' ? next(req) : textForbidden('Not Me');
 
 const log: HttpMiddleware = (next) => (req) => {
@@ -370,10 +364,11 @@ const log: HttpMiddleware = (next) => (req) => {
   return response;
 };
 
-const app: HttpApp = (req) => textOk(req.body);
+const app: HttpApp = async (req) => textOk(req.body);
 
 const server = new HttpServer({ app: log(auth(app)) });
-server.start().then((server) => console.log(server.describe()));
+
+start([server], console);
 ```
 
 You can see how we can string those middlewares along `log(auth(main))` as just function calls. But that's not all that impressive. Where this approach really shines is when we want to modify the context to pass state to middlewares downstream, and we want to make sure that is statically typed. E.g. we want typescript to complain and bicker if we attempt to use a middleware that requires something from the context, that hasn't yet been set.
@@ -385,7 +380,7 @@ Lets see how we can go about doing that.
 > [examples/echo-auth-log-db.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/echo-auth-log-db.ts)
 
 ```typescript
-import { HttpMiddleware, HttpApp, textForbidden, jsonOk, HttpServer } from '@ovotech/laminar';
+import { HttpMiddleware, HttpApp, textForbidden, jsonOk, HttpServer, start } from '@ovotech/laminar';
 
 /**
  * Its a very simple database, that only has one function:
@@ -409,7 +404,7 @@ const createDbMiddleware = (): HttpMiddleware<RequestDB> => {
   return (next) => (req) => next({ ...req, db });
 };
 
-const auth: HttpMiddleware = (next) => (req) =>
+const auth: HttpMiddleware = (next) => async (req) =>
   req.headers.authorization === 'Me' ? next(req) : textForbidden('Not Me');
 
 const log: HttpMiddleware = (next) => (req) => {
@@ -423,12 +418,13 @@ const log: HttpMiddleware = (next) => (req) => {
  * We can now require this app to have the middleware.
  * If the propper ones are not executed later, TypeScript will inform us at compile time.
  */
-const app: HttpApp<RequestDB> = (req) => jsonOk({ url: req.url.toString(), user: req.db.getValidUser() });
+const app: HttpApp<RequestDB> = async (req) => jsonOk({ url: req.url.toString(), user: req.db.getValidUser() });
 
 const db = createDbMiddleware();
 
 const server = new HttpServer({ app: log(db(auth(app))) });
-server.start().then((server) => console.log(server.describe()));
+
+start([server], console);
 ```
 
 We have a convenience type `Middleware<TProvide, TRequre>` that state what context does it provide to all the middleware downstream of it, and what context does it require from the one upstream of it.
@@ -446,21 +442,21 @@ You can write and add your own parsers. Each one has a 'match' function and a 'p
 > [examples/body-parser.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/body-parser.ts)
 
 ```typescript
-import { HttpServer, HttpApp, textOk, BodyParser, concatStream, defaultBodyParsers } from '@ovotech/laminar';
+import { HttpServer, HttpApp, textOk, BodyParser, concatStream, defaultBodyParsers, start } from '@ovotech/laminar';
 
 const csvParser: BodyParser = {
   match: (contentType) => contentType === 'text/csv',
   parse: async (body) => String(await concatStream(body)).split(','),
 };
 
-const app: HttpApp = ({ body }) => textOk(JSON.stringify(body));
+const app: HttpApp = async ({ body }) => textOk(JSON.stringify(body));
 
 const server = new HttpServer({
   app,
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 ### Streaming Data
@@ -472,7 +468,7 @@ You can achieve that by writing your own parser that will preserve the `Readable
 > [examples/streaming-parser.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/streaming-parser.ts)
 
 ```typescript
-import { HttpServer, HttpApp, BodyParser, defaultBodyParsers, csv, ok } from '@ovotech/laminar';
+import { HttpServer, HttpApp, BodyParser, defaultBodyParsers, csv, ok, start } from '@ovotech/laminar';
 import { pipeline, Readable, Transform } from 'stream';
 import * as parse from 'csv-parse';
 import * as stringify from 'csv-stringify';
@@ -498,14 +494,14 @@ const upperCaseTransform = new Transform({
 const transformCsv = (body: Readable): Readable =>
   pipeline(body, parse(), upperCaseTransform, stringify(), (err) => (err ? console.error(err.message) : undefined));
 
-const app: HttpApp = ({ body }) => csv(ok({ body: transformCsv(body) }));
+const app: HttpApp = async ({ body }) => csv(ok({ body: transformCsv(body) }));
 
 const server = new HttpServer({
   app,
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 Alternatively, you can also set `bodyParsers` option to an empty array (`[]`), and use `bodyParserComponent` as a middleware, selectively only on specific routes.
@@ -517,7 +513,7 @@ The router middleware allows you to respond to requests based on what path was r
 > [examples/router.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/router.ts)
 
 ```typescript
-import { get, put, HttpServer, router, jsonOk, jsonNotFound } from '@ovotech/laminar';
+import { get, put, HttpServer, router, jsonOk, jsonNotFound, start } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -526,19 +522,19 @@ const users: Record<string, string> = {
 
 const server = new HttpServer({
   app: router(
-    get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-    get('/users', () => jsonOk(users)),
-    get('/users/{id}', ({ path }) => jsonOk(users[path.id])),
-    put('/users/{id}', ({ path, body }) => {
+    get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+    get('/users', async () => jsonOk(users)),
+    get('/users/{id}', async ({ path }) => jsonOk(users[path.id])),
+    put('/users/{id}', async ({ path, body }) => {
       users[path.id] = body;
       return jsonOk(users[path.id]);
     }),
     // Default URL handler
-    ({ url }) => jsonNotFound({ message: `This url ${url} was not found` }),
+    async ({ url }) => jsonNotFound({ message: `This url ${url} was not found` }),
   ),
 });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 Path parameters are written in `{nameOfParameter}` style, and each name is extracted and its value passed in the `path` context property.
@@ -548,16 +544,16 @@ If none of the routes match, the router would return a generic 404. You can modi
 > [examples/default-route.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/default-route.ts)
 
 ```typescript
-import { get, router, jsonOk, textNotFound, HttpServer } from '@ovotech/laminar';
+import { get, router, start, jsonOk, textNotFound, HttpServer } from '@ovotech/laminar';
 
 const server = new HttpServer({
   app: router(
-    get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-    () => textNotFound('Woopsy'),
+    get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+    async () => textNotFound('Woopsy'),
   ),
 });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 You can also configure a route to ba a static folder with assets. Works with nested folders as well, does not support index pages.
@@ -565,18 +561,17 @@ You can also configure a route to ba a static folder with assets. Works with nes
 > [examples/static-assets.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/static-assets.ts)
 
 ```typescript
-import { get, HttpServer, router, staticAssets, jsonOk } from '@ovotech/laminar';
+import { get, HttpServer, router, staticAssets, jsonOk, start } from '@ovotech/laminar';
 import { join } from 'path';
 
 const main = async () => {
   const server = new HttpServer({
     app: router(
       staticAssets('/my-folder', join(__dirname, 'assets')),
-      get('/', () => jsonOk({ health: 'ok' })),
+      get('/', async () => jsonOk({ health: 'ok' })),
     ),
   });
-  await server.start();
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();
@@ -621,6 +616,7 @@ import {
   ok,
   badRequest,
   textOk,
+  start,
 } from '@ovotech/laminar';
 import { createReadStream } from 'fs';
 import { join } from 'path';
@@ -628,37 +624,37 @@ import { join } from 'path';
 const server = new HttpServer({
   app: router(
     // Redirects
-    get('/redirect', () => redirect('http://my-new-location.example.com', { headers: { 'X-Other': 'Other' } })),
+    get('/redirect', async () => redirect('http://my-new-location.example.com', { headers: { 'X-Other': 'Other' } })),
 
     // Static files
-    get('/static-file', () => file(join(__dirname, 'assets/start.svg'))),
+    get('/static-file', async () => file(join(__dirname, 'assets/start.svg'))),
 
     // Different stream types
-    get('/text-stream', () => textOk(createReadStream(join(__dirname, 'assets/texts/one.txt')))),
-    get('/html-stream', () => htmlOk(createReadStream(join(__dirname, 'assets/texts/other.html')))),
+    get('/text-stream', async () => textOk(createReadStream(join(__dirname, 'assets/texts/one.txt')))),
+    get('/html-stream', async () => htmlOk(createReadStream(join(__dirname, 'assets/texts/other.html')))),
 
     // JSON Responses
-    get('/json/forbidden', () => jsonForbidden({ message: 'Not Authorized' })),
-    get('/json/object', () => jsonOk({ health: 'ok' })),
-    get('/json/not-found-response', () => jsonNotFound({ message: 'not found' })),
-    get('/json/bad-request', () => jsonBadRequest({ message: 'not found' })),
+    get('/json/forbidden', async () => jsonForbidden({ message: 'Not Authorized' })),
+    get('/json/object', async () => jsonOk({ health: 'ok' })),
+    get('/json/not-found-response', async () => jsonNotFound({ message: 'not found' })),
+    get('/json/bad-request', async () => jsonBadRequest({ message: 'not found' })),
 
     // Custom status code
-    get('/json/208', () => json({ body: { message: 'custom response' }, status: 208 })),
+    get('/json/208', async () => json({ body: { message: 'custom response' }, status: 208 })),
 
     // HTML Responses
-    get('/json/forbidden', () => htmlForbidden('<html>Forbidden</html>')),
-    get('/html/object', () => htmlOk('<html>OK</html>')),
-    get('/html/not-found-response', () => htmlNotFound('<html>Not Found</html>')),
-    get('/html/bad-request', () => htmlBadRequest('<html>Bad Request</html>')),
+    get('/json/forbidden', async () => htmlForbidden('<html>Forbidden</html>')),
+    get('/html/object', async () => htmlOk('<html>OK</html>')),
+    get('/html/not-found-response', async () => htmlNotFound('<html>Not Found</html>')),
+    get('/html/bad-request', async () => htmlBadRequest('<html>Bad Request</html>')),
 
     // Additional Types
-    get('/csv/ok', () => csv(ok({ body: 'one,two,three' }))),
-    get('/csv/error', () => csv(badRequest({ body: 'error,error2,error3' }))),
+    get('/csv/ok', async () => csv(ok({ body: 'one,two,three' }))),
+    get('/csv/error', async () => csv(badRequest({ body: 'error,error2,error3' }))),
   ),
 });
 
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 Helpers that set the status code are as follows:
@@ -723,7 +719,7 @@ For example this would allow only 'example.com' and 'localhost' as origins.
 > [examples/cors.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/cors.ts)
 
 ```typescript
-import { jsonOk, get, put, HttpServer, router, corsMiddleware } from '@ovotech/laminar';
+import { jsonOk, get, put, HttpServer, router, corsMiddleware, start } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -737,17 +733,17 @@ const cors = corsMiddleware({
 const server = new HttpServer({
   app: cors(
     router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      get('/users', () => jsonOk(users)),
-      get('/users/{id}', ({ path }) => jsonOk(users[path.id])),
-      put('/users/{id}', ({ path, body }) => {
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      get('/users', async () => jsonOk(users)),
+      get('/users/{id}', async ({ path }) => jsonOk(users[path.id])),
+      put('/users/{id}', async ({ path, body }) => {
         users[path.id] = body;
         return jsonOk(users[path.id]);
       }),
     ),
   ),
 });
-server.start().then((server) => console.log(server.describe()));
+start([server], console);
 ```
 
 ### Logging Middleware
@@ -757,7 +753,7 @@ There's a simple middleware that allows you to log requests, responses and pass 
 > [examples/logging.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/logging.ts)
 
 ```typescript
-import { get, put, HttpServer, router, jsonOk, loggingMiddleware } from '@ovotech/laminar';
+import { get, put, HttpServer, router, jsonOk, loggingMiddleware, start } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -769,10 +765,10 @@ const logging = loggingMiddleware(console);
 const server = new HttpServer({
   app: logging(
     router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      get('/users', () => jsonOk(users)),
-      get('/users/{id}', ({ path }) => jsonOk(users[path.id])),
-      put('/users/{id}', ({ path, body, logger }) => {
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      get('/users', async () => jsonOk(users)),
+      get('/users/{id}', async ({ path }) => jsonOk(users[path.id])),
+      put('/users/{id}', async ({ path, body, logger }) => {
         logger.log('info', 'putting');
         users[path.id] = body;
         return jsonOk(users[path.id]);
@@ -780,7 +776,8 @@ const server = new HttpServer({
     ),
   ),
 });
-server.start().then((server) => console.log(server.describe()));
+
+start([server], console);
 ```
 
 ### HTTPS (TLS) Support
@@ -790,7 +787,7 @@ laminar can use node's https server.
 > [examples/simple-https.ts](https://github.com/ovotech/laminar/tree/main/packages/laminar/examples/simple-https.ts)
 
 ```typescript
-import { get, post, HttpServer, router, textOk, jsonOk } from '@ovotech/laminar';
+import { get, post, HttpServer, router, textOk, jsonOk, start } from '@ovotech/laminar';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -802,14 +799,12 @@ const main = async () => {
       cert: readFileSync(join(__dirname, 'cert.pem')),
     },
     app: router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      post('/test', () => textOk('submited')),
-      get('/test', () => textOk('index')),
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      post('/test', async () => textOk('submited')),
+      get('/test', async () => textOk('index')),
     ),
   });
-  await server.start();
-
-  console.log(server.describe());
+  await start([server], console);
 };
 
 main();

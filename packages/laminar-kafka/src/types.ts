@@ -28,17 +28,17 @@ export interface DecodedEachBatchPayload<TValue> extends EachBatchPayload {
   batch: DecodedBatch<TValue>;
 }
 
-export type DecodedEachMessage<TValue, TContext extends Empty = Empty> = (
+export type EachMessageConsumer<TValue, TContext extends Empty = Empty> = (
   payload: DecodedEachMessagePayload<TValue> & TContext,
 ) => Promise<void>;
 
-export type DecodedEachBatch<TValue, TContext extends Empty = Empty> = (
+export type EachBatchConsumer<TValue, TContext extends Empty = Empty> = (
   payload: DecodedEachBatchPayload<TValue> & TContext,
 ) => Promise<void>;
 
 export interface SchemaRegistryConsumerRunConfig<TValue> extends Omit<ConsumerRunConfig, 'eachMessage' | 'eachBatch'> {
-  eachMessage?: DecodedEachMessage<TValue>;
-  eachBatch?: DecodedEachBatch<TValue>;
+  eachMessage?: EachMessageConsumer<TValue>;
+  eachBatch?: EachBatchConsumer<TValue>;
 }
 
 export interface EncodedMessage<TValue> extends Omit<Message, 'value'> {

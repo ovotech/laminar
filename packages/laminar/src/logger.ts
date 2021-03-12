@@ -2,34 +2,31 @@ export interface LoggerMetadata {
   [key: string]: unknown;
 }
 
+export interface RequestLogging {
+  logger: LoggerLike;
+}
+
 export interface LoggerLike {
-  log: (level: string, message?: unknown, metadata?: LoggerMetadata) => void;
-  info: (message: unknown, metadata?: LoggerMetadata) => void;
-  error: (message: unknown, metadata?: LoggerMetadata) => void;
-  debug: (message: unknown, metadata?: LoggerMetadata) => void;
-  warn: (message: unknown, metadata?: LoggerMetadata) => void;
+  debug: (message: any, metadata?: LoggerMetadata) => void;
+  info: (message: any, metadata?: LoggerMetadata) => void;
+  warn: (message: any, metadata?: LoggerMetadata) => void;
+  error: (message: any, metadata?: LoggerMetadata) => void;
 }
 
-export class LoggerWithMetadata implements LoggerLike {
-  constructor(public readonly source: LoggerLike, public readonly staticMetadata: LoggerMetadata) {}
+export const withStaticMetadata = (logger: LoggerLike, staticMetadata: LoggerMetadata): LoggerLike => ({
+  info(message, metadata) {
+    logger.info(message, { ...metadata, ...staticMetadata });
+  },
 
-  log(level: string, message?: unknown, metadata?: LoggerMetadata): void {
-    this.source.log(level, message, { ...metadata, ...this.staticMetadata });
-  }
+  error(message, metadata) {
+    logger.error(message, { ...metadata, ...staticMetadata });
+  },
 
-  info(message: unknown, metadata?: LoggerMetadata): void {
-    this.source.info(message, { ...metadata, ...this.staticMetadata });
-  }
+  debug(message, metadata) {
+    logger.debug(message, { ...metadata, ...staticMetadata });
+  },
 
-  error(message: unknown, metadata?: LoggerMetadata): void {
-    this.source.error(message, { ...metadata, ...this.staticMetadata });
-  }
-
-  debug(message: unknown, metadata?: LoggerMetadata): void {
-    this.source.debug(message, { ...metadata, ...this.staticMetadata });
-  }
-
-  warn(message: unknown, metadata?: LoggerMetadata): void {
-    this.source.warn(message, { ...metadata, ...this.staticMetadata });
-  }
-}
+  warn(message, metadata) {
+    logger.warn(message, { ...metadata, ...staticMetadata });
+  },
+});

@@ -9,7 +9,7 @@ You can use the `router` function to create a rest api
 > [examples/docs/src/server.ts](https://github.com/ovotech/laminar/tree/main/examples/docs/src/server.ts)
 
 ```typescript
-import { get, jsonOk, router, httpServer, describe, start } from '@ovotech/laminar';
+import { get, jsonOk, router, HttpServer, start } from '@ovotech/laminar';
 
 /**
  * A simple function to get some data out of a data store
@@ -17,10 +17,10 @@ import { get, jsonOk, router, httpServer, describe, start } from '@ovotech/lamin
 const findUser = (id: string) => ({ id, name: 'John' });
 
 const main = async () => {
-  const server = httpServer({
+  const server = new HttpServer({
     app: router(
-      get('/.well-known/health-check', () => jsonOk({ health: 'ok' })),
-      get('/users/{id}', ({ path }) => jsonOk(findUser(path.id))),
+      get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
+      get('/users/{id}', async ({ path }) => jsonOk(findUser(path.id))),
     ),
     port: 4399,
   });
@@ -28,9 +28,7 @@ const main = async () => {
   /**
    * Now we've cerated the server, but it has not yet been started.
    */
-  await start(server);
-
-  console.log(describe(server));
+  await start([server], console);
 };
 
 main();
@@ -48,7 +46,7 @@ A request object has at its core this `incommingMessage` which is an instance fr
 /**
  * Returns the url path being accessed
  */
-const app: App = ({ incommingMessage }) => jsonOk({ accessedUrl: incommingMessage.url });
+const app: HttpApp = async ({ incommingMessage }) => jsonOk({ accessedUrl: incommingMessage.url });
 ```
 
 While simple the app sits at the heart of all of laminar and is an essential building block, so don't dismiss it out of hand.
@@ -70,24 +68,24 @@ const app = router(
   /**
    * You match pathnames with strings
    */
-  get('/authors', () => jsonOk(authors)),
+  get('/authors', async () => jsonOk(authors)),
 
   /**
    * If a pathname has a {some_name} in it it would be captured and accessible with the `path` paramters
    */
-  get('/authors/{id}', ({ path: { id } }) => jsonOk(authors[id])),
+  get('/authors/{id}', async ({ path: { id } }) => jsonOk(authors[id])),
 
   /**
    * You can have multiple parameters in the path, all of them will be extracted
    */
-  get('/blog/{articleId}/authors/{authorId}', ({ path: { authorId, articleId } }) =>
+  get('/blog/{articleId}/authors/{authorId}', async ({ path: { authorId, articleId } }) =>
     jsonOk([articles[articleId], authors[authorId]]),
   ),
 
   /**
    * You have helpers available for all the HTTP methods: get, post, del, patch, put, options
    */
-  put('/authors', ({ body }) => {
+  put('/authors', async ({ body }) => {
     authors[body.id] = body.name;
     return jsonOk({ success: true });
   }),
@@ -98,7 +96,7 @@ const app = router(
   route({
     path: '/blog',
     method: 'DRAFT',
-    app: ({ body }) => {
+    app: async ({ body }) => {
       articles[body.id] = body.name;
       return jsonOk({ success: true });
     },
@@ -126,17 +124,17 @@ const app = router(
    * They need to start it with a ^ and should end it with $
    * Though that is not required and you can leave it out to create wildcard routes
    */
-  get(/^\/names$/, () => jsonOk(items)),
+  get(/^\/names$/, async () => jsonOk(items)),
 
   /**
    * If a pathname has a capture group in it it would be captured and accessible with the `path` paramters array
    */
-  get(/\/names\/(\d+)/, ({ path: [id] }) => jsonOk(items[id])),
+  get(/\/names\/(\d+)/, async ({ path: [id] }) => jsonOk(items[id])),
 
   /**
    * You can use other method helpers: get, post, del, patch, put, options are available
    */
-  put(/^\/names$/, ({ body }) => {
+  put(/^\/names$/, async ({ body }) => {
     items[body.id] = body.name;
     return jsonOk({ success: true });
   }),
@@ -157,7 +155,7 @@ You can serve a directory of static assesets with `staticAssets` helper.
 
 ```typescript
 const app = router(
-  get('/.well-known/health-check', () => jsonOk({ success: 'ok' })),
+  get('/.well-known/health-check', async () => jsonOk({ success: 'ok' })),
   /**
    * All the files from the 'assets' directory are going to be served
    */
@@ -173,15 +171,15 @@ By default it accepts range headers on files and if you request a directory, it 
 
 ```typescript
 const app = router(
-  get('/.well-known/health-check', () => jsonOk({ success: 'ok' })),
+  get('/.well-known/health-check', async () => jsonOk({ success: 'ok' })),
   /**
    * You can pass configuration options
    */
   staticAssets('/my-assets', join(__dirname, '../assets'), {
     index: 'index.htm',
     acceptRanges: false,
-    indexNotFound: () => htmlNotFound('<html>Not Found</html>'),
-    fileNotFound: () => htmlNotFound('<html>No File</html>'),
+    indexNotFound: async () => htmlNotFound('<html>Not Found</html>'),
+    fileNotFound: async () => htmlNotFound('<html>No File</html>'),
   }),
 );
 ```

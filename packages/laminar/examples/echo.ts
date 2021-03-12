@@ -1,5 +1,5 @@
-import { HttpServer, response, start } from '@ovotech/laminar';
+import { HttpServer, response, init } from '@ovotech/laminar';
 
 const server = new HttpServer({ app: async ({ body }) => response({ body }) });
 
-start([server], console);
+init([server], console);
