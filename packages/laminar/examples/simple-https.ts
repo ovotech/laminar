@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const main = async () => {
-  const server = new HttpServer({
+  const http = new HttpServer({
     port: 8443,
     https: {
       key: readFileSync(join(__dirname, 'key.pem')),
@@ -15,7 +15,7 @@ const main = async () => {
       get('/test', async () => textOk('index')),
     ),
   });
-  await init([server], console);
+  await init({ services: [http], logger: console });
 };
 
 main();

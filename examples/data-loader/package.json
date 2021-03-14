@@ -32,7 +32,8 @@
     "preset": "../../jest.json"
   },
   "scripts": {
-    "start": "SECRET=123 PG=postgres://example-admin:example-pass@localhost:5432/example ts-node src/index.ts",
+    "start": "ts-node src/index.ts",
+    "create-session": "node dist/create-session.js",
     "build:schema": "laminar api --file schema.yaml | prettier --stdin-filepath schema.ts > src/__generated__/schema.ts",
     "build:avro": "avro-ts src/consumers/avro/*.json --output-dir src/__generated__ --logical-type-import-default decimal=Decimal:decimal.js  --logical-type timestamp-millis=Date --logical-type date=Date",
     "build:ts": "tsc --declaration",
@@ -45,10 +46,11 @@
     "@ovotech/laminar": "^0.11.0",
     "@ovotech/laminar-jwt": "^0.11.0",
     "@ovotech/laminar-kafka": "^0.11.0",
-    "@ovotech/laminar-pg": "^0.11.0",
-    "@ovotech/laminar-queue": "^0.11.0",
+    "decimal.js": "^10.2.1",
+    "dotenv": "^8.2.0",
     "kafkajs": "^1.15.0",
     "pg": "^8.5.1",
+    "pg-boss": "^4.3.4",
     "runtypes": "^5.0.1",
     "winston": "^3.3.3"
   }

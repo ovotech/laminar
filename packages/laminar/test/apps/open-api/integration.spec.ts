@@ -12,6 +12,7 @@ import {
   jsonForbidden,
   optional,
   jsonNoContent,
+  run,
 } from '../../../src';
 import axios from 'axios';
 import { join } from 'path';
@@ -141,11 +142,9 @@ describe('Integration', () => {
     const oapi = await openApi(config);
     const logger = withLogger(log);
 
-    const server = new HttpServer({ app: logger(oapi), port: 8063 });
+    const http = new HttpServer({ app: logger(oapi), port: 8063 });
 
-    try {
-      await server.start();
-
+    await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:8063' });
 
       await expect(api.get('/pets?pagination[page]=0&pagination[perPage]=1')).resolves.toMatchObject({
@@ -527,12 +526,7 @@ describe('Integration', () => {
       );
       expect(log).toHaveBeenNthCalledWith(11, 'Get all');
       expect(log).toHaveBeenNthCalledWith(12, 'Get all');
-    } catch (error) {
-      console.log(error.response?.data);
-      throw error;
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });
 

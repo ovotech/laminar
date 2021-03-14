@@ -13,6 +13,7 @@ services:
     volumes:
       - ./examples/petstore/init.sql:/docker-entrypoint-initdb.d/petstore.sql
       - ./examples/split/init.sql:/docker-entrypoint-initdb.d/split.sql
+      - ./examples/data-loader/init.sql:/docker-entrypoint-initdb.d/data-loader.sql
       - ./packages/laminar-pg/init.sql:/docker-entrypoint-initdb.d/laminar-pg.sql
       - ./packages/laminar-queue/init.sql:/docker-entrypoint-initdb.d/laminar-queue.sql
 

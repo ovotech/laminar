@@ -87,10 +87,18 @@ export {
   ResponseTimeConfig,
   defaultResponseTimeHeader,
 } from './http/middleware/response-time.middleware';
-export { httpLoggingMiddleware } from './http/middleware/http-logging.middleware';
-export { loggingMiddleware } from './middleware/logging.middleware';
-export { LoggerMetadata, LoggerLike, withStaticMetadata, RequestLogging } from './logger';
-export { start, stop, ContextItem, init, stopOnSignal } from './lifecycle';
+export { requestLoggingMiddleware } from './http/middleware/request-logging.middleware';
+
+export {
+  LoggerMetadata,
+  LoggerLike,
+  withStaticMetadata,
+  RequestLogging,
+  loggerMiddleware,
+  LoggerService,
+} from './logger/index';
+
+export { start, stop, Context, init, run, testRun, stopOnSignal } from './context';
 export {
   responseParserMiddleware,
   defaultResponseParsers,
@@ -147,3 +155,43 @@ export {
   OapiPaths,
   OapiConfig,
 } from './http/apps/open-api';
+
+export { RequestPg, pgMiddleware, PgService } from './pg/index';
+
+export {
+  QueueService,
+  QueueSubscriptionService,
+  QueueSubscriptionsService,
+  queueMiddleware,
+  QueueContext,
+  Publish,
+  JobData,
+  JobHandler,
+  Subscribe,
+  Queue,
+} from './queue/index';
+
+export {
+  ConsumerService,
+  OptionalConsumerService,
+  ProducerService,
+  RegisterSchemas,
+  producerMiddleware,
+  ProducerContext,
+  registerSchemas,
+  toProducerRecord,
+  RegisterSchemasConfig,
+  toLogCreator,
+  produce,
+  Produce,
+  chunkBatchMiddleware,
+  DecodedKafkaMessage,
+  DecodedEachMessagePayload,
+  DecodedBatch,
+  DecodedEachBatchPayload,
+  EachBatchConsumer,
+  EachMessageConsumer,
+  EncodedMessage,
+  EncodedProducerRecord,
+  SchemaRegistryConsumerRunConfig,
+} from './kafka/index';

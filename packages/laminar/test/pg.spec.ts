@@ -1,17 +1,6 @@
 import axios from 'axios';
-import {
-  HttpServer,
-  LoggerLike,
-  Middleware,
-  start,
-  stop,
-  router,
-  post,
-  jsonOk,
-  get,
-  jsonNotFound,
-} from '@ovotech/laminar';
-import { pgPoolMiddleware, PgPoolService } from '../src';
+import { HttpServer, LoggerLike, Middleware, run, router, post, jsonOk, get, jsonNotFound } from '@ovotech/laminar';
+import { pgMiddleware, PgService } from '../src';
 import { Pool } from 'pg';
 
 export interface LoggerContext {
@@ -34,13 +23,13 @@ describe('Integration', () => {
     };
     const withLogger = loggerMiddleware(loggerMock);
 
-    const pool = new PgPoolService(
+    const pool = new PgService(
       new Pool({
         connectionString: 'postgres://example-admin:example-pass@localhost:5432/example',
         max: 5,
       }),
     );
-    const withPool = pgPoolMiddleware(pool);
+    const withPool = pgMiddleware(pool);
 
     const http = new HttpServer({
       port,
@@ -64,18 +53,12 @@ describe('Integration', () => {
       ),
     });
 
-    const services = [pool, http];
-
-    try {
-      await start(services, loggerMock);
-
+    await run({ services: [pool, http] }, async () => {
       const names = [...Array(100).keys()].map((key) => `test-${key}`);
 
       const results = await Promise.all(names.map((name) => axios.post(`http://localhost:${port}/create`, { name })));
 
       await Promise.all(results.map(({ data: { id } }) => axios.get(`http://localhost:${port}/pet/${id}`)));
-    } finally {
-      await stop(services, loggerMock);
-    }
+    });
   });
 });

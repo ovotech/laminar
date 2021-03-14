@@ -79,13 +79,18 @@ export const verifyToken = async <TUser extends JWTData = JWTData>(
   } catch (error) {
     if (error instanceof jsonwebtoken.TokenExpiredError) {
       return jsonForbidden({
-        message: `Unauthorized. ${error.message}`,
+        message: `Unauthorized. TokenExpiredError: ${error.message}`,
         expiredAt: error.expiredAt,
       });
     } else if (error instanceof jsonwebtoken.NotBeforeError) {
       return jsonForbidden({
-        message: `Unauthorized. ${error.message}`,
+        message: `Unauthorized. NotBeforeError: ${error.message}`,
         date: error.date,
+      });
+    } else if (error instanceof jsonwebtoken.JsonWebTokenError) {
+      return jsonForbidden({
+        message: `Unauthorized. JsonWebTokenError: ${error.message}`,
+        inner: error.inner,
       });
     }
 

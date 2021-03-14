@@ -1,4 +1,4 @@
-import { Record, String, Undefined, Static } from 'runtypes';
+import { Record, String, Undefined, Static, Union, Literal } from 'runtypes';
 
 export const EnvVarsRecord = Record({
   // Database
@@ -10,10 +10,10 @@ export const EnvVarsRecord = Record({
   KAFKA_GROUP_ID: String,
 
   // Server
-  HOST: String.Or(Undefined),
-  PORT: String.Or(Undefined),
+  HOST: String,
+  PORT: String,
   SECRET: String,
-  LOG_LEVEL: String.Or(Undefined),
+  LOG_LEVEL: Union(Literal('error'), Literal('warn'), Literal('info'), Literal('debug'), Undefined),
 });
 
 export type EnvVars = Static<typeof EnvVarsRecord>;

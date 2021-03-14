@@ -1,4 +1,4 @@
-import { HttpServer, jsonOk } from '@ovotech/laminar';
+import { HttpServer, jsonOk, run } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/loss';
@@ -41,16 +41,12 @@ describe('Statements', () => {
         },
       },
     });
-    const server = new HttpServer({ app, port: 4910 });
-    try {
-      await server.start();
-
+    const http = new HttpServer({ app, port: 4910 });
+    await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:4910' });
       const { data } = await api.get('/accounts/123/meters');
 
       expect(data).toMatchSnapshot();
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });

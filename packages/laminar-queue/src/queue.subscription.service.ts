@@ -15,6 +15,9 @@ export class QueueSubscriptionService<ReqData> implements Service {
   }
 
   describe(): string {
-    return `Subscription: ${this.subscribe.name}, Options ${JSON.stringify(this.subscribe.options)}`;
+    return [
+      `Subscription: ${this.subscribe.name}`,
+      this.subscribe.options ? `Options ${JSON.stringify(this.subscribe.options)}` : undefined,
+    ].join(', ');
   }
 }

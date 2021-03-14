@@ -12,6 +12,6 @@ const log: HttpMiddleware = (next) => (req) => {
 
 const app: HttpApp = async (req) => textOk(req.body);
 
-const server = new HttpServer({ app: log(auth(app)) });
+const http = new HttpServer({ app: log(auth(app)) });
 
-init([server], console);
+init({ services: [http], logger: console });

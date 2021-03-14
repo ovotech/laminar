@@ -4,7 +4,8 @@ import * as parse from 'csv-parse';
 import * as stringify from 'csv-stringify';
 
 const csvParser: BodyParser = {
-  match: (contentType) => contentType === 'text/csv',
+  name: 'CsvParser',
+  match: /text\/csv/,
   parse: async (body) => body,
 };
 
@@ -26,9 +27,9 @@ const transformCsv = (body: Readable): Readable =>
 
 const app: HttpApp = async ({ body }) => csv(ok({ body: transformCsv(body) }));
 
-const server = new HttpServer({
+const http = new HttpServer({
   app,
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 
-init([server], console);
+init({ services: [http], logger: console });

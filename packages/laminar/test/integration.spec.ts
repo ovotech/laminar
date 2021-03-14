@@ -11,18 +11,16 @@ import {
   router,
   responseTimeMiddleware,
   HttpMiddleware,
-  httpLoggingMiddleware,
+  requestLoggingMiddleware,
   staticAssets,
   jsonOk,
   textOk,
-  LoggerLike,
   RequestLogging,
   jsonNotFound,
   file,
   HttpError,
   HttpApp,
-  start,
-  stop,
+  run,
 } from '../src';
 import { join } from 'path';
 import { readFileSync, createReadStream } from 'fs';
@@ -35,14 +33,10 @@ describe('Integration', () => {
     const port = 8051;
 
     const server = new HttpServer({ port, app, timeout: 50 });
-    try {
-      await start([server]);
-
+    await run({ services: [server] }, async () => {
       const error = await axios.get(`http://localhost:${port}`).catch((error) => error);
       expect(error.message).toEqual('socket hang up');
-    } finally {
-      await stop([server]);
-    }
+    });
   });
 
   it('Should allow TLS', async () => {
@@ -52,22 +46,18 @@ describe('Integration', () => {
     const cert = readFileSync(join(__dirname, '../examples/cert.pem'));
     const ca = readFileSync(join(__dirname, '../examples/ca.pem'));
 
-    const server = new HttpServer({ port, app, https: { key, cert } });
-    try {
-      await server.start();
-
+    const http = new HttpServer({ port, app, https: { key, cert } });
+    await run({ services: [http] }, async () => {
       const response = await axios.get(`https://localhost:${port}`, {
         httpsAgent: new Agent({ ca }),
       });
       expect(response.data).toEqual('TLS Test');
-    } finally {
-      await server.stop();
-    }
+    });
   });
 
   it('Should process response', async () => {
-    const loggerMock: LoggerLike = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
-    const logging = httpLoggingMiddleware(loggerMock);
+    const logger = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
+    const logging = requestLoggingMiddleware(logger);
     const responseTime = responseTimeMiddleware();
 
     interface DBRequest {
@@ -166,10 +156,8 @@ describe('Integration', () => {
       async ({ url }) => jsonNotFound(`Test url ${url.pathname} not found`),
     );
 
-    const server = new HttpServer({ port: 8050, app: responseTime(db(logging(app))) });
-    try {
-      await server.start();
-
+    const http = new HttpServer({ port: 8050, app: responseTime(db(logging(app))) });
+    await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:8050' });
 
       await expect(api.get('/unknown-url').catch((error) => error.response)).resolves.toMatchObject({
@@ -182,7 +170,7 @@ describe('Integration', () => {
         data: { message: 'unknown' },
       });
 
-      await expect(api.get('/return-file')).resolves.toMatchObject({
+      expect(await api.get('/return-file')).toMatchObject({
         status: 200,
         headers: { 'content-type': 'text/plain' },
         data: 'one\n',
@@ -345,21 +333,13 @@ describe('Integration', () => {
         data: { id: '30', name: 'Added' },
       });
 
-      expect(loggerMock.info).toHaveBeenNthCalledWith(1, 'Request', {
-        request: 'GET /unknown-url',
+      expect(logger.error).toHaveBeenNthCalledWith(1, 'Error: 404, [GET /unknown-url]', {
+        body: 'Test url /unknown-url not found',
       });
-      expect(loggerMock.info).toHaveBeenNthCalledWith(2, 'Response', {
-        request: 'GET /unknown-url',
-        status: 404,
-        contentType: 'application/json',
-      });
-      expect(loggerMock.error).toHaveBeenNthCalledWith(1, 'Error', {
-        request: 'GET /error',
+      expect(logger.error).toHaveBeenNthCalledWith(2, 'Error: unknown [GET /error]', {
         message: 'unknown',
         stack: expect.any(String),
       });
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });

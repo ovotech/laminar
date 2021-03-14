@@ -1,4 +1,4 @@
-import { get, post, start, HttpServer, jsonOk, router, HttpApp } from '@ovotech/laminar';
+import { get, post, init, HttpServer, jsonOk, router, HttpApp } from '@ovotech/laminar';
 import { authMiddleware, createSession } from '@ovotech/laminar-jwt';
 
 const secret = '123';
@@ -21,6 +21,6 @@ const app: HttpApp = router(
   ),
 );
 
-const server = new HttpServer({ app });
+const http = new HttpServer({ app });
 
-start([server], console);
+init({ services: [http], logger: console });

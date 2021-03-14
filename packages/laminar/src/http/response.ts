@@ -94,6 +94,8 @@ export interface FileOptions {
  * @param filename a local path to the file.
  * @category HttpResponse
  */
+export function file(filename: string): HttpResponse<string, 200>;
+export function file(filename: string, options: Partial<HttpResponse> & FileOptions): HttpResponse;
 export function file(
   filename: string,
   { headers, status = 200, incommingMessage, stats }: Partial<HttpResponse> & FileOptions = {},
@@ -108,7 +110,7 @@ export function file(
 
     if (range) {
       return {
-        status: 206,
+        status: 206 as const,
         body: createReadStream(filename, range),
         headers: {
           'content-type': contentType,
@@ -120,7 +122,7 @@ export function file(
       };
     } else {
       return {
-        status: 416,
+        status: 416 as const,
         headers: { 'accept-ranges': 'bytes', 'Content-Range': `bytes */${stat.size}` },
         body: '',
       };

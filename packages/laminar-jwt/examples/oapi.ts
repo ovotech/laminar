@@ -1,4 +1,4 @@
-import { HttpServer, start, jsonOk, openApi } from '@ovotech/laminar';
+import { HttpServer, init, jsonOk, openApi } from '@ovotech/laminar';
 import { createSession, jwtSecurityResolver } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 
@@ -17,8 +17,8 @@ const main = async () => {
       },
     },
   });
-  const server = new HttpServer({ app });
-  await start([server], console);
+  const http = new HttpServer({ app });
+  await init({ services: [http], logger: console });
 };
 
 main();

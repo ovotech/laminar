@@ -9,6 +9,7 @@ import {
   jsonNotFound,
   jsonUnauthorized,
   securityOk,
+  run,
 } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
@@ -136,10 +137,8 @@ describe('Statements', () => {
     });
     const log = jest.fn();
     const logger = withLogger(log);
-    const server = new HttpServer({ app: logger(app), port: 4913 });
-    try {
-      await server.start();
-
+    const http = new HttpServer({ app: logger(app), port: 4913 });
+    await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:4913' });
 
       const { data: statementHtml } = await api.get('/v2/statements/111/html', {
@@ -153,8 +152,6 @@ describe('Statements', () => {
       });
 
       expect(statementPdf).toMatchSnapshot();
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });

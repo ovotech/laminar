@@ -5,7 +5,7 @@ const users: Record<string, string> = {
   '2': 'Foo',
 };
 
-const server = new HttpServer({
+const http = new HttpServer({
   app: router(
     get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
     get('/users', async () => jsonOk(users)),
@@ -19,4 +19,4 @@ const server = new HttpServer({
   ),
 });
 
-init([server], console);
+init({ services: [http], logger: console });

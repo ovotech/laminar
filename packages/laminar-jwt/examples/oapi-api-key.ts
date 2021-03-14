@@ -1,4 +1,4 @@
-import { HttpServer, start, openApi, textOk, setCookie } from '@ovotech/laminar';
+import { HttpServer, init, openApi, textOk, setCookie } from '@ovotech/laminar';
 import { createSession, verifyToken } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 
@@ -22,8 +22,8 @@ const main = async () => {
       },
     },
   });
-  const server = new HttpServer({ app });
-  await start([server], console);
+  const http = new HttpServer({ app });
+  await init({ services: [http], logger: console });
 };
 
 main();

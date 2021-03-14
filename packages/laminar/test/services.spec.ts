@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { HttpServer, textOk, Middleware, start, stop } from '../src';
+import { HttpServer, textOk, Middleware, run } from '../src';
 import { SimpleQueue, Boss } from './simple-queue';
 
 export interface BossContext<TData> {
@@ -34,38 +34,32 @@ describe('Services', () => {
       }),
     });
 
-    const services = [boss, [http, queue]];
-
-    try {
-      await start(services, logger);
-
+    await run({ services: [boss, [http, queue]], logger }, async () => {
       await axios.get(`http://localhost:${port}?data[]=1&data[]=2&data[]=3`);
       await axios.get(`http://localhost:${port}?data[]=4`);
 
       await new Promise((resolve) => setTimeout(resolve, 100));
-    } finally {
-      await stop(services, logger);
+    });
 
-      expect(logger.info.mock.calls).toEqual([
-        ['⏫ Starting Boss'],
-        ['✅ Started Boss'],
-        ['⏫ Starting ⛲ Laminar: null'],
-        ['⏫ Starting Queue: one'],
-        ['✅ Started Queue: one'],
-        ['✅ Started ⛲ Laminar: 127.0.0.1:8060 (IPv4)'],
-        ['test'],
-        ['1'],
-        ['2'],
-        ['3'],
-        ['test'],
-        ['4'],
-        ['⏬ Stopping ⛲ Laminar: 127.0.0.1:8060 (IPv4)'],
-        ['⏬ Stopping Queue: one'],
-        ['❎ Stopped Queue: one'],
-        ['❎ Stopped ⛲ Laminar: null'],
-        ['⏬ Stopping Boss'],
-        ['❎ Stopped Boss'],
-      ]);
-    }
+    expect(logger.info.mock.calls).toEqual([
+      ['⏫ Starting Boss'],
+      ['✅ Started Boss'],
+      ['⏫ Starting ⛲ Laminar: -'],
+      ['⏫ Starting Queue: one'],
+      ['✅ Started Queue: one'],
+      ['✅ Started ⛲ Laminar: 127.0.0.1:8060 (IPv4)'],
+      ['test'],
+      ['1'],
+      ['2'],
+      ['3'],
+      ['test'],
+      ['4'],
+      ['⏬ Stopping ⛲ Laminar: 127.0.0.1:8060 (IPv4)'],
+      ['⏬ Stopping Queue: one'],
+      ['❎ Stopped Queue: one'],
+      ['❎ Stopped ⛲ Laminar: -'],
+      ['⏬ Stopping Boss'],
+      ['❎ Stopped Boss'],
+    ]);
   });
 });

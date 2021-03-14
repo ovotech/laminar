@@ -158,6 +158,6 @@ export class HttpServer implements Service {
     const url =
       typeof address === 'object' && address ? `${address.address}:${address.port} (${address.family})` : address;
 
-    return `⛲ Laminar: ${url}`;
+    return `⛲ Laminar: ${url ?? '-'}`;
   }
 }

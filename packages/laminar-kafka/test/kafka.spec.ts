@@ -73,15 +73,15 @@ const eachEvent2: EachBatchConsumer<Event2, LoggerContext> = async ({ batch, log
   }
 };
 
-const myLogger = {
+const logger = {
   info: jest.fn(),
   debug: jest.fn(),
   error: jest.fn(),
   warn: jest.fn(),
 };
 
-const logging = loggerMiddleware(myLogger);
-const logCreator = toLogCreator(myLogger);
+const logging = loggerMiddleware(logger);
+const logCreator = toLogCreator(logger);
 
 const batchSizer = jest.fn();
 
@@ -148,7 +148,7 @@ describe('Integration', () => {
           { topic: topic3, numPartitions: 1 },
         ],
       });
-      await start(services, myLogger);
+      await start({ services, logger });
 
       await Promise.all([
         producer.send<Event1>({ topic: topic1, messages: [{ value: { field1: 'test1' }, partition: 0 }] }),
@@ -185,13 +185,13 @@ describe('Integration', () => {
             2: ['test3'],
           });
 
-          expect(myLogger.info).toHaveBeenCalledWith('test1');
-          expect(myLogger.info).toHaveBeenCalledWith('test2');
-          expect(myLogger.info).toHaveBeenCalledWith('test3');
-          expect(myLogger.info).toHaveBeenCalledWith('test4');
-          expect(myLogger.info).toHaveBeenCalledWith('test5');
-          expect(myLogger.info).toHaveBeenCalledWith('test6');
-          expect(myLogger.info).toHaveBeenCalledWith('test7');
+          expect(logger.info).toHaveBeenCalledWith('test1');
+          expect(logger.info).toHaveBeenCalledWith('test2');
+          expect(logger.info).toHaveBeenCalledWith('test3');
+          expect(logger.info).toHaveBeenCalledWith('test4');
+          expect(logger.info).toHaveBeenCalledWith('test5');
+          expect(logger.info).toHaveBeenCalledWith('test6');
+          expect(logger.info).toHaveBeenCalledWith('test7');
 
           expect(batchSizer).toHaveBeenCalledWith({
             partition: 0,
@@ -219,7 +219,7 @@ describe('Integration', () => {
       );
     } finally {
       await admin.disconnect();
-      await stop(services, myLogger);
+      await stop({ services, logger });
     }
   });
 });

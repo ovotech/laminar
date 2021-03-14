@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { HttpServer, textOk, router, get, post, route } from '../../src';
+import { HttpServer, textOk, router, get, post, route, run } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8096' });
 
 describe('router middleware', () => {
   it('Should route resolvers correctly', async () => {
-    const server = new HttpServer({
+    const http = new HttpServer({
       port: 8096,
       app: router(
         route({
@@ -29,9 +29,7 @@ describe('router middleware', () => {
         async () => textOk('nothing'),
       ),
     });
-    try {
-      await server.start();
-
+    await run({ services: [http] }, async () => {
       await expect(api.get('/one/foo/10')).resolves.toMatchObject({
         status: 200,
         data: 'One foo 10',
@@ -69,8 +67,6 @@ describe('router middleware', () => {
       await expect(api.get('/two')).resolves.toMatchObject({ status: 200, data: 'two not found' });
 
       await expect(api.get('/ttas')).resolves.toMatchObject({ status: 200, data: 'nothing' });
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });

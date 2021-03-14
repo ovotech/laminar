@@ -6,6 +6,7 @@ import {
   jsonNoContent,
   securityOk,
   optional,
+  run,
 } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
@@ -82,11 +83,9 @@ describe('Petstore', () => {
       },
     });
     const logger = withLogger(log);
-    const server = new HttpServer({ app: logger(oapi), port: 4911 });
+    const http = new HttpServer({ app: logger(oapi), port: 4911 });
 
-    try {
-      await server.start();
-
+    await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:4911' });
 
       await expect(api.get('/unknown-url').catch((error) => error.response)).resolves.toMatchObject({
@@ -209,8 +208,6 @@ describe('Petstore', () => {
       expect(log).toHaveBeenNthCalledWith(3, 'new pet New Puppy, trace token: 123');
       expect(log).toHaveBeenNthCalledWith(4, 'Get all');
       expect(log).toHaveBeenNthCalledWith(5, 'Get all');
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });

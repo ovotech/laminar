@@ -1,6 +1,6 @@
 import {
   HttpServer,
-  start,
+  init,
   openApi,
   redirect,
   isSecurityOk,
@@ -43,8 +43,8 @@ const main = async () => {
       '/unauthorized': { get: async () => textForbidden('Forbidden!') },
     },
   });
-  const server = new HttpServer({ app });
-  await start([server], console);
+  const http = new HttpServer({ app });
+  await init({ services: [http], logger: console });
 };
 
 main();

@@ -19,8 +19,8 @@ const main = async () => {
       },
     },
   });
-  const server = new HttpServer({ app });
-  await init([server], console);
+  const http = new HttpServer({ app });
+  await init({ services: [http], logger: console });
 };
 
 main();

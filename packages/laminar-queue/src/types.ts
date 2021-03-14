@@ -1,29 +1,31 @@
-/* eslint-disable @typescript-eslint/ban-types */
+import { Empty } from '@ovotech/laminar';
 import { PublishOptions, SubscribeOptions } from 'pg-boss';
 
-export interface Publish<ReqData = object> {
+export interface Publish<TData extends Empty = Empty> {
   name: string;
-  data?: ReqData;
+  data?: TData;
   options?: PublishOptions;
 }
 
-export interface JobData<ReqData> {
-  data: ReqData;
+export interface JobData<TData> {
+  data: TData;
   id: string;
   name: string;
   queue: Queue;
 }
 
-export type JobHandler<ReqData> = (data: JobData<ReqData>) => Promise<void>;
+export type JobHandler<TData extends Empty, TRequest extends Empty = Empty> = (
+  data: JobData<TData> & TRequest,
+) => Promise<void>;
 
-export interface Subscribe<ReqData = object> {
+export interface Subscribe<TData extends Empty = Empty, TRequest extends Empty = Empty> {
   name: string;
-  app: JobHandler<ReqData>;
+  app: JobHandler<TData, TRequest>;
   options?: SubscribeOptions;
 }
 
 export interface Queue {
   publish(request: Publish): Promise<string | null>;
-  subscribe<ReqData>(request: Subscribe<ReqData>): Promise<void>;
+  subscribe<TData>(request: Subscribe<TData>): Promise<void>;
   unsubscribe(name: string): Promise<boolean>;
 }

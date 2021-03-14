@@ -1,4 +1,4 @@
-import { HttpServer, start, jsonOk } from '@ovotech/laminar';
+import { HttpServer, init, jsonOk } from '@ovotech/laminar';
 import { openApiTyped } from './__generated__/convertion.yaml';
 import { join } from 'path';
 
@@ -24,7 +24,7 @@ const main = async () => {
     },
   });
   const server = new HttpServer({ app });
-  await start([server], console);
+  await init({ services: [server], logger: console });
 };
 
 main();

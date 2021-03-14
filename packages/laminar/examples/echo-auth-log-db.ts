@@ -40,6 +40,6 @@ const app: HttpApp<RequestDB> = async (req) => jsonOk({ url: req.url.toString(),
 
 const db = createDbMiddleware();
 
-const server = new HttpServer({ app: log(db(auth(app))) });
+const http = new HttpServer({ app: log(db(auth(app))) });
 
-init([server], console);
+init({ services: [http], logger: console });

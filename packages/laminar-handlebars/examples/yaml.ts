@@ -1,4 +1,4 @@
-import { start, router, get, HttpServer } from '@ovotech/laminar';
+import { init, router, get, HttpServer } from '@ovotech/laminar';
 import { handlebarsMiddleware } from '@ovotech/laminar-handlebars';
 import { join } from 'path';
 
@@ -18,4 +18,4 @@ const server = new HttpServer({
   ),
 });
 
-start([server], console);
+init({ services: [server], logger: console });

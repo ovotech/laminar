@@ -1,4 +1,4 @@
-import { OapiConfig, openApi, HttpServer, jsonOk } from '../../../src';
+import { OapiConfig, openApi, HttpServer, jsonOk, run } from '../../../src';
 import axios from 'axios';
 import { join } from 'path';
 
@@ -42,20 +42,13 @@ describe('Statements', () => {
     };
 
     const app = await openApi(config);
-    const server = new HttpServer({ app, port: 8064 });
+    const http = new HttpServer({ app, port: 8064 });
 
-    try {
-      await server.start();
-
+    await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:8064' });
       const { data } = await api.get('/accounts/123/meters');
 
       expect(data).toMatchSnapshot();
-    } catch (error) {
-      console.log(error.response?.data);
-      throw error;
-    } finally {
-      server.stop();
-    }
+    });
   });
 });

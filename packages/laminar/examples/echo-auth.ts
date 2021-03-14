@@ -5,6 +5,6 @@ const auth: HttpMiddleware = (next) => async (req) =>
 
 const app: HttpApp = async (req) => textOk(req.url.toString());
 
-const server = new HttpServer({ app: auth(app) });
+const http = new HttpServer({ app: auth(app) });
 
-init([server], console);
+init({ services: [http], logger: console });

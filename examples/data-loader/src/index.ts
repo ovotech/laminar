@@ -1,7 +1,11 @@
-import { init } from "@ovotech/laminar";
-import { services } from "./services";
+import { init } from '@ovotech/laminar';
+import { EnvVarsRecord } from './env';
+import { createContext } from './context';
+import { config } from 'dotenv';
 
+/**
+ * Load env variables from the .env file
+ */
+config();
 
-await init([pool, [httpServer, meterReadingService]], console);
-
-main();
+createContext(EnvVarsRecord.check(process.env)).then(init);

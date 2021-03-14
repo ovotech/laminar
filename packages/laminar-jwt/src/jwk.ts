@@ -26,7 +26,7 @@ const jwkSchema = (kid: string): Schema => ({
             required: ['kid', 'use', 'kty'],
           },
           {
-            oneOf: [
+            anyOf: [
               {
                 properties: { x5c: { minItems: 1, items: { type: 'string' } } },
                 required: ['x5c'],

@@ -81,6 +81,7 @@ jobs:
       - npm-login
       - run: git config user.email "ovotech-ci@ovoenergy.com"
       - run: git config user.name "Ovotech CI"
+      - run: git update-index --assume-unchanged .yarnrc.yaml
       - run: yarn lerna publish from-package --yes
 
 workflows:

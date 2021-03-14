@@ -9,7 +9,7 @@ const cors = corsMiddleware({
   allowOrigin: (origin) => ['http://example.com', 'http://localhost'].includes(origin),
 });
 
-const server = new HttpServer({
+const http = new HttpServer({
   app: cors(
     router(
       get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
@@ -22,4 +22,4 @@ const server = new HttpServer({
     ),
   ),
 });
-init([server], console);
+init({ services: [http], logger: console });

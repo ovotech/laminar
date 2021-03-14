@@ -22,7 +22,7 @@ import {
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
-const server = new HttpServer({
+const http = new HttpServer({
   app: router(
     // Redirects
     get('/redirect', async () => redirect('http://my-new-location.example.com', { headers: { 'X-Other': 'Other' } })),
@@ -55,4 +55,4 @@ const server = new HttpServer({
   ),
 });
 
-init([server], console);
+init({ services: [http], logger: console });

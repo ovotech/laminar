@@ -1,4 +1,4 @@
-import { start, router, get, post, HttpServer } from '@ovotech/laminar';
+import { init, router, get, post, HttpServer } from '@ovotech/laminar';
 import { handlebars } from '@ovotech/laminar-handlebars';
 import { join } from 'path';
 
@@ -11,4 +11,4 @@ const server = new HttpServer({
   ),
 });
 
-start([server], console);
+init({ services: [server], logger: console });

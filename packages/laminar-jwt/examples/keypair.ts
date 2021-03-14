@@ -1,4 +1,4 @@
-import { get, post, HttpServer, router, start, jsonOk, HttpApp } from '@ovotech/laminar';
+import { get, post, HttpServer, router, init, jsonOk, HttpApp } from '@ovotech/laminar';
 import { authMiddleware, createSession } from '@ovotech/laminar-jwt';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -30,5 +30,5 @@ const app: HttpApp = router(
   ),
 );
 
-const server = new HttpServer({ app });
-start([server], console);
+const http = new HttpServer({ app });
+init({ services: [http], logger: console });

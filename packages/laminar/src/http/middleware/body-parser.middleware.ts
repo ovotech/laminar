@@ -3,12 +3,18 @@ import { URLSearchParams } from 'url';
 import { parseQueryObjects } from '../../helpers';
 import { HttpMiddleware } from '../types';
 import { Readable } from 'stream';
+import { toMultipartBoundary, MultipartParser, toMultipartData } from '../multipart-parser';
+import { HttpError } from '../http-error';
 
 export interface BodyParser {
   /**
+   * The name of the parseer, for debugging purposes
+   */
+  name: string;
+  /**
    * If returns true for a given content type, then this body parser will be used
    */
-  match: (contentType: string) => boolean;
+  match: RegExp | ((contentType: string) => boolean);
   /**
    * Process a raw incomming message into a concrete parsed response
    */
@@ -28,11 +34,9 @@ export function concatStream(stream: Readable): Promise<string | undefined> {
   });
 }
 
-const parseJsonRegExp = /^application\/([^\+\;]+\+)?json(\;.*)?/;
-const parseFormRegExp = /^application\/x-www-form-urlencoded(\;.*)?/;
-
 export const parseJson: BodyParser = {
-  match: (contentType) => parseJsonRegExp.test(contentType),
+  name: 'JsonBodyParser',
+  match: /^application\/([^\+\;]+\+)?json(\;.*)?/,
   parse: async (incommingMessage) => {
     const buffer = await concatStream(incommingMessage);
     return buffer === undefined ? undefined : JSON.parse(buffer);
@@ -40,29 +44,53 @@ export const parseJson: BodyParser = {
 };
 
 export const parseForm: BodyParser = {
-  match: (contentType) => parseFormRegExp.test(contentType),
+  name: 'FormUrlEncodedBodyParser',
+  match: /^application\/x-www-form-urlencoded(\;.*)?/,
   parse: async (incommingMessage) =>
     parseQueryObjects(new URLSearchParams((await concatStream(incommingMessage)) ?? '')),
 };
 
-const parseTextRegx = /^text\/.*/;
-
 export const parseText: BodyParser = {
-  match: (contentType) => parseTextRegx.test(contentType),
+  name: 'PlainTextBodyParser',
+  match: /^text\/.*/,
   parse: async (incommingMessage) => await concatStream(incommingMessage),
 };
 
+export const multipartFormData: BodyParser = {
+  name: 'MultipartFormDataBodyParser',
+  match: /^multipart\/form-data/,
+  parse: async (incommingMessage) => {
+    const contentType = incommingMessage.headers['content-type'];
+    const boundary = toMultipartBoundary(contentType);
+    if (!boundary) {
+      throw new Error(`Missing boundary in Content-Type header: ${contentType}`);
+    }
+    const parser = new MultipartParser(boundary);
+    return await toMultipartData(incommingMessage.pipe(parser));
+  },
+};
+
 export const parseDefault: BodyParser = {
+  name: 'DefaultParser',
   match: () => true,
   parse: async (incommingMessage) => await concatStream(incommingMessage),
 };
 
-export const defaultBodyParsers: BodyParser[] = [parseJson, parseForm, parseText, parseDefault];
+export const defaultBodyParsers: BodyParser[] = [parseJson, parseForm, parseText, multipartFormData, parseDefault];
 
 export async function parseBody(incommingMessage: IncomingMessage, parsers = defaultBodyParsers): Promise<unknown> {
-  const parser = parsers.find((parser) => parser.match(incommingMessage.headers['content-type'] || ''));
+  const parser = parsers.find((parser) => {
+    const contentType = incommingMessage.headers['content-type'] || '';
+    return parser.match instanceof RegExp ? parser.match.test(contentType) : parser.match(contentType);
+  });
 
-  return parser ? await parser.parse(incommingMessage) : incommingMessage;
+  return parser
+    ? await parser.parse(incommingMessage).catch((error) => {
+        throw new HttpError(400, {
+          message: `Error Parsing Request Body: "${error.message}" with parser: ${parser.name}`,
+        });
+      })
+    : incommingMessage;
 }
 
 /**

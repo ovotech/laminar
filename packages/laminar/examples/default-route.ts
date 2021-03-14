@@ -1,10 +1,10 @@
 import { get, router, init, jsonOk, textNotFound, HttpServer } from '@ovotech/laminar';
 
-const server = new HttpServer({
+const http = new HttpServer({
   app: router(
     get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
     async () => textNotFound('Woopsy'),
   ),
 });
 
-init([server], console);
+init({ services: [http], logger: console });

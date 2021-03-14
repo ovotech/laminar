@@ -1,15 +1,14 @@
-import { HttpApp, jsonOk, ok, yaml, RequestLogging } from '@ovotech/laminar';
-import { RequestPgPool } from '@ovotech/laminar-pg';
+import { HttpApp, jsonOk, ok, yaml, RequestLogging, RequestPg } from '@ovotech/laminar';
 import { jwtSecurityResolver } from '@ovotech/laminar-jwt';
-import { readFileSync } from 'fs';
+import { createReadStream } from 'fs';
 import { join } from 'path';
 import { openApiTyped } from '../../__generated__/schema';
 import { EnvVars } from '../../env';
 
-export const httpApp = async (env: EnvVars): Promise<HttpApp<RequestPgPool & RequestLogging>> => {
-  const api = readFileSync(join(__dirname, '../../schema.yaml'), 'utf-8');
-  const app = await openApiTyped<RequestPgPool & RequestLogging>({
-    api,
+export const httpApp = async (env: EnvVars): Promise<HttpApp<RequestPg & RequestLogging>> => {
+  const schemaFilename = join(__dirname, '../../../schema.yaml');
+  const app = await openApiTyped<RequestPg & RequestLogging>({
+    api: schemaFilename,
     security: {
       BearerAuth: jwtSecurityResolver({ secret: env.SECRET }),
     },
@@ -18,7 +17,7 @@ export const httpApp = async (env: EnvVars): Promise<HttpApp<RequestPgPool & Req
         get: async () => jsonOk({ healthy: true }),
       },
       '/.well-known/openapi.yaml': {
-        get: async () => yaml(ok({ body: api })),
+        get: async () => yaml(ok({ body: createReadStream(schemaFilename) })),
       },
       '/v1/hydration/meter-reads': {
         post: async ({ body, logger }) => {
