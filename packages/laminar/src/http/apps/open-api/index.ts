@@ -1,7 +1,7 @@
 export { openApi, defaultOapiNotFound } from './open-api';
 export { securityOk, isSecurityOk, isSecurityResponse } from './security';
 export {
-  RequestOapi,
+  OapiContext,
   AppRouteOapi,
   OapiPath,
   OapiAuthInfo,

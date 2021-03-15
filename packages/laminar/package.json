@@ -55,7 +55,6 @@
   },
   "dependencies": {
     "@ovotech/json-schema": "^0.6.0",
-    "cookie": "^0.4.1",
     "mime-types": "^2.1.27",
     "openapi-schemas": "^2.0.3",
     "openapi3-ts": "^2.0.0"

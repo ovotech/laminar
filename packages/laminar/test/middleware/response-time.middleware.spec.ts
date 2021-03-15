@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { HttpServer, responseTimeMiddleware, textOk } from '../../src';
+import { HttpService, responseTimeMiddleware, textOk } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8096' });
 
 describe('responseTimeMiddleware middleware', () => {
   it('Should measure small response time', async () => {
     const responseTime = responseTimeMiddleware();
-    const server = new HttpServer({
+    const server = new HttpService({
       port: 8096,
-      app: responseTime(async () => {
+      listener: responseTime(async () => {
         await new Promise((resolve) => setTimeout(resolve, 15));
         return textOk('OK');
       }),
@@ -27,9 +27,9 @@ describe('responseTimeMiddleware middleware', () => {
 
   it('Should measure larger response time', async () => {
     const responseTime = responseTimeMiddleware();
-    const server = new HttpServer({
+    const server = new HttpService({
       port: 8096,
-      app: responseTime(async () => {
+      listener: responseTime(async () => {
         await new Promise((resolve) => setTimeout(resolve, 55));
         return textOk('OK');
       }),
@@ -49,9 +49,9 @@ describe('responseTimeMiddleware middleware', () => {
 
   it('Should use custom header', async () => {
     const responseTime = responseTimeMiddleware({ header: 'My-Time' });
-    const server = new HttpServer({
+    const server = new HttpService({
       port: 8096,
-      app: responseTime(async () => textOk('OK')),
+      listener: responseTime(async () => textOk('OK')),
     });
     try {
       await server.start();

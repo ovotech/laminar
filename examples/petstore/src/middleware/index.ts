@@ -1,1 +1,1 @@
-export { petsDbMiddleware, PetsDb, RequestPetsDb } from './pets.middleware';
+export { petsDbMiddleware, PetsDb, PetsDbContext } from './pets.middleware';

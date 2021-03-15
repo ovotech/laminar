@@ -1,10 +1,10 @@
-import { HttpServer, jsonOk, openApi, init } from '@ovotech/laminar';
+import { HttpService, jsonOk, openApi, init } from '@ovotech/laminar';
 import { join } from 'path';
 
 const api = join(__dirname, 'oapi.yaml');
 
 const main = async () => {
-  const app = await openApi({
+  const listener = await openApi({
     api,
     paths: {
       '/user': {
@@ -13,7 +13,7 @@ const main = async () => {
       },
     },
   });
-  const http = new HttpServer({ app });
+  const http = new HttpService({ listener });
   await init({ services: [http], logger: console });
 };
 

@@ -67,8 +67,7 @@ jobs:
           command: |
             psql postgres://example-admin:example-pass@localhost:5432/example < examples/petstore/init.sql
             psql postgres://example-admin:example-pass@localhost:5432/example < examples/split/init.sql
-            psql postgres://example-admin:example-pass@localhost:5432/example < packages/laminar-pg/init.sql
-            psql postgres://example-admin:example-pass@localhost:5432/example < packages/laminar-queue/init.sql
+            psql postgres://example-admin:example-pass@localhost:5432/example < packages/laminar/init.sql
       - run: yarn test
 
   publish:

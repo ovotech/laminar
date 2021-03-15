@@ -1,4 +1,4 @@
-import { LoggerLike, RequestLogging } from './types';
+import { LoggerLike, LoggerContext } from './types';
 import { Middleware } from '../types';
 
 /**
@@ -7,5 +7,5 @@ import { Middleware } from '../types';
  * @param logger Logger instance, must implement `info` and `error`. You can use `console` to output to stdout
  * @category middleware
  */
-export const loggerMiddleware = (logger: LoggerLike): Middleware<RequestLogging> => (next) => (req) =>
+export const loggerMiddleware = (logger: LoggerLike): Middleware<LoggerContext> => (next) => (req) =>
   next({ ...req, logger });

@@ -1,5 +1,6 @@
 export { QueueService } from './queue.service';
-export { QueueSubscriptionService } from './queue.subscription.service';
-export { QueueSubscriptionsService } from './queue.subscriptions.service';
+export { QueueWorkerService } from './queue.worker.service';
+export { QueueWorkersService } from './queue.workers.service';
 export { queueMiddleware, QueueContext } from './queue.middleware';
-export { Publish, JobData, JobHandler, Subscribe, Queue } from './types';
+export { jobLoggingMiddleware } from './job-logging.middleware';
+export { Publish, JobData, JobWorker, Subscribe, Queue, WorkerMiddleware } from './types';

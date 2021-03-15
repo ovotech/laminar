@@ -1,4 +1,4 @@
-import { HttpRequest } from '../../types';
+import { HttpContext } from '../../types';
 import { Empty } from '../../../types';
 import {
   ResolvedOpenAPIObject,
@@ -168,7 +168,7 @@ const coercers: { [key: string]: Coercer } = {
  * Since all parameter values would be strings, this allows us to validate even numeric values
  * @param parameter
  */
-function toParameterCoerce<TRequest extends Empty>(parameter: ResolvedParameterObject): Coerce<TRequest> | undefined {
+function toParameterCoerce<TContext extends Empty>(parameter: ResolvedParameterObject): Coerce<TContext> | undefined {
   const coercer = coercers[parameter.schema?.type ?? ''];
   if (coercer) {
     return (req) => {
@@ -190,15 +190,15 @@ function toParameterCoerce<TRequest extends Empty>(parameter: ResolvedParameterO
  * If a request has parameters, defined to be integer, attempt to convert the string value to integer first
  * Since all parameter values would be strings, this allows us to validate even numeric values
  */
-function toRequestCoerce<TRequest extends Empty>(
+function toRequestCoerce<TContext extends Empty>(
   { parameters }: ResolvedOperationObject,
   { parameters: commonParameters }: Pick<ResolvedPathItemObject, 'parameters'>,
-): Coerce<TRequest> {
+): Coerce<TContext> {
   const allParameters = (parameters ?? []).concat(commonParameters ?? []);
 
   const coerceParameters = allParameters
-    .map((item) => toParameterCoerce<TRequest>(item))
-    .filter((item): item is Coerce<TRequest> => Boolean(item));
+    .map((item) => toParameterCoerce<TContext>(item))
+    .filter((item): item is Coerce<TContext> => Boolean(item));
 
   return (req) => coerceParameters.reduce((acc, coerce) => coerce(acc), req);
 }
@@ -256,15 +256,15 @@ function toResponseSchema({ responses }: ResolvedOperationObject): Record<string
  * @param api
  * @param oapiPaths
  */
-export function toRoutes<TRequest extends Empty>(
+export function toRoutes<TContext extends Empty>(
   api: ResolvedOpenAPIObject,
-  oapiPaths: OapiPaths<TRequest>,
-): Route<TRequest>[] {
-  return Object.entries(api.paths).reduce<Route<TRequest>[]>((pathRoutes, [path, pathParameters]) => {
+  oapiPaths: OapiPaths<TContext>,
+): Route<TContext>[] {
+  return Object.entries(api.paths).reduce<Route<TContext>[]>((pathRoutes, [path, pathParameters]) => {
     const { parameters, summary, description, ...methods } = pathParameters;
     return [
       ...pathRoutes,
-      ...Object.entries(methods).reduce<Route<TRequest>[]>((methodRoutes, [method, operation]) => {
+      ...Object.entries(methods).reduce<Route<TContext>[]>((methodRoutes, [method, operation]) => {
         return [
           ...methodRoutes,
           {
@@ -286,12 +286,12 @@ export function toRoutes<TRequest extends Empty>(
  * Attempt to match the routes from {@link toRoutes} sequentially.
  * If a route matches, return it plus the captured path parameters
  *
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the app requires. Usually added by the middlewares
  */
-export function selectRoute<TRequest extends Empty = Empty>(
-  req: TRequest & HttpRequest,
-  routes: Route<TRequest>[],
-): false | { path: OapiPath; route: Route<TRequest> } {
+export function selectRoute<TContext extends Empty = Empty>(
+  req: TContext & HttpContext,
+  routes: Route<TContext>[],
+): false | { path: OapiPath; route: Route<TContext> } {
   for (const route of routes) {
     const path = route.matcher(req);
     if (path) {

@@ -1,15 +1,15 @@
-export { ConsumerService } from './consumer.service';
-export { OptionalConsumerService } from './optional-consumer.service';
+export { KafkaConsumerService } from './kafka-consumer.service';
+export { KafkaConsumerOptionalService } from './kafka-consumer-optional.service';
 export {
-  ProducerService,
+  KafkaProducerService,
   RegisterSchemas,
   producerMiddleware,
   ProducerContext,
   registerSchemas,
   toProducerRecord,
   RegisterSchemasConfig,
-} from './producer.service';
-export { toLogCreator, produce, Produce } from './helpers';
+} from './kafka-producer.service';
+export { kafkaLogCreator, produce, Produce } from './helpers';
 export { chunkBatchMiddleware } from './chunk-batch.middleware';
 export {
   DecodedKafkaMessage,

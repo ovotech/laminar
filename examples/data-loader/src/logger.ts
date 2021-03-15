@@ -4,7 +4,8 @@ import { format } from 'winston';
 export const consoleTransportFormat = format.combine(
   format.colorize(),
   format.printf(({ level, message, metadata }) => {
-    const details = metadata && Object.keys(metadata).length ? inspect(metadata, { colors: true, depth: 10 }) : '';
+    const details =
+      metadata && Object.keys(metadata).length ? inspect(metadata, { breakLength: 120, colors: true, depth: 10 }) : '';
     return `${level}: ${message} ${details}`;
   }),
 );

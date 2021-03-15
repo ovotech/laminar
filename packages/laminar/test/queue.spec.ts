@@ -1,10 +1,18 @@
 import axios from 'axios';
-import { HttpServer, loggerMiddleware, textOk, run } from '@ovotech/laminar';
-import { queueMiddleware, QueueService, QueueSubscriptionService, QueueSubscriptionsService } from '../src';
+import {
+  HttpService,
+  loggerMiddleware,
+  textOk,
+  run,
+  queueMiddleware,
+  QueueService,
+  QueueWorkerService,
+  QueueWorkersService,
+} from '../src';
 import * as PgBoss from 'pg-boss';
 
 describe('Integration', () => {
-  it('Should work through a queue with a single subscription', async () => {
+  it('Should work through a queue with a single worker', async () => {
     const port = 9060;
     const logger = { info: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
     const logging = loggerMiddleware(logger);
@@ -14,17 +22,17 @@ describe('Integration', () => {
     );
     const withQueue = queueMiddleware(queue);
 
-    const worker = new QueueSubscriptionService<string>(queue, {
+    const worker = new QueueWorkerService<string>(queue, {
       name: 'test',
-      app: logging(async ({ data, logger }) => {
+      worker: logging(async ({ data, logger }) => {
         logger.info(data);
       }),
       options: { newJobCheckInterval: 100, teamConcurrency: 1, teamSize: 1 },
     });
 
-    const http = new HttpServer({
+    const http = new HttpService({
       port,
-      app: withQueue(
+      listener: withQueue(
         logging(async ({ logger, queue, query: { data } }) => {
           logger.info('test');
           for (const item of data) {
@@ -48,7 +56,7 @@ describe('Integration', () => {
     expect(logger.info).toHaveBeenCalledWith(4);
   });
 
-  it('Should work with multiple subscriptions', async () => {
+  it('Should work with multiple workers', async () => {
     const port = 9061;
     const logger = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
     const logging = loggerMiddleware(logger);
@@ -58,26 +66,26 @@ describe('Integration', () => {
     );
     const withQueue = queueMiddleware(queue);
 
-    const worker = new QueueSubscriptionsService(queue, [
+    const worker = new QueueWorkersService(queue, [
       {
         name: 'test-1',
-        app: logging(async ({ data, logger }) => {
+        worker: logging(async ({ data, logger }) => {
           logger.info('test-1', { data });
         }),
         options: { newJobCheckInterval: 100, teamConcurrency: 1, teamSize: 1 },
       },
       {
         name: 'test-2',
-        app: logging(async ({ data, logger }) => {
+        worker: logging(async ({ data, logger }) => {
           logger.info('test-2', { data });
         }),
         options: { newJobCheckInterval: 100, teamConcurrency: 1, teamSize: 1 },
       },
     ]);
 
-    const http = new HttpServer({
+    const http = new HttpService({
       port,
-      app: withQueue(
+      listener: withQueue(
         logging(async ({ logger, queue, query: { name, data } }) => {
           logger.info('test');
           for (const item of data) {

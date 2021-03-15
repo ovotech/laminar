@@ -522,25 +522,24 @@ __metadata:
     "@ovotech/laminar": ^0.11.0
     "@ovotech/laminar-cli": ^0.11.0
     "@ovotech/laminar-jwt": ^0.11.0
-    "@ovotech/laminar-kafka": ^0.11.0
     "@types/jest": ^26.0.16
-    "@types/jsonwebtoken": ^8.5.0
     "@types/node": ^14.14.10
     "@types/pg": ^7.14.9
     "@typescript-eslint/eslint-plugin": ^4.9.0
     "@typescript-eslint/parser": ^4.9.0
     axios: ^0.21.0
+    csv-parse: ^4.15.3
     decimal.js: ^10.2.1
     dotenv: ^8.2.0
     eslint: ^7.14.0
     eslint-config-prettier: ^6.15.0
     jest: ^26.6.3
-    jsonwebtoken: ^8.5.1
     kafkajs: ^1.15.0
     pg: ^8.5.1
     pg-boss: ^4.3.4
     prettier: ^2.2.1
     runtypes: ^5.0.1
+    sql-template-tag: ^4.0.0
     ts-jest: ^26.4.4
     ts-node: ^9.0.0
     typescript: ^4.1.2
@@ -574,9 +573,7 @@ __metadata:
     "@ovotech/laminar": ^0.11.0
     "@ovotech/laminar-cli": ^0.11.0
     "@ovotech/laminar-jwt": ^0.11.0
-    "@ovotech/laminar-pg": ^0.11.0
     "@types/jest": ^26.0.16
-    "@types/jsonwebtoken": ^8.5.0
     "@types/node": ^14.14.10
     "@types/pg": ^7.14.9
     "@typescript-eslint/eslint-plugin": ^4.9.0
@@ -585,7 +582,6 @@ __metadata:
     eslint: ^7.14.0
     eslint-config-prettier: ^6.15.0
     jest: ^26.6.3
-    jsonwebtoken: ^8.5.1
     pg: ^8.5.1
     prettier: ^2.2.1
     ts-jest: ^26.4.4
@@ -642,7 +638,7 @@ __metadata:
     "@ovotech/laminar": ^0.11.0
     "@types/jest": ^26.0.16
     "@types/node": ^14.14.10
-    "@types/pg": ^7.14.7
+    "@types/pg": ^7.14.9
     "@typescript-eslint/eslint-plugin": ^4.9.0
     "@typescript-eslint/parser": ^4.9.0
     axios: ^0.21.0
@@ -2030,35 +2026,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ovotech/laminar-kafka@^0.11.0, @ovotech/laminar-kafka@workspace:packages/laminar-kafka":
-  version: 0.0.0-use.local
-  resolution: "@ovotech/laminar-kafka@workspace:packages/laminar-kafka"
-  dependencies:
-    "@ikerin/build-readme": ^1.0.4
-    "@kafkajs/confluent-schema-registry": ^2.0.0
-    "@ovotech/laminar": ^0.11.0
-    "@ovotech/laminar-cli": ^0.11.0
-    "@types/jest": ^26.0.16
-    "@types/node": ^14.14.10
-    "@types/uuid": ^8.3.0
-    "@typescript-eslint/eslint-plugin": ^4.9.0
-    "@typescript-eslint/parser": ^4.9.0
-    eslint: ^7.14.0
-    eslint-config-prettier: ^6.15.0
-    jest: ^26.6.3
-    kafkajs: ^1.15.0
-    prettier: ^2.2.1
-    ts-jest: ^26.4.4
-    ts-retry-promise: ^0.6.0
-    typescript: ^4.1.2
-    uuid: ^8.3.0
-  peerDependencies:
-    "@kafkajs/confluent-schema-registry": ^2.0.0
-    "@ovotech/laminar": "*"
-    kafkajs: ^1.0.0
-  languageName: unknown
-  linkType: soft
-
 "@ovotech/laminar-performance-testing@workspace:performance":
   version: 0.0.0-use.local
   resolution: "@ovotech/laminar-performance-testing@workspace:performance"
@@ -2069,57 +2036,6 @@ __metadata:
     node-fetch: ^2.6.1
     ts-node: ^9.0.0
     typescript: ^4.1.2
-  languageName: unknown
-  linkType: soft
-
-"@ovotech/laminar-pg@^0.11.0, @ovotech/laminar-pg@workspace:packages/laminar-pg":
-  version: 0.0.0-use.local
-  resolution: "@ovotech/laminar-pg@workspace:packages/laminar-pg"
-  dependencies:
-    "@ikerin/build-readme": ^1.0.4
-    "@ovotech/laminar": ^0.11.0
-    "@types/jest": ^26.0.16
-    "@types/node": ^14.14.10
-    "@types/pg": ^7.14.9
-    "@typescript-eslint/eslint-plugin": ^4.9.0
-    "@typescript-eslint/parser": ^4.9.0
-    axios: ^0.21.0
-    eslint: ^7.14.0
-    eslint-config-prettier: ^6.15.0
-    jest: ^26.6.3
-    pg: ^8.5.1
-    prettier: ^2.2.1
-    ts-jest: ^26.4.4
-    ts-retry-promise: ^0.6.0
-    typescript: ^4.1.2
-  peerDependencies:
-    "@ovotech/laminar": "*"
-    pg: "*"
-  languageName: unknown
-  linkType: soft
-
-"@ovotech/laminar-queue@workspace:packages/laminar-queue":
-  version: 0.0.0-use.local
-  resolution: "@ovotech/laminar-queue@workspace:packages/laminar-queue"
-  dependencies:
-    "@ikerin/build-readme": ^1.0.4
-    "@ovotech/laminar": ^0.11.0
-    "@types/jest": ^26.0.16
-    "@types/node": ^14.14.10
-    "@typescript-eslint/eslint-plugin": ^4.9.0
-    "@typescript-eslint/parser": ^4.9.0
-    axios: ^0.21.0
-    eslint: ^7.14.0
-    eslint-config-prettier: ^6.15.0
-    jest: ^26.6.3
-    pg-boss: ^4.3.4
-    prettier: ^2.2.1
-    ts-jest: ^26.4.4
-    ts-retry-promise: ^0.6.0
-    typescript: ^4.1.2
-  peerDependencies:
-    "@ovotech/laminar": "*"
-    pg-boss: "*"
   languageName: unknown
   linkType: soft
 
@@ -2142,7 +2058,6 @@ __metadata:
     "@typescript-eslint/parser": ^4.9.0
     axios: ^0.21.0
     axios-cookiejar-support: ^1.0.1
-    cookie: ^0.4.1
     csv-parse: ^4.14.1
     csv-stringify: ^5.5.3
     eslint: ^7.14.0
@@ -2508,23 +2423,6 @@ __metadata:
   version: 2.4.0
   resolution: "@types/normalize-package-data@npm:2.4.0"
   checksum: 6d077e73be7ac6227b678829c7bd765607136cdef537fd4ee7f368d9302a651aea924254d69826663322048436d90d6e7c679c9aa99c4824a687c568aab8ce4f
-  languageName: node
-  linkType: hard
-
-"@types/pg-types@npm:*":
-  version: 1.11.5
-  resolution: "@types/pg-types@npm:1.11.5"
-  checksum: 11a2b2aee93f2857dd6b929bf6eb80f41eb66303dad354fb0a1317f81202d77dbc690366777dc426dacfb964dfe3a3181116576a06e07d46a068f7f55e17c95f
-  languageName: node
-  linkType: hard
-
-"@types/pg@npm:^7.14.7":
-  version: 7.14.7
-  resolution: "@types/pg@npm:7.14.7"
-  dependencies:
-    "@types/node": "*"
-    "@types/pg-types": "*"
-  checksum: 6695ae8ed4d039378d5405e4e9b89034d735f568e7ecb06d4f7736b37c82477315466153b18bbf644088bf80e1f99d3596d4358f9ae697a2006043a793cd3f23
   languageName: node
   linkType: hard
 
@@ -3994,13 +3892,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "cookie@npm:0.4.1"
-  checksum: b8e0928e3e7aba013087974b33a6eec730b0a68b7ec00fc3c089a56ba2883bcf671252fc2ed64775aa1ca64796b6e1f6fdddba25a66808aef77614d235fd3e06
-  languageName: node
-  linkType: hard
-
 "copy-concurrently@npm:^1.0.0":
   version: 1.0.5
   resolution: "copy-concurrently@npm:1.0.5"
@@ -4092,6 +3983,13 @@ __metadata:
   version: 4.14.1
   resolution: "csv-parse@npm:4.14.1"
   checksum: bf4b6e851411e454e6068b90c6a6702bff0a7712e640e77629e75cfbea0df54dfc98f830457569f7131f1cc9ff1c7942e7df12e67f397f6fb74228ff153fca81
+  languageName: node
+  linkType: hard
+
+"csv-parse@npm:^4.15.3":
+  version: 4.15.3
+  resolution: "csv-parse@npm:4.15.3"
+  checksum: 7b125fd77f757c8ab605f107dffbd60a91a0a423d2c44b89f20ba050d11e7c5ae2130b58a05216caccea5f5ffee8f2fb9863c8a14ec580ed7532a268a362eb60
   languageName: node
   linkType: hard
 
@@ -10110,6 +10008,13 @@ resolve@^1.18.1:
   version: 1.0.3
   resolution: "sprintf-js@npm:1.0.3"
   checksum: 51df1bce9e577287f56822d79ac5bd94f6c634fccf193895f2a1d2db2e975b6aa7bc97afae9cf11d49b7c37fe4afc188ff5c4878be91f2c86eabd11c5df8b62c
+  languageName: node
+  linkType: hard
+
+"sql-template-tag@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "sql-template-tag@npm:4.0.0"
+  checksum: 476cb319efe3f571c1356004688073268d4ff0c95e1b93caabc8bfa22bd1924bea786f175b3ba72bd8baf30eeb7f42e541239c153892a257896e2d3578363128
   languageName: node
   linkType: hard
 

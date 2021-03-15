@@ -1,4 +1,4 @@
-import { Empty } from '../types';
+import { AbstractMiddleware, Empty } from '../types';
 import type { PublishOptions, SubscribeOptions } from 'pg-boss';
 
 export interface Publish<TData extends Empty = Empty> {
@@ -7,25 +7,32 @@ export interface Publish<TData extends Empty = Empty> {
   options?: PublishOptions;
 }
 
-export interface JobData<TData> {
+export interface JobData<TData = any> {
   data: TData;
   id: string;
   name: string;
   queue: Queue;
 }
 
-export type JobHandler<TData extends Empty, TRequest extends Empty = Empty> = (
-  data: JobData<TData> & TRequest,
+export type WorkerMiddleware<TProvide extends Empty = Empty, TRequire extends Empty = Empty> = AbstractMiddleware<
+  JobData,
+  void,
+  TProvide,
+  TRequire
+>;
+
+export type JobWorker<TData extends Empty, TContext extends Empty = Empty> = (
+  data: JobData<TData> & TContext,
 ) => Promise<void>;
 
-export interface Subscribe<TData extends Empty = Empty, TRequest extends Empty = Empty> {
+export interface Subscribe<TData extends Empty = Empty, TContext extends Empty = Empty> {
   name: string;
-  app: JobHandler<TData, TRequest>;
+  worker: JobWorker<TData, TContext>;
   options?: SubscribeOptions;
 }
 
 export interface Queue {
-  publish(request: Publish): Promise<string | null>;
+  publish<TData>(request: Publish<TData>): Promise<string | null>;
   subscribe<TData>(request: Subscribe<TData>): Promise<void>;
   unsubscribe(name: string): Promise<boolean>;
 }

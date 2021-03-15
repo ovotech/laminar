@@ -1,7 +1,6 @@
-import { Middleware } from '@ovotech/laminar';
+import { Middleware, PgContext } from '@ovotech/laminar';
 import { PoolClient } from 'pg';
 import { NewPet, Pet } from '../__generated__/petstore';
-import { RequestPgPool } from '@ovotech/laminar-pg';
 
 /**
  * A simple repository for handling pets
@@ -42,7 +41,7 @@ export class PetsDb {
   }
 }
 
-export interface RequestPetsDb {
+export interface PetsDbContext {
   petsDb: PetsDb;
 }
 
@@ -51,12 +50,12 @@ export interface RequestPetsDb {
  * While not as optimal as shareing it between requests,
  * it would mean we are absolutly sure about its isolation between requests.
  *
- * We explicitly require the request to have the "RequestPgPool" type
+ * We explicitly require the request to have the "PgContextPool" type
  * This ensures we apply it after the pgPoolMiddleware.
  *
  * It will provide all subsiquent middlewares with the petsDb object.
  */
-export const petsDbMiddleware = (): Middleware<RequestPetsDb, RequestPgPool> => {
+export const petsDbMiddleware = (): Middleware<PetsDbContext, PgContext> => {
   return (next) => (req) => {
     const petsDb = new PetsDb(req.db);
     return next({ ...req, petsDb });

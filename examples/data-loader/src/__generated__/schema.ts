@@ -1,8 +1,8 @@
 import {
-  RequestOapi,
+  OapiContext,
   OapiConfig,
   Empty,
-  HttpApp,
+  HttpListener,
   openApi,
   OapiSecurityResolver,
   OapiAuthInfo,
@@ -13,7 +13,7 @@ import { Readable } from 'stream';
 
 export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(
   config: Config<R, TAuthInfo>,
-): Promise<HttpApp<R>> => openApi(config);
+): Promise<HttpListener<R>> => openApi(config);
 
 export interface HealthCheck {
   healthy: boolean;
@@ -25,7 +25,7 @@ export type ResponseWellknownHealthcheckGet = ResponseOapi<HealthCheck, 200, 'ap
  * Health check endpoint
  */
 export type PathWellknownHealthcheckGet<R extends Empty = Empty> = (
-  req: RequestOapi & R,
+  req: OapiContext & R,
 ) => Promise<ResponseWellknownHealthcheckGet>;
 
 export type ResponseWellknownOpenapiyamlGet = ResponseOapi<string | Readable | Buffer, 200, 'application/yaml'>;
@@ -34,56 +34,21 @@ export type ResponseWellknownOpenapiyamlGet = ResponseOapi<string | Readable | B
  * The open api spec for the service. OpenAPI v3.
  */
 export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (
-  req: RequestOapi & R,
+  req: OapiContext & R,
 ) => Promise<ResponseWellknownOpenapiyamlGet>;
 
-export interface Status {
-  isOutOfDate?: boolean;
-  data: {
-    name: string;
-    type: 'bigquery' | 'kafka';
-    isOutOfDate?: boolean;
-    freshness?: string;
-    freshnessText?: string;
-  }[];
-  consumptions: {
-    id: number;
-    topic: string;
-    state?: 'started' | 'running' | 'error';
-    updatedAt?: string;
-    lag?: {
-      partition: number;
-      lag: string;
-    }[];
-    error?: string;
-    errorAt?: string;
-  }[];
-  hydrations: {
-    id: number;
-    createdAt: string;
-    name: string;
-    state: 'started' | 'job_started' | 'job_finished' | 'loading' | 'finished' | 'error';
-    interval: Interval;
-    jobFinishedAt?: string;
-    finishedAt?: string;
-    totalItems?: number;
-    processedItems?: number;
-    errorAt?: string;
-    error?: string;
-  }[];
+export interface MeterRead {
+  serialNumber: string;
+  value: string;
+  date?: string;
 }
 
-export interface Interval {
-  start: string | string;
-  end: string | string;
-}
-
-export type ResponseV1StatusGet = ResponseOapi<Status, 200, 'application/json'>;
+export type ResponseV1MeterreadsGet = ResponseOapi<MeterRead[], 200, 'application/json'>;
 
 /**
- * Status data for the hydrators and kafka consumers
+ * Retern meter reads
  */
-export type PathV1StatusGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseV1StatusGet>;
+export type PathV1MeterreadsGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseV1MeterreadsGet>;
 
 export interface HttpError {
   message?: string;
@@ -97,6 +62,7 @@ export type ResponseV1HydrationMeterreadsPost =
       200,
       'application/json'
     >
+  | ResponseOapi<HttpError, 400, 'application/json'>
   | ResponseOapi<HttpError, 500, 'application/json'>;
 
 /**
@@ -104,7 +70,7 @@ export type ResponseV1HydrationMeterreadsPost =
  * Upload a csv meter reads.
  *
  */
-export interface RequestV1HydrationMeterreadsPost<TAuthInfo> extends RequestOapi {
+export interface RequestV1HydrationMeterreadsPost<TAuthInfo> extends OapiContext {
   headers: {
     /**
      * An optional trace token to be passed to the service and used for logging
@@ -137,11 +103,11 @@ export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo 
        */
       get: PathWellknownOpenapiyamlGet<R>;
     };
-    '/v1/status': {
+    '/v1/meter-reads': {
       /**
-       * Status data for the hydrators and kafka consumers
+       * Retern meter reads
        */
-      get: PathV1StatusGet<R>;
+      get: PathV1MeterreadsGet<R>;
     };
     '/v1/hydration/meter-reads': {
       /**

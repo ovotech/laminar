@@ -1,15 +1,18 @@
 import {
-  ConsumerService,
-  ProducerService,
+  KafkaConsumerService,
+  KafkaProducerService,
   EachBatchConsumer,
   EachMessageConsumer,
   chunkBatchMiddleware,
-  toLogCreator,
+  kafkaLogCreator,
   produce,
   registerSchemas,
+  LoggerLike,
+  Middleware,
+  start,
+  stop,
 } from '../src';
 import { retry } from 'ts-retry-promise';
-import { LoggerLike, Middleware, start, stop } from '@ovotech/laminar';
 import * as uuid from 'uuid';
 import { Kafka } from 'kafkajs';
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry';
@@ -81,7 +84,7 @@ const logger = {
 };
 
 const logging = loggerMiddleware(logger);
-const logCreator = toLogCreator(logger);
+const logCreator = kafkaLogCreator(logger);
 
 const batchSizer = jest.fn();
 
@@ -92,21 +95,21 @@ describe('Integration', () => {
     const schemaRegistry = new SchemaRegistry({ host: 'http://localhost:8081' });
     const admin = kafka.admin();
 
-    const event1Service = new ConsumerService<Event1>(kafka, schemaRegistry, {
+    const event1Service = new KafkaConsumerService<Event1>(kafka, schemaRegistry, {
       topic: topic1,
       groupId: groupId1,
       fromBeginning: true,
       eachMessage: logging(eachEvent1),
     });
 
-    const event2Service = new ConsumerService<Event2>(kafka, schemaRegistry, {
+    const event2Service = new KafkaConsumerService<Event2>(kafka, schemaRegistry, {
       topic: topic2,
       groupId: groupId2,
       fromBeginning: true,
       eachBatch: logging(eachEvent2),
     });
 
-    const event3Service = new ConsumerService<Event2>(kafka, schemaRegistry, {
+    const event3Service = new KafkaConsumerService<Event2>(kafka, schemaRegistry, {
       topic: topic3,
       fromBeginning: true,
       groupId: groupId3,
@@ -130,7 +133,7 @@ describe('Integration', () => {
       ),
     });
 
-    const producer = new ProducerService(kafka, schemaRegistry, {
+    const producer = new KafkaProducerService(kafka, schemaRegistry, {
       register: registerSchemas({
         [topic1]: { type: SchemaType.AVRO, schema: JSON.stringify(Event1Schema) },
         [topic2]: { type: SchemaType.AVRO, schema: JSON.stringify(Event2Schema) },

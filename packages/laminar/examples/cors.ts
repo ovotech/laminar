@@ -1,4 +1,4 @@
-import { jsonOk, get, put, HttpServer, router, corsMiddleware, init } from '@ovotech/laminar';
+import { jsonOk, get, put, HttpService, router, corsMiddleware, init } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -9,8 +9,8 @@ const cors = corsMiddleware({
   allowOrigin: (origin) => ['http://example.com', 'http://localhost'].includes(origin),
 });
 
-const http = new HttpServer({
-  app: cors(
+const http = new HttpService({
+  listener: cors(
     router(
       get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
       get('/users', async () => jsonOk(users)),

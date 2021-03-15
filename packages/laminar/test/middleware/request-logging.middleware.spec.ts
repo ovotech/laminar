@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { requestLoggingMiddleware, textOk, HttpServer, LoggerLike } from '../../src';
+import { requestLoggingMiddleware, textOk, HttpService, LoggerLike } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8098' });
 
@@ -14,9 +14,9 @@ describe('httpLoggingMiddleware middleware', () => {
 
     const logging = requestLoggingMiddleware(logger);
 
-    const server = new HttpServer({
+    const server = new HttpService({
       port: 8098,
-      app: logging(() => {
+      listener: logging(() => {
         throw new Error('Test Error');
       }),
     });
@@ -58,9 +58,9 @@ describe('httpLoggingMiddleware middleware', () => {
     };
     const logging = requestLoggingMiddleware(logger);
 
-    const server = new HttpServer({
+    const server = new HttpService({
       port: 8098,
-      app: logging(async () => textOk('OK')),
+      listener: logging(async () => textOk('OK')),
     });
 
     try {

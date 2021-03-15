@@ -1,9 +1,9 @@
-import { HttpServer, init, jsonOk } from '@ovotech/laminar';
+import { HttpService, init, jsonOk } from '@ovotech/laminar';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/api.yaml';
 
 const main = async () => {
-  const app = await openApiTyped({
+  const listener = await openApiTyped({
     api: join(__dirname, 'api.yaml'),
     paths: {
       '/test': {
@@ -12,7 +12,7 @@ const main = async () => {
       },
     },
   });
-  const server = new HttpServer({ app });
+  const server = new HttpService({ listener });
   await init({ services: [server], logger: console });
 };
 

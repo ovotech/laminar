@@ -1,6 +1,6 @@
 import { PathPetsGet } from '../__generated__/petstore';
 import { jsonOk } from '@ovotech/laminar';
-import { RequestPetsDb } from '../middleware';
+import { PetsDbContext } from '../middleware';
 
 /**
  * Request and response are both validated runtime and checked at compoile time
@@ -11,7 +11,7 @@ import { RequestPetsDb } from '../middleware';
  * Anithing that's deviating from the OpenAPI schema - the shape of the json response, status or content-type
  * would be flagged by typescript as an error
  */
-export const pathPetsGet: PathPetsGet<RequestPetsDb> = async ({ petsDb, query }) => {
+export const pathPetsGet: PathPetsGet<PetsDbContext> = async ({ petsDb, query }) => {
   const { tags, limit } = query;
   return jsonOk(await petsDb.all({ tags, limit }));
 };

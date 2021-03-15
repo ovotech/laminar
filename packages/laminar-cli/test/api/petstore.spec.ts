@@ -1,5 +1,5 @@
 import {
-  HttpServer,
+  HttpService,
   jsonUnauthorized,
   jsonNotFound,
   jsonOk,
@@ -7,10 +7,11 @@ import {
   securityOk,
   optional,
   run,
+  LoggerContext,
+  loggerMiddleware,
 } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
-import { LoggerContext, withLogger } from './middleware/logger';
 import { openApiTyped, Pet } from './__generated__/petstore';
 
 interface AuthInfo {
@@ -23,14 +24,14 @@ describe('Petstore', () => {
       { id: 111, name: 'Catty', tag: 'kitten' },
       { id: 222, name: 'Doggy' },
     ];
-    const log = jest.fn();
+    const logger = { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() };
 
     const oapi = await openApiTyped<LoggerContext, AuthInfo>({
       api: join(__dirname, 'petstore.yaml'),
       security: {
         BearerAuth: ({ headers, logger }) => {
           if (headers.authorization === 'Bearer 123') {
-            logger('Auth Successful');
+            logger.info('Auth Successful');
             return securityOk({ user: 'dinkey' });
           } else {
             return jsonUnauthorized({ message: 'Unathorized user' });
@@ -54,12 +55,12 @@ describe('Petstore', () => {
       paths: {
         '/pets': {
           get: async ({ logger }) => {
-            logger('Get all');
+            logger.info('Get all');
             return jsonOk(db);
           },
           post: async ({ body, authInfo, logger, headers }) => {
             const pet = { ...body, id: Math.max(...db.map((item) => item.id)) + 1 };
-            logger(`new pet ${pet.name}, trace token: ${headers['x-trace-token']}`);
+            logger.info(`new pet ${pet.name}, trace token: ${headers['x-trace-token']}`);
 
             db.push(pet);
             return jsonOk({ pet, user: authInfo.user });
@@ -82,8 +83,8 @@ describe('Petstore', () => {
         },
       },
     });
-    const logger = withLogger(log);
-    const http = new HttpServer({ app: logger(oapi), port: 4911 });
+    const withLogger = loggerMiddleware(logger);
+    const http = new HttpService({ listener: withLogger(oapi), port: 4911 });
 
     await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:4911' });
@@ -203,11 +204,11 @@ describe('Petstore', () => {
         ],
       });
 
-      expect(log).toHaveBeenNthCalledWith(1, 'Get all');
-      expect(log).toHaveBeenNthCalledWith(2, 'Auth Successful');
-      expect(log).toHaveBeenNthCalledWith(3, 'new pet New Puppy, trace token: 123');
-      expect(log).toHaveBeenNthCalledWith(4, 'Get all');
-      expect(log).toHaveBeenNthCalledWith(5, 'Get all');
+      expect(logger.info).toHaveBeenNthCalledWith(1, 'Get all');
+      expect(logger.info).toHaveBeenNthCalledWith(2, 'Auth Successful');
+      expect(logger.info).toHaveBeenNthCalledWith(3, 'new pet New Puppy, trace token: 123');
+      expect(logger.info).toHaveBeenNthCalledWith(4, 'Get all');
+      expect(logger.info).toHaveBeenNthCalledWith(5, 'Get all');
     });
   });
 });

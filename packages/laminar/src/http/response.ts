@@ -6,12 +6,12 @@ import { IncomingMessage, OutgoingHttpHeaders } from 'http';
 import { createReadStream, statSync } from 'fs';
 import { Json, parseRange, toJson } from '../helpers';
 import { Stats } from 'fs';
-import * as cookie from 'cookie';
+import { CookieOptions, serializeCookie } from './cookie';
 
 /**
  * Set additional paramters for the cookie
  */
-export interface SetCookie extends cookie.CookieSerializeOptions {
+export interface SetCookie extends CookieOptions {
   value: string;
 }
 
@@ -26,10 +26,10 @@ export const setCookie = (cookies: { [key: string]: string | SetCookie }, res: H
     ...res.headers,
     'set-cookie': Object.entries(cookies).map(([name, content]) => {
       if (typeof content === 'string') {
-        return cookie.serialize(name, content);
+        return serializeCookie(name, content);
       } else {
         const { value, ...options } = content;
-        return cookie.serialize(name, value, options);
+        return serializeCookie(name, value, options);
       }
     }),
   },

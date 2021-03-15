@@ -1,4 +1,4 @@
-import { HttpServer, HttpApp, BodyParser, defaultBodyParsers, csv, ok, init } from '@ovotech/laminar';
+import { HttpService, HttpListener, BodyParser, defaultBodyParsers, csv, ok, init } from '@ovotech/laminar';
 import { pipeline, Readable, Transform } from 'stream';
 import * as parse from 'csv-parse';
 import * as stringify from 'csv-stringify';
@@ -25,10 +25,10 @@ const upperCaseTransform = new Transform({
 const transformCsv = (body: Readable): Readable =>
   pipeline(body, parse(), upperCaseTransform, stringify(), (err) => (err ? console.error(err.message) : undefined));
 
-const app: HttpApp = async ({ body }) => csv(ok({ body: transformCsv(body) }));
+const listener: HttpListener = async ({ body }) => csv(ok({ body: transformCsv(body) }));
 
-const http = new HttpServer({
-  app,
+const http = new HttpService({
+  listener,
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 

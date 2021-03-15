@@ -1,6 +1,17 @@
 import axios from 'axios';
-import { HttpServer, LoggerLike, Middleware, run, router, post, jsonOk, get, jsonNotFound } from '@ovotech/laminar';
-import { pgMiddleware, PgService } from '../src';
+import {
+  HttpService,
+  LoggerLike,
+  Middleware,
+  run,
+  router,
+  post,
+  jsonOk,
+  get,
+  jsonNotFound,
+  pgMiddleware,
+  PgService,
+} from '../src';
 import { Pool } from 'pg';
 
 export interface LoggerContext {
@@ -31,9 +42,9 @@ describe('Integration', () => {
     );
     const withPool = pgMiddleware(pool);
 
-    const http = new HttpServer({
+    const http = new HttpService({
       port,
-      app: withLogger(
+      listener: withLogger(
         withPool(
           router(
             post('/create', async ({ logger, db, body }) => {

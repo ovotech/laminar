@@ -1,4 +1,4 @@
-import { get, post, HttpServer, router, init, jsonOk, HttpApp } from '@ovotech/laminar';
+import { get, post, HttpService, router, init, jsonOk, HttpListener } from '@ovotech/laminar';
 import { authMiddleware, createSession } from '@ovotech/laminar-jwt';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -15,7 +15,7 @@ const auth = authMiddleware({ secret: publicKey, options: { clockTolerance: 2 } 
 const onlyLoggedIn = auth();
 const onlyAdmin = auth(['admin']);
 
-const app: HttpApp = router(
+const listener: HttpListener = router(
   get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
   post('/session', async ({ body }) =>
     jsonOk(createSession({ secret: privateKey, options: { algorithm: 'RS256' } }, body)),
@@ -30,5 +30,5 @@ const app: HttpApp = router(
   ),
 );
 
-const http = new HttpServer({ app });
+const http = new HttpService({ listener });
 init({ services: [http], logger: console });

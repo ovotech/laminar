@@ -1,6 +1,6 @@
-import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from "@ovotech/laminar";
+import { OapiContext, OapiConfig, Empty, HttpListener, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from "@ovotech/laminar";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpListener<R>> => openApi(config);
 
 export type Pet = NewPet & {
     id: number;
@@ -27,7 +27,7 @@ export type ResponsePetsGet = ResponseOapi<Pet[], 200, "application/json"> | Res
  * Sed tempus felis lobortis leo pulvinar rutrum. Nam mattis velit nisl, eu condimentum ligula luctus nec. Phasellus semper velit eget aliquet faucibus. In a mattis elit. Phasellus vel urna viverra, condimentum lorem id, rhoncus nibh. Ut pellentesque posuere elementum. Sed a varius odio. Morbi rhoncus ligula libero, vel eleifend nunc tristique vitae. Fusce et sem dui. Aenean nec scelerisque tortor. Fusce malesuada accumsan magna vel tempus. Quisque mollis felis eu dolor tristique, sit amet auctor felis gravida. Sed libero lorem, molestie sed nisl in, accumsan tempor nisi. Fusce sollicitudin massa ut lacinia mattis. Sed vel eleifend lorem. Pellentesque vitae felis pretium, pulvinar elit eu, euismod sapien.
  *
  */
-export interface RequestPetsGet<TAuthInfo> extends RequestOapi {
+export interface RequestPetsGet<TAuthInfo> extends OapiContext {
     query: {
         /**
          * tags to filter by
@@ -61,7 +61,7 @@ export type ResponsePetsPost = ResponseOapi<PetCreated, 200, "application/json">
 /**
  * Creates a new pet in the store.  Duplicates are allowed
  */
-export interface RequestPetsPost<TAuthInfo> extends RequestOapi {
+export interface RequestPetsPost<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * a trace token to trace posts
@@ -82,7 +82,7 @@ export type ResponsePetsIdGet = ResponseOapi<Pet, 200, "application/json"> | Res
 /**
  * Returns a user based on a single ID, if the user does not have access to the pet
  */
-export interface RequestPetsIdGet<TAuthInfo> extends RequestOapi {
+export interface RequestPetsIdGet<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of pet to fetch
@@ -102,7 +102,7 @@ export type ResponsePetsIdDelete = ResponseOapi<unknown, 204, string> | Response
 /**
  * deletes a single pet based on the ID supplied
  */
-export interface RequestPetsIdDelete<TAuthInfo> extends RequestOapi {
+export interface RequestPetsIdDelete<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of pet to delete

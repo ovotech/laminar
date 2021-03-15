@@ -1,4 +1,4 @@
-import { HttpServer, start, jsonOk } from '@ovotech/laminar';
+import { HttpService, init, jsonOk } from '@ovotech/laminar';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/api';
 
@@ -12,7 +12,7 @@ const main = async () => {
    * Since we've already generated this using the api file, the paths,
    * all of its request and response data would be properly typed
    */
-  const app = await openApiTyped({
+  const listener = await openApiTyped({
     api: join(__dirname, 'api.yaml'),
     paths: {
       '/user/{id}': {
@@ -31,12 +31,12 @@ const main = async () => {
    * Now we've cerated the server, but it has not yet been started.
    * Default port is 3300
    */
-  const server = new HttpServer({ app });
+  const http = new HttpService({ listener });
 
   /**
    * The http server now should be running and indicate that the server is now running
    */
-  await start([server], console);
+  await init({ services: [http], logger: console });
 };
 
 main();

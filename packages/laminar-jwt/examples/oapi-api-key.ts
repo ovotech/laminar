@@ -1,10 +1,10 @@
-import { HttpServer, init, openApi, textOk, setCookie } from '@ovotech/laminar';
+import { HttpService, init, openApi, textOk, setCookie } from '@ovotech/laminar';
 import { createSession, verifyToken } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 
 const main = async () => {
   const secret = '123';
-  const app = await openApi({
+  const listener = await openApi({
     api: join(__dirname, 'oapi-api-key.yaml'),
     security: {
       /**
@@ -22,7 +22,7 @@ const main = async () => {
       },
     },
   });
-  const http = new HttpServer({ app });
+  const http = new HttpService({ listener });
   await init({ services: [http], logger: console });
 };
 

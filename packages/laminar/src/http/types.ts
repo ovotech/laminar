@@ -7,7 +7,7 @@ import { Empty, AbstractMiddleware } from '../types';
 /**
  * The initial Request that comes from node's [http.createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener)
  */
-export interface HttpRequest {
+export interface HttpContext {
   incommingMessage: IncomingMessage;
 
   /**
@@ -104,7 +104,7 @@ export interface HttpResponse<Content = unknown, Status = number> {
  *
  * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
  */
-export type HttpApp<TRequest extends Empty = Empty> = (req: HttpRequest & TRequest) => Promise<HttpResponse>;
+export type HttpListener<TRequest extends Empty = Empty> = (req: HttpContext & TRequest) => Promise<HttpResponse>;
 
 // export type HttpMiddleware<TProvide extends Empty = Empty, TRequire extends Empty = Empty> = <
 //   TInherit extends HttpRequest
@@ -133,7 +133,7 @@ export type HttpApp<TRequest extends Empty = Empty> = (req: HttpRequest & TReque
  * @returns A function to compose with other middlewares over an app
  */
 export type HttpMiddleware<TProvide extends Empty = Empty, TRequire extends Empty = Empty> = AbstractMiddleware<
-  HttpRequest,
+  HttpContext,
   HttpResponse,
   TProvide,
   TRequire

@@ -37,16 +37,17 @@ paths:
             application/yaml:
               schema: { type: string }
 
-  '/v1/status':
+  '/v1/meter-reads':
     get:
-      summary: Status data
-      description: Status data for the hydrators and kafka consumers
+      summary: Meter Reads
+      description: Retern meter reads
       responses:
         '200':
-          description: Status Data
+          description: Meter Reads list
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Status' }
+              schema:
+                items: { $ref: '#/components/schemas/MeterRead' }
 
   '/v1/hydration/meter-reads':
     parameters:
@@ -64,6 +65,7 @@ paths:
         Upload a csv meter reads.
       responses:
         '500': { $ref: '#/components/responses/HttpErrorResponse' }
+        '400': { $ref: '#/components/responses/HttpErrorResponse' }
         '200': { $ref: '#/components/responses/SuccessResponse' }
 
 components:
@@ -119,82 +121,13 @@ components:
       required:
         - healthy
 
-    Status:
+    MeterRead:
       additionalProperties: false
       properties:
-        isOutOfDate: { type: boolean }
-        data:
-          items:
-            additionalProperties: false
-            properties:
-              name: { type: string }
-              type: { enum: ['bigquery', 'kafka'] }
-              isOutOfDate: { type: boolean }
-              freshness: { type: 'string', format: 'date-time' }
-              freshnessText: { type: 'string' }
-            required:
-              - type
-              - name
-        consumptions:
-          items:
-            additionalProperties: false
-            properties:
-              id: { type: 'number' }
-              topic: { type: 'string' }
-              state: { enum: ['started', 'running', 'error'] }
-              updatedAt: { type: 'string', format: 'date-time' }
-              lag:
-                items:
-                  additionalProperties: false
-                  properties:
-                    partition: { type: 'integer' }
-                    lag: { type: 'string' }
-                  required:
-                    - partition
-                    - lag
-              error: { type: 'string' }
-              errorAt: { type: 'string', format: 'date-time' }
-            required:
-              - id
-              - topic
-
-        hydrations:
-          items:
-            additionalProperties: false
-            properties:
-              id: { type: 'number' }
-              createdAt: { type: 'string', format: 'date-time' }
-              name: { type: 'string' }
-              state: { enum: ['started', 'job_started', 'job_finished', 'loading', 'finished', 'error'] }
-              interval: { $ref: '#/components/schemas/Interval' }
-              jobFinishedAt: { type: 'string', format: 'date-time' }
-              finishedAt: { type: 'string', format: 'date-time' }
-              totalItems: { type: 'number' }
-              processedItems: { type: 'number' }
-              errorAt: { type: 'string', format: 'date-time' }
-              error: { type: 'string' }
-            required:
-              - id
-              - name
-              - createdAt
-              - state
-              - interval
+        serialNumber: { type: string }
+        value: { type: string }
+        date: { type: string, format: date-time }
       required:
-        - data
-        - consumptions
-        - hydrations
-
-    Interval:
-      additionalProperties: false
-      properties:
-        start:
-          oneOf:
-            - { type: 'string', format: 'date-time' }
-            - { type: 'string', format: 'date' }
-        end:
-          oneOf:
-            - { type: 'string', format: 'date-time' }
-            - { type: 'string', format: 'date' }
-      required:
-        - start
-        - end
+        - serialNumber
+        - value
+        - date

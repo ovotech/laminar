@@ -1,17 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Types Content Test api-with-examples.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export type ResponseGet = ResponseOapi<unknown, 200, \\"application/json\\"> | ResponseOapi<unknown, 300, \\"application/json\\">;
 
-export type PathGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseGet>;
+export type PathGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseGet>;
 
 export type ResponseV2Get = ResponseOapi<unknown, 200, \\"application/json\\"> | ResponseOapi<unknown, 203, \\"application/json\\">;
 
-export type PathV2Get<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseV2Get>;
+export type PathV2Get<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseV2Get>;
 
 export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
     paths: {
@@ -27,9 +27,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test balance-service.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpListener<R>> => openApi(config);
 
 export type ResponseInternalStatusGet = ResponseOapi<unknown, 200, string>;
 
@@ -37,7 +37,7 @@ export type ResponseInternalStatusGet = ResponseOapi<unknown, 200, string>;
  * Health check endpoint
  * Returns 200 if the application is up. It does not do deep check. Always gives back 200.
  */
-export interface RequestInternalStatusGet<TAuthInfo> extends RequestOapi {
+export interface RequestInternalStatusGet<TAuthInfo> extends OapiContext {
     authInfo: TAuthInfo;
 }
 
@@ -51,7 +51,7 @@ export type ResponseInternalSwaggeryamlGet = ResponseOapi<unknown, 200, string>;
 /**
  * Returns application swagger definition
  */
-export interface RequestInternalSwaggeryamlGet<TAuthInfo> extends RequestOapi {
+export interface RequestInternalSwaggeryamlGet<TAuthInfo> extends OapiContext {
     authInfo: TAuthInfo;
 }
 
@@ -85,7 +85,7 @@ export type ResponseApiV2AccountsAccountIdBalanceGet = ResponseOapi<BalanceSumma
  * DEPRECATED: Find Balance for the given accountId
  * Returns the balance
  */
-export interface RequestApiV2AccountsAccountIdBalanceGet<TAuthInfo> extends RequestOapi {
+export interface RequestApiV2AccountsAccountIdBalanceGet<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of the account to return
@@ -142,7 +142,7 @@ export type ResponseApiV2AccountsAccountIdTransactionsGet = ResponseOapi<Transac
  * DEPRECATED: Find Transactions for the given accountId. Generic endpoint capable of returning with all the supported transaction types. See transactionType parameter!
  * Returns the transaction history
  */
-export interface RequestApiV2AccountsAccountIdTransactionsGet<TAuthInfo> extends RequestOapi {
+export interface RequestApiV2AccountsAccountIdTransactionsGet<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of the account to return
@@ -200,7 +200,7 @@ export type ResponseApiV2AccountsAccountIdAdjustbalancePost = ResponseOapi<Balan
  * DEPRECATED: Adjust balance for a given accountId
  * Returns with the adjusted balance
  */
-export interface RequestApiV2AccountsAccountIdAdjustbalancePost<TAuthInfo> extends RequestOapi {
+export interface RequestApiV2AccountsAccountIdAdjustbalancePost<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of the account
@@ -222,7 +222,7 @@ export type ResponseApiV3AccountsAccountIdBalanceGet = ResponseOapi<BalanceSumma
  * Find Balance for the given accountId
  * Returns the balance
  */
-export interface RequestApiV3AccountsAccountIdBalanceGet<TAuthInfo> extends RequestOapi {
+export interface RequestApiV3AccountsAccountIdBalanceGet<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of the account to return
@@ -280,7 +280,7 @@ export type ResponseApiV3AccountsAccountIdTransactionsGet = ResponseOapi<Transac
  * Find Transactions for the given accountId. Generic endpoint capable of returning with all the supported transaction types. See transactionType parameter!
  * Returns the transaction history
  */
-export interface RequestApiV3AccountsAccountIdTransactionsGet<TAuthInfo> extends RequestOapi {
+export interface RequestApiV3AccountsAccountIdTransactionsGet<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of the account to return
@@ -315,7 +315,7 @@ export type ResponseApiV3AccountsAccountIdAdjustbalancePost = ResponseOapi<Balan
  * Adjust balance for a given accountId
  * Returns with the adjusted balance
  */
-export interface RequestApiV3AccountsAccountIdAdjustbalancePost<TAuthInfo> extends RequestOapi {
+export interface RequestApiV3AccountsAccountIdAdjustbalancePost<TAuthInfo> extends OapiContext {
     path: {
         /**
          * ID of the account
@@ -389,9 +389,9 @@ export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo 
 `;
 
 exports[`Types Content Test cloudtasks.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpListener<R>> => openApi(config);
 
 export interface Empty {
     [key: string]: unknown;
@@ -406,7 +406,7 @@ export type ResponseV2NameDelete = ResponseOapi<Empty, 200, string>;
  * cannot be deleted if it has executed successfully or permanently
  * failed.
  */
-export interface RequestV2NameDelete<TAuthInfo> extends RequestOapi {
+export interface RequestV2NameDelete<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -761,7 +761,7 @@ export type ResponseV2NameGet = ResponseOapi<Task, 200, string>;
 /**
  * Gets a task.
  */
-export interface RequestV2NameGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2NameGet<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1089,7 +1089,7 @@ export type ResponseV2NamePatch = ResponseOapi<Queue, 200, string>;
  * queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
  * this method.
  */
-export interface RequestV2NamePatch<TAuthInfo> extends RequestOapi {
+export interface RequestV2NamePatch<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1235,7 +1235,7 @@ export type ResponseV2NameLocationsGet = ResponseOapi<ListLocationsResponse, 200
 /**
  * Lists information about the supported locations for this service.
  */
-export interface RequestV2NameLocationsGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2NameLocationsGet<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1323,7 +1323,7 @@ export type ResponseV2NamepausePost = ResponseOapi<Queue, 200, string>;
  * when the queue is paused. A queue is paused if its
  * state is PAUSED.
  */
-export interface RequestV2NamepausePost<TAuthInfo> extends RequestOapi {
+export interface RequestV2NamepausePost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1406,7 +1406,7 @@ export type ResponseV2NamepurgePost = ResponseOapi<Queue, 200, string>;
  * Purge operations can take up to one minute to take effect. Tasks
  * might be dispatched before the purge takes effect. A purge is irreversible.
  */
-export interface RequestV2NamepurgePost<TAuthInfo> extends RequestOapi {
+export interface RequestV2NamepurgePost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1495,7 +1495,7 @@ export type ResponseV2NameresumePost = ResponseOapi<Queue, 200, string>;
  * [Managing Cloud Tasks Scaling
  * Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
  */
-export interface RequestV2NameresumePost<TAuthInfo> extends RequestOapi {
+export interface RequestV2NameresumePost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1617,7 +1617,7 @@ export type ResponseV2NamerunPost = ResponseOapi<Task, 200, string>;
  * NOT_FOUND when it is called on a
  * task that has already succeeded or permanently failed.
  */
-export interface RequestV2NamerunPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2NamerunPost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1730,7 +1730,7 @@ export type ResponseV2ParentQueuesGet = ResponseOapi<ListQueuesResponse, 200, st
  *
  * Queues are returned in lexicographical order.
  */
-export interface RequestV2ParentQueuesGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2ParentQueuesGet<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1845,7 +1845,7 @@ export type ResponseV2ParentQueuesPost = ResponseOapi<Queue, 200, string>;
  * queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
  * this method.
  */
-export interface RequestV2ParentQueuesPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ParentQueuesPost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -1954,7 +1954,7 @@ export type ResponseV2ParentTasksGet = ResponseOapi<ListTasksResponse, 200, stri
  * The tasks may be returned in any order. The ordering may change at any
  * time.
  */
-export interface RequestV2ParentTasksGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2ParentTasksGet<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -2091,7 +2091,7 @@ export type ResponseV2ParentTasksPost = ResponseOapi<Task, 200, string>;
  *
  * * The maximum task size is 100KB.
  */
-export interface RequestV2ParentTasksPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ParentTasksPost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -2278,7 +2278,7 @@ export type ResponseV2ResourcegetIamPolicyPost = ResponseOapi<Policy, 200, strin
  *
  * * \`cloudtasks.queues.getIamPolicy\`
  */
-export interface RequestV2ResourcegetIamPolicyPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ResourcegetIamPolicyPost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -2369,7 +2369,7 @@ export type ResponseV2ResourcesetIamPolicyPost = ResponseOapi<Policy, 200, strin
  *
  * * \`cloudtasks.queues.setIamPolicy\`
  */
-export interface RequestV2ResourcesetIamPolicyPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ResourcesetIamPolicyPost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -2473,7 +2473,7 @@ export type ResponseV2ResourcetestIamPermissionsPost = ResponseOapi<TestIamPermi
  * UIs and command-line tools, not for authorization checking. This operation
  * may \\"fail open\\" without warning.
  */
-export interface RequestV2ResourcetestIamPermissionsPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ResourcetestIamPermissionsPost<TAuthInfo> extends OapiContext {
     query: {
         /**
          * API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
@@ -2749,17 +2749,17 @@ export interface Config<R extends Empty = Empty, TAuthInfo extends OapiAuthInfo 
 `;
 
 exports[`Types Content Test converter.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export type ResponseWellknownDocsGet = ResponseOapi<unknown, 200, \\"text/html\\">;
 
-export type PathWellknownDocsGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownDocsGet>;
+export type PathWellknownDocsGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseWellknownDocsGet>;
 
 export type ResponseWellknownOpenapiyamlGet = ResponseOapi<unknown, 200, \\"text/yaml\\">;
 
-export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownOpenapiyamlGet>;
+export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseWellknownOpenapiyamlGet>;
 
 export interface HttpError {
     message?: string;
@@ -2770,7 +2770,7 @@ export type ResponseHtmlPost = ResponseOapi<unknown, 200, \\"application/pdf\\">
 /**
  * Generate PDF from html
  */
-export interface RequestHtmlPost extends RequestOapi {
+export interface RequestHtmlPost extends OapiContext {
     body: any;
 }
 
@@ -2793,9 +2793,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test link-example.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export interface user {
     username?: string;
@@ -2805,7 +2805,7 @@ export interface user {
 
 export type Response20UsersUsernameGet = ResponseOapi<user, 200, \\"application/json\\">;
 
-export interface Request20UsersUsernameGet extends RequestOapi {
+export interface Request20UsersUsernameGet extends OapiContext {
     path: {
         username: string;
     };
@@ -2821,7 +2821,7 @@ export interface repository {
 
 export type Response20RepositoriesUsernameGet = ResponseOapi<repository[], 200, \\"application/json\\">;
 
-export interface Request20RepositoriesUsernameGet extends RequestOapi {
+export interface Request20RepositoriesUsernameGet extends OapiContext {
     path: {
         username: string;
     };
@@ -2831,7 +2831,7 @@ export type Path20RepositoriesUsernameGet<R extends Empty = Empty> = (req: Reque
 
 export type Response20RepositoriesUsernameSlugGet = ResponseOapi<repository, 200, \\"application/json\\">;
 
-export interface Request20RepositoriesUsernameSlugGet extends RequestOapi {
+export interface Request20RepositoriesUsernameSlugGet extends OapiContext {
     path: {
         username: string;
         slug: string;
@@ -2850,7 +2850,7 @@ export interface pullrequest {
 
 export type Response20RepositoriesUsernameSlugPullrequestsGet = ResponseOapi<pullrequest[], 200, \\"application/json\\">;
 
-export interface Request20RepositoriesUsernameSlugPullrequestsGet extends RequestOapi {
+export interface Request20RepositoriesUsernameSlugPullrequestsGet extends OapiContext {
     path: {
         username: string;
         slug: string;
@@ -2864,7 +2864,7 @@ export type Path20RepositoriesUsernameSlugPullrequestsGet<R extends Empty = Empt
 
 export type Response20RepositoriesUsernameSlugPullrequestsPidGet = ResponseOapi<pullrequest, 200, \\"application/json\\">;
 
-export interface Request20RepositoriesUsernameSlugPullrequestsPidGet extends RequestOapi {
+export interface Request20RepositoriesUsernameSlugPullrequestsPidGet extends OapiContext {
     path: {
         username: string;
         slug: string;
@@ -2876,7 +2876,7 @@ export type Path20RepositoriesUsernameSlugPullrequestsPidGet<R extends Empty = E
 
 export type Response20RepositoriesUsernameSlugPullrequestsPidMergePost = ResponseOapi<unknown, 204, string>;
 
-export interface Request20RepositoriesUsernameSlugPullrequestsPidMergePost extends RequestOapi {
+export interface Request20RepositoriesUsernameSlugPullrequestsPidMergePost extends OapiContext {
     path: {
         username: string;
         slug: string;
@@ -2912,9 +2912,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test petstore.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export type Pets = Pet[];
 
@@ -2936,7 +2936,7 @@ export type ResponsePetsGet = ResponseOapi<Pets, 200, \\"application/json\\"> | 
 /**
  * List all pets
  */
-export interface RequestPetsGet extends RequestOapi {
+export interface RequestPetsGet extends OapiContext {
     query: {
         /**
          * How many items to return at one time (max 100)
@@ -2949,14 +2949,14 @@ export type PathPetsGet<R extends Empty = Empty> = (req: RequestPetsGet & R) => 
 
 export type ResponsePetsPost = ResponseOapi<unknown, 201, string> | ResponseOapi<Error, number, \\"application/json\\">;
 
-export type PathPetsPost<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponsePetsPost>;
+export type PathPetsPost<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponsePetsPost>;
 
 export type ResponsePetsPetIdGet = ResponseOapi<Pets, 200, \\"application/json\\"> | ResponseOapi<Error, number, \\"application/json\\">;
 
 /**
  * Info for a specific pet
  */
-export interface RequestPetsPetIdGet extends RequestOapi {
+export interface RequestPetsPetIdGet extends OapiContext {
     path: {
         /**
          * The id of the pet to retrieve
@@ -2982,9 +2982,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test petstore-expanded.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export type Pet = NewPet & {
     id: number;
@@ -3012,7 +3012,7 @@ export type ResponsePetsGet = ResponseOapi<Pet[], 200, \\"application/json\\"> |
  * Sed tempus felis lobortis leo pulvinar rutrum. Nam mattis velit nisl, eu condimentum ligula luctus nec. Phasellus semper velit eget aliquet faucibus. In a mattis elit. Phasellus vel urna viverra, condimentum lorem id, rhoncus nibh. Ut pellentesque posuere elementum. Sed a varius odio. Morbi rhoncus ligula libero, vel eleifend nunc tristique vitae. Fusce et sem dui. Aenean nec scelerisque tortor. Fusce malesuada accumsan magna vel tempus. Quisque mollis felis eu dolor tristique, sit amet auctor felis gravida. Sed libero lorem, molestie sed nisl in, accumsan tempor nisi. Fusce sollicitudin massa ut lacinia mattis. Sed vel eleifend lorem. Pellentesque vitae felis pretium, pulvinar elit eu, euismod sapien.
  *
  */
-export interface RequestPetsGet extends RequestOapi {
+export interface RequestPetsGet extends OapiContext {
     query: {
         /**
          * tags to filter by
@@ -3039,7 +3039,7 @@ export type ResponsePetsPost = ResponseOapi<Pet, 200, \\"application/json\\"> | 
 /**
  * Creates a new pet in the store.  Duplicates are allowed
  */
-export interface RequestPetsPost extends RequestOapi {
+export interface RequestPetsPost extends OapiContext {
     body: NewPet;
 }
 
@@ -3053,7 +3053,7 @@ export type ResponsePetsIdGet = ResponseOapi<Pet, 200, \\"application/json\\"> |
 /**
  * Returns a user based on a single ID, if the user does not have access to the pet
  */
-export interface RequestPetsIdGet extends RequestOapi {
+export interface RequestPetsIdGet extends OapiContext {
     path: {
         /**
          * ID of pet to fetch
@@ -3072,7 +3072,7 @@ export type ResponsePetsIdDelete = ResponseOapi<unknown, 204, string> | Response
 /**
  * deletes a single pet based on the ID supplied
  */
-export interface RequestPetsIdDelete extends RequestOapi {
+export interface RequestPetsIdDelete extends OapiContext {
     path: {
         /**
          * ID of pet to delete
@@ -3118,9 +3118,9 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test statements.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export type AccountId = string;
 
@@ -3161,7 +3161,7 @@ export type ResponseAccountsAccountIdMetersGet = ResponseOapi<AccountMeter[], 20
 /**
  * Get Meters, associated with an account, and its service start and end dates (SSD...SED)
  */
-export interface RequestAccountsAccountIdMetersGet extends RequestOapi {
+export interface RequestAccountsAccountIdMetersGet extends OapiContext {
     path: {
         accountId: AccountId;
     };
@@ -3180,11 +3180,11 @@ export interface Config<R extends Empty = Empty> extends OapiConfig<R> {
 `;
 
 exports[`Types Content Test uspto.yaml 1`] = `
-"import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
+"import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from \\"@ovotech/laminar\\";
 
 import { Readable } from \\"stream\\";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export interface dataSetList {
     total?: number;
@@ -3212,7 +3212,7 @@ export interface dataSetList {
 
 export type ResponseGet = ResponseOapi<dataSetList, 200, \\"application/json\\">;
 
-export type PathGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseGet>;
+export type PathGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseGet>;
 
 export type ResponseDatasetVersionFieldsGet = ResponseOapi<string | Readable | Buffer, 200, \\"application/json\\"> | ResponseOapi<string | Readable | Buffer, 404, \\"application/json\\">;
 
@@ -3220,7 +3220,7 @@ export type ResponseDatasetVersionFieldsGet = ResponseOapi<string | Readable | B
  * Provides the general information about the API and the list of fields that can be used to query the dataset.
  * This GET API returns the list of all the searchable field names that are in the oa_citations. Please see the 'fields' attribute which returns an array of field names. Each field or a combination of fields can be searched using the syntax options shown below.
  */
-export interface RequestDatasetVersionFieldsGet extends RequestOapi {
+export interface RequestDatasetVersionFieldsGet extends OapiContext {
     path: {
         /**
          * Name of the dataset.
@@ -3244,7 +3244,7 @@ export type ResponseDatasetVersionRecordsPost = ResponseOapi<any[], 200, \\"appl
  * Provides search capability for the data set with the given search criteria.
  * This API is based on Solr/Lucense Search. The data is indexed using SOLR. This GET API returns the list of all the searchable field names that are in the Solr Index. Please see the 'fields' attribute which returns an array of field names. Each field or a combination of fields can be searched using the Solr/Lucene Syntax. Please refer https://lucene.apache.org/core/3_6_2/queryparsersyntax.html#Overview for the query syntax. List of field names that are searchable can be determined using above GET api.
  */
-export interface RequestDatasetVersionRecordsPost extends RequestOapi {
+export interface RequestDatasetVersionRecordsPost extends OapiContext {
     path: {
         /**
          * Version of the dataset.

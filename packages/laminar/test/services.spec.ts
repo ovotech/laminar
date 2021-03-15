@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { HttpServer, textOk, Middleware, run } from '../src';
+import { HttpService, textOk, Middleware, run } from '../src';
 import { SimpleQueue, Boss } from './simple-queue';
 
 export interface BossContext<TData> {
@@ -23,9 +23,9 @@ describe('Services', () => {
       },
     ]);
 
-    const http = new HttpServer({
+    const http = new HttpService({
       port,
-      app: withBoss(async ({ boss, query: { data } }) => {
+      listener: withBoss(async ({ boss, query: { data } }) => {
         logger.info('test');
         for (const item of data) {
           boss.add('one', Number(item));
@@ -44,20 +44,20 @@ describe('Services', () => {
     expect(logger.info.mock.calls).toEqual([
       ['⏫ Starting Boss'],
       ['✅ Started Boss'],
-      ['⏫ Starting ⛲ Laminar: -'],
+      ['⏫ Starting ⛲ Laminar: http://localhost:8060'],
       ['⏫ Starting Queue: one'],
       ['✅ Started Queue: one'],
-      ['✅ Started ⛲ Laminar: 127.0.0.1:8060 (IPv4)'],
+      ['✅ Started ⛲ Laminar: http://localhost:8060'],
       ['test'],
       ['1'],
       ['2'],
       ['3'],
       ['test'],
       ['4'],
-      ['⏬ Stopping ⛲ Laminar: 127.0.0.1:8060 (IPv4)'],
+      ['⏬ Stopping ⛲ Laminar: http://localhost:8060'],
       ['⏬ Stopping Queue: one'],
       ['❎ Stopped Queue: one'],
-      ['❎ Stopped ⛲ Laminar: -'],
+      ['❎ Stopped ⛲ Laminar: http://localhost:8060'],
       ['⏬ Stopping Boss'],
       ['❎ Stopped Boss'],
     ]);

@@ -1,5 +1,5 @@
-import { loggingMiddleware, HttpServer, start } from '@ovotech/laminar';
-import { createPgClient } from './db.middleware';
+import { loggerMiddleware, HttpService, init, pgMiddleware, PgService } from '@ovotech/laminar';
+import { Pool } from 'pg';
 import { routes } from './routes';
 
 const main = async () => {
@@ -11,13 +11,15 @@ const main = async () => {
     throw new Error('Need PORT env variable');
   }
 
-  const logging = loggingMiddleware(console);
-  const pgClient = await createPgClient(process.env.PG);
+  const pg = new PgService(new Pool({ connectionString: process.env.PG }));
 
-  const app = logging(pgClient(routes));
+  const withLogger = loggerMiddleware(console);
+  const withPg = pgMiddleware(pg);
 
-  const server = new HttpServer({ app, port: Number(process.env.PORT) });
-  await start([server], console);
+  const listener = withLogger(withPg(routes));
+
+  const server = new HttpService({ listener, port: Number(process.env.PORT) });
+  await init({ services: [pg, server], logger: console });
 };
 
 main();

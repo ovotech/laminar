@@ -2,7 +2,7 @@ import { Middleware } from '../types';
 import type { PoolClient } from 'pg';
 import { PgService } from './pg.service';
 
-export interface RequestPg {
+export interface PgContext {
   db: PoolClient;
 }
 
@@ -14,7 +14,7 @@ export interface RequestPg {
  * We are also able to handle exceptions gracefully,
  * releasing the client from the pool in an event of one.
  */
-export const pgMiddleware = (pool: PgService): Middleware<RequestPg> => {
+export const pgMiddleware = (pool: PgService): Middleware<PgContext> => {
   return (next) => async (req) => {
     // Each request gets its own client connection.
     const db = await pool.connect();

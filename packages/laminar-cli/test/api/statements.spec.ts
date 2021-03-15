@@ -1,5 +1,5 @@
 import {
-  HttpServer,
+  HttpService,
   htmlOk,
   jsonOk,
   ok,
@@ -9,12 +9,13 @@ import {
   jsonNotFound,
   jsonUnauthorized,
   securityOk,
+  loggerMiddleware,
   run,
+  LoggerContext,
 } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/statements';
-import { LoggerContext, withLogger } from './middleware/logger';
 import { createReadStream } from 'fs';
 import { StatementService, ReportsService } from './statements';
 
@@ -27,7 +28,7 @@ const reportsService = new ReportsService();
 
 describe('Statements', () => {
   it('Should process response', async () => {
-    const app = await openApiTyped<LoggerContext, AuthInfo>({
+    const oapi = await openApiTyped<LoggerContext, AuthInfo>({
       api: join(__dirname, 'statements.yaml'),
       security: {
         BearerAuth: ({ headers }) => {
@@ -135,9 +136,10 @@ describe('Statements', () => {
         },
       },
     });
-    const log = jest.fn();
-    const logger = withLogger(log);
-    const http = new HttpServer({ app: logger(app), port: 4913 });
+
+    const logger = { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() };
+    const withLogger = loggerMiddleware(logger);
+    const http = new HttpService({ listener: withLogger(oapi), port: 4913 });
     await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:4913' });
 

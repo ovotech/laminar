@@ -11,7 +11,7 @@ export class QueueService implements Queue, Service {
 
   async subscribe<ReqData>(req: Subscribe<ReqData>): Promise<void> {
     return await this.boss.subscribe<ReqData, void>(req.name, req.options ?? {}, (job) =>
-      req.app({ ...job, queue: this }),
+      req.worker({ ...job, queue: this }),
     );
   }
 
@@ -30,6 +30,6 @@ export class QueueService implements Queue, Service {
   }
 
   describe(): string {
-    return 'Queue';
+    return '🧑‍⚖️ Queue';
   }
 }

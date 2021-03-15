@@ -2,7 +2,7 @@ import axios from 'axios';
 import {
   del,
   get,
-  HttpServer,
+  HttpService,
   options,
   patch,
   post,
@@ -15,11 +15,11 @@ import {
   staticAssets,
   jsonOk,
   textOk,
-  RequestLogging,
+  LoggerContext,
   jsonNotFound,
   file,
   HttpError,
-  HttpApp,
+  HttpListener,
   run,
 } from '../src';
 import { join } from 'path';
@@ -29,10 +29,10 @@ import { URLSearchParams } from 'url';
 
 describe('Integration', () => {
   it('Should respect timeout', async () => {
-    const app: HttpApp = () => new Promise((resolve) => setTimeout(() => resolve(textOk('OK')), 100));
+    const listener: HttpListener = () => new Promise((resolve) => setTimeout(() => resolve(textOk('OK')), 100));
     const port = 8051;
 
-    const server = new HttpServer({ port, app, timeout: 50 });
+    const server = new HttpService({ port, listener, timeout: 50 });
     await run({ services: [server] }, async () => {
       const error = await axios.get(`http://localhost:${port}`).catch((error) => error);
       expect(error.message).toEqual('socket hang up');
@@ -40,13 +40,13 @@ describe('Integration', () => {
   });
 
   it('Should allow TLS', async () => {
-    const app = jest.fn().mockReturnValue(textOk('TLS Test'));
+    const listener = jest.fn().mockReturnValue(textOk('TLS Test'));
     const port = 8051;
     const key = readFileSync(join(__dirname, '../examples/key.pem'));
     const cert = readFileSync(join(__dirname, '../examples/cert.pem'));
     const ca = readFileSync(join(__dirname, '../examples/ca.pem'));
 
-    const http = new HttpServer({ port, app, https: { key, cert } });
+    const http = new HttpService({ port, listener, https: { key, cert } });
     await run({ services: [http] }, async () => {
       const response = await axios.get(`https://localhost:${port}`, {
         httpsAgent: new Agent({ ca }),
@@ -60,19 +60,19 @@ describe('Integration', () => {
     const logging = requestLoggingMiddleware(logger);
     const responseTime = responseTimeMiddleware();
 
-    interface DBRequest {
+    interface DBContext {
       getUser: (id: string) => string | undefined;
       delUser: (id: string) => void;
       setUser: (id: string, name: string) => void;
     }
 
-    const db: HttpMiddleware<DBRequest> = (next) => {
+    const db: HttpMiddleware<DBContext> = (next) => {
       const users: { [key: string]: string } = {
         10: 'John',
         20: 'Tom',
       };
 
-      const dbReq: DBRequest = {
+      const dbReq: DBContext = {
         getUser: (id) => users[id],
         setUser: (id, name) => {
           users[id] = name;
@@ -85,7 +85,7 @@ describe('Integration', () => {
       return (req) => next({ ...req, ...dbReq });
     };
 
-    const app = router<RequestLogging & DBRequest>(
+    const app = router<LoggerContext & DBContext>(
       staticAssets('/assets', join(__dirname, '../examples/assets')),
       get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
       get('/link', async () => redirect('http://localhost:8050/destination')),
@@ -156,7 +156,7 @@ describe('Integration', () => {
       async ({ url }) => jsonNotFound(`Test url ${url.pathname} not found`),
     );
 
-    const http = new HttpServer({ port: 8050, app: responseTime(db(logging(app))) });
+    const http = new HttpService({ port: 8050, listener: responseTime(db(logging(app))) });
     await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:8050' });
 

@@ -1,4 +1,12 @@
-import { HttpServer, HttpApp, textOk, BodyParser, concatStream, defaultBodyParsers, init } from '@ovotech/laminar';
+import {
+  HttpService,
+  HttpListener,
+  textOk,
+  BodyParser,
+  concatStream,
+  defaultBodyParsers,
+  init,
+} from '@ovotech/laminar';
 
 const csvParser: BodyParser = {
   name: 'CsvParser',
@@ -6,10 +14,10 @@ const csvParser: BodyParser = {
   parse: async (body) => String(await concatStream(body)).split(','),
 };
 
-const app: HttpApp = async ({ body }) => textOk(JSON.stringify(body));
+const listener: HttpListener = async ({ body }) => textOk(JSON.stringify(body));
 
-const http = new HttpServer({
-  app,
+const http = new HttpService({
+  listener,
   bodyParsers: [csvParser, ...defaultBodyParsers],
 });
 

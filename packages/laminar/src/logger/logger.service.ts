@@ -31,6 +31,6 @@ export class LoggerService implements Service, LoggerLike {
   }
 
   describe(): string {
-    return 'Winston Logger';
+    return '📜 Winston Logger';
   }
 }

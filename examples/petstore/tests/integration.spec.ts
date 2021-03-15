@@ -1,30 +1,30 @@
-import { HttpServer, start, stop } from '@ovotech/laminar';
-import { createApp } from '../src/app';
-import { sign } from 'jsonwebtoken';
 import axios from 'axios';
-import { Pool } from 'pg';
-import { PgPoolService } from '@ovotech/laminar-pg';
+import { run } from '@ovotech/laminar';
+import { createSession } from '@ovotech/laminar-jwt';
+import { createApplication } from '../src/application';
+import { EnvVars } from '../src/env';
 
-const secret = 'TEST_SECRET';
+const env: EnvVars = {
+  HOST: 'localhost',
+  SECRET: 'TEST_SECRET',
+  PG: 'postgres://example-admin:example-pass@localhost:5432/example',
+  PORT: '4400',
+};
 const logger = { info: jest.fn(), error: jest.fn(), warn: jest.fn(), log: jest.fn(), debug: jest.fn() };
-const port = 4400;
-const hostname = 'localhost';
-const connectionString = 'postgres://example-admin:example-pass@localhost:5432/example';
-const token = sign({ email: 'me@example.com', scopes: [] }, secret);
-const client = axios.create({
-  baseURL: `http://${hostname}:${port}`,
-  headers: { Authorization: `Bearer ${token}` },
-});
 
 describe('Petstore Integration Tests', () => {
   it('Should work as a petstore', async () => {
-    const pool = new PgPoolService(new Pool({ connectionString }));
-    const petstore = new HttpServer({ app: await createApp({ secret, pool, logger }), port, hostname });
-    await pool.pg.query('DELETE FROM pets');
-    await start([pool, petstore], logger);
+    const app = await createApplication(env, logger);
 
-    try {
-      await expect(client.get('/pets')).resolves.toMatchObject({
+    const { jwt } = createSession({ secret: app.secret }, { email: 'me@example.com', scopes: [] });
+    const client = axios.create({ baseURL: app.http.url(), headers: { Authorization: `Bearer ${jwt}` } });
+
+    await run(app, async () => {
+      await app.pg.pool.query('DELETE FROM pets');
+
+      const petsList = await client.get('/pets');
+
+      expect(petsList).toMatchObject({
         status: 200,
         data: [],
       });
@@ -47,7 +47,9 @@ describe('Petstore Integration Tests', () => {
         data: { id: expect.any(Number), name: 'Leya', tag: 'cat' },
       });
 
-      await expect(client.get('/pets?limit=2')).resolves.toMatchObject({
+      const petsListWithLimit = await client.get('/pets?limit=2');
+
+      expect(petsListWithLimit).toMatchObject({
         status: 200,
         data: [
           { id: expect.any(Number), name: 'Charlie', tag: 'dog' },
@@ -55,35 +57,45 @@ describe('Petstore Integration Tests', () => {
         ],
       });
 
-      await expect(client.get('/pets?tags[]=dog')).resolves.toMatchObject({
+      const petsListOnlyDogs = await client.get('/pets?tags[]=dog');
+
+      expect(petsListOnlyDogs).toMatchObject({
         status: 200,
         data: [{ id: expect.any(Number), name: 'Charlie', tag: 'dog' }],
       });
 
-      await expect(client.get(`/pets/${charlie.data.id}`)).resolves.toMatchObject({
+      const getCharlie = await client.get(`/pets/${charlie.data.id}`);
+
+      expect(getCharlie).toMatchObject({
         status: 200,
         data: { id: expect.any(Number), name: 'Charlie', tag: 'dog' },
       });
 
-      await expect(client.get(`/pets/${leya.data.id}`)).resolves.toMatchObject({
+      const getLeya = await client.get(`/pets/${leya.data.id}`);
+
+      expect(getLeya).toMatchObject({
         status: 200,
         data: { id: expect.any(Number), name: 'Leya', tag: 'cat' },
       });
 
-      await expect(client.delete(`/pets/${leya.data.id}`)).resolves.toMatchObject({
+      const deleteLeya = await client.delete(`/pets/${leya.data.id}`);
+
+      expect(deleteLeya).toMatchObject({
         status: 204,
       });
 
-      await expect(client.delete(`/pets/${charlie.data.id}`)).resolves.toMatchObject({
+      const deleteCharlie = await client.delete(`/pets/${charlie.data.id}`);
+
+      expect(deleteCharlie).toMatchObject({
         status: 204,
       });
 
-      await expect(client.get('/pets')).resolves.toMatchObject({
+      const petsListEmpty = await client.get('/pets');
+
+      expect(petsListEmpty).toMatchObject({
         status: 200,
         data: [],
       });
-    } finally {
-      await stop([pool, petstore], logger);
-    }
+    });
   });
 });

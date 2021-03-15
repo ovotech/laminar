@@ -1,5 +1,5 @@
 import {
-  HttpServer,
+  HttpService,
   init,
   openApi,
   redirect,
@@ -14,7 +14,7 @@ import { join } from 'path';
 
 const main = async () => {
   const secret = '123';
-  const app = await openApi({
+  const listener = await openApi({
     api: join(__dirname, 'oapi-custom.yaml'),
     security: {
       /**
@@ -43,7 +43,7 @@ const main = async () => {
       '/unauthorized': { get: async () => textForbidden('Forbidden!') },
     },
   });
-  const http = new HttpServer({ app });
+  const http = new HttpService({ listener });
   await init({ services: [http], logger: console });
 };
 

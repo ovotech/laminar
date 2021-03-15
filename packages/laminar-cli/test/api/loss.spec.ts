@@ -1,11 +1,11 @@
-import { HttpServer, jsonOk, run } from '@ovotech/laminar';
+import { HttpService, jsonOk, run } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
 import { openApiTyped } from './__generated__/loss';
 
 describe('Statements', () => {
   it('Should process response', async () => {
-    const app = await openApiTyped({
+    const listener = await openApiTyped({
       api: join(__dirname, 'loss.yaml'),
       paths: {
         '/accounts/{accountId}/meters': {
@@ -41,7 +41,7 @@ describe('Statements', () => {
         },
       },
     });
-    const http = new HttpServer({ app, port: 4910 });
+    const http = new HttpService({ listener, port: 4910 });
     await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:4910' });
       const { data } = await api.get('/accounts/123/meters');

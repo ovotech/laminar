@@ -1,11 +1,12 @@
 import {
-  HttpServer,
+  HttpService,
   jsonOk,
   jsonNoContent,
   jsonNotFound,
   jsonUnauthorized,
   securityOk,
   optional,
+  run,
 } from '@ovotech/laminar';
 import axios from 'axios';
 import { join } from 'path';
@@ -25,7 +26,7 @@ describe('Integration', () => {
       { id: 222, name: 'Doggy' },
     ];
 
-    const app = await openApiTyped<AuthInfo>({
+    const listener = await openApiTyped<AuthInfo>({
       api: join(__dirname, 'integration.yaml'),
       security: {
         BearerAuth: ({ headers }) =>
@@ -69,11 +70,9 @@ describe('Integration', () => {
       },
     });
 
-    const server = new HttpServer({ app, port: 4920 });
+    const http = new HttpService({ listener, port: 4920 });
 
-    try {
-      await server.start();
-
+    await run({ services: [http] }, async () => {
       const api = axiosOapi(axios.create({ baseURL: 'http://localhost:4920' }));
 
       await expect(api.api.get('/unknown-url').catch((error) => error.response)).resolves.toMatchObject({
@@ -171,8 +170,6 @@ describe('Integration', () => {
           { id: 223, name: 'New Puppy' },
         ],
       });
-    } finally {
-      await server.stop();
-    }
+    });
   });
 });

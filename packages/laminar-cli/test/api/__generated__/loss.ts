@@ -1,6 +1,6 @@
-import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from "@ovotech/laminar";
+import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from "@ovotech/laminar";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export interface AccountMeterBase {
     tariffName: string;
@@ -23,7 +23,7 @@ export type ResponseAccountsAccountIdMetersGet = ResponseOapi<AccountMeterBase[]
 /**
  * Get Meters, associated with an account, and its service start and end dates (SSD...SED)
  */
-export interface RequestAccountsAccountIdMetersGet extends RequestOapi {
+export interface RequestAccountsAccountIdMetersGet extends OapiContext {
     path: {
         accountId: string;
     };

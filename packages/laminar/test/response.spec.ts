@@ -3,7 +3,7 @@ import { join } from 'path';
 import { ObjectReadableMock } from 'stream-mock';
 import {
   file,
-  HttpServer,
+  HttpService,
   text,
   textOk,
   form,
@@ -27,7 +27,7 @@ const api = axios.create({ baseURL: 'http://localhost:8052' });
 
 describe('Requests', () => {
   it('Should process response', async () => {
-    const http = new HttpServer({ port: 8052, app: async () => textOk('Test') });
+    const http = new HttpService({ port: 8052, listener: async () => textOk('Test') });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
         headers: expect.objectContaining({
@@ -40,9 +40,9 @@ describe('Requests', () => {
   });
 
   it('Should process json', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => jsonOk({ other: 'stuff', at: new Date('2020-02-02T12:00:00Z'), no: undefined }),
+      listener: async () => jsonOk({ other: 'stuff', at: new Date('2020-02-02T12:00:00Z'), no: undefined }),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -56,9 +56,9 @@ describe('Requests', () => {
   });
 
   it('Should process buffer', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => binary(ok({ body: Buffer.from('test-test-maaaany-test') })),
+      listener: async () => binary(ok({ body: Buffer.from('test-test-maaaany-test') })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -72,9 +72,9 @@ describe('Requests', () => {
   });
 
   it('Should process stream', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => textOk(new ObjectReadableMock(['test-', 'test-', 'maaaany-', 'test'])),
+      listener: async () => textOk(new ObjectReadableMock(['test-', 'test-', 'maaaany-', 'test'])),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -87,7 +87,7 @@ describe('Requests', () => {
   });
 
   it('Should process laminar simple response', async () => {
-    const http = new HttpServer({ port: 8052, app: async () => text({ body: '', status: 201 }) });
+    const http = new HttpService({ port: 8052, listener: async () => text({ body: '', status: 201 }) });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
         status: 201,
@@ -101,9 +101,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar response', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () =>
+      listener: async () =>
         setCookie(
           { me: { value: 'test', httpOnly: true, maxAge: 1000 }, other: 'test2' },
           json({
@@ -128,9 +128,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar message', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => jsonNotFound({ message: 'test' }),
+      listener: async () => jsonNotFound({ message: 'test' }),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test').catch((error) => error.response)).resolves.toMatchObject({
@@ -143,9 +143,9 @@ describe('Requests', () => {
   it('Should process json responds for undefined', async () => {
     let data: { message: string } | undefined;
 
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => optional(jsonOk, data) ?? jsonNotFound({ message: 'not found' }),
+      listener: async () => optional(jsonOk, data) ?? jsonNotFound({ message: 'not found' }),
     });
     await run({ services: [http] }, async () => {
       data = { message: 'test' };
@@ -163,9 +163,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar text file', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => file(join(__dirname, 'test.txt')),
+      listener: async () => file(join(__dirname, 'test.txt')),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -180,9 +180,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar html file', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => file(join(__dirname, 'test.html')),
+      listener: async () => file(join(__dirname, 'test.html')),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -197,9 +197,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar file with status', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => file(join(__dirname, 'test.txt'), { status: 201 }),
+      listener: async () => file(join(__dirname, 'test.txt'), { status: 201 }),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -210,9 +210,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type csv', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => csv(ok({ body: 'one,two' })),
+      listener: async () => csv(ok({ body: 'one,two' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -223,9 +223,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type css', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => css(ok({ body: 'html { backgroun: red; }' })),
+      listener: async () => css(ok({ body: 'html { backgroun: red; }' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -236,9 +236,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type html', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => html(ok({ body: '<html></html>' })),
+      listener: async () => html(ok({ body: '<html></html>' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -249,9 +249,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type text', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => text(ok({ body: 'txt' })),
+      listener: async () => text(ok({ body: 'txt' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -262,9 +262,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type form', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => form(ok({ body: { one: 'foo', two: 'bar' } })),
+      listener: async () => form(ok({ body: { one: 'foo', two: 'bar' } })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -275,9 +275,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type xml', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => xml(ok({ body: '<xml></xml>' })),
+      listener: async () => xml(ok({ body: '<xml></xml>' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -288,9 +288,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type pdf', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => pdf(ok({ body: 'tmp' })),
+      listener: async () => pdf(ok({ body: 'tmp' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -300,9 +300,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type binary', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => binary(ok({ body: 'tmp' })),
+      listener: async () => binary(ok({ body: 'tmp' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -312,9 +312,9 @@ describe('Requests', () => {
   });
 
   it('Should process response type yaml', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => yaml(ok({ body: 'tmp' })),
+      listener: async () => yaml(ok({ body: 'tmp' })),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -324,9 +324,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar file with status', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async () => file(join(__dirname, 'test.txt'), { status: 201 }),
+      listener: async () => file(join(__dirname, 'test.txt'), { status: 201 }),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test')).resolves.toMatchObject({
@@ -337,9 +337,9 @@ describe('Requests', () => {
   });
 
   it('Should process laminar file with range', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8052,
-      app: async ({ incommingMessage }) => file(join(__dirname, 'test.txt'), { incommingMessage }),
+      listener: async ({ incommingMessage }) => file(join(__dirname, 'test.txt'), { incommingMessage }),
     });
     await run({ services: [http] }, async () => {
       await expect(api.get('/test', { headers: { Range: 'bytes=0-3' } })).resolves.toMatchObject({

@@ -1,6 +1,6 @@
 import { PathPetsIdDelete } from '../__generated__/petstore';
 import { jsonNotFound, jsonNoContent } from '@ovotech/laminar';
-import { RequestPetsDb } from '../middleware';
+import { PetsDbContext } from '../middleware';
 
 /**
  * Request and response are both validated runtime and checked at compoile time
@@ -11,7 +11,7 @@ import { RequestPetsDb } from '../middleware';
  * Anithing that's deviating from the OpenAPI schema - the shape of the json response, status or content-type
  * would be flagged by typescript as an error
  */
-export const pathPetsIdDelete: PathPetsIdDelete<RequestPetsDb> = async ({ petsDb, path: { id } }) => {
+export const pathPetsIdDelete: PathPetsIdDelete<PetsDbContext> = async ({ petsDb, path: { id } }) => {
   const pet = await petsDb.find(id);
   if (pet) {
     await petsDb.remove(id);

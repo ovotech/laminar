@@ -1,6 +1,6 @@
-import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, ResponseOapi } from "@ovotech/laminar";
+import { OapiContext, OapiConfig, Empty, HttpListener, openApi, ResponseOapi } from "@ovotech/laminar";
 
-export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty>(config: Config<R>): Promise<HttpListener<R>> => openApi(config);
 
 export interface UserResponse {
     id?: string;
@@ -10,7 +10,7 @@ export interface UserResponse {
 
 export type ResponseUserIdGet = ResponseOapi<UserResponse, 200, "application/json">;
 
-export interface RequestUserIdGet extends RequestOapi {
+export interface RequestUserIdGet extends OapiContext {
     path: {
         id: string;
     };

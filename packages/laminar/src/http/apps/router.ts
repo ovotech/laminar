@@ -2,14 +2,14 @@
 import { resolve, normalize, join } from 'path';
 import { existsSync, statSync } from 'fs';
 import { file, jsonNotFound, textNotFound, textForbidden } from '../response';
-import { HttpRequest, HttpApp } from '../types';
+import { HttpContext, HttpListener } from '../types';
 import { Empty } from '../../types';
 import { toPathKeys, toPathRe } from '../../helpers';
 
 /**
  * Adds the `path` property to the request, containing the captured path parameters.
  */
-export interface RequestRoute {
+export interface RouteContext {
   /**
    * Captured path parameters to the route.
    *
@@ -22,32 +22,32 @@ export interface RequestRoute {
 /**
  * A function to check if a route matches. If it does, returns the captured path parameters, otherwsie - false.
  *
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-type Matcher<TRequest> = (req: TRequest & HttpRequest) => RequestRoute | false;
+type Matcher<TContext> = (req: TContext & HttpContext) => RouteContext | false;
 
 /**
  * Captured path parameters to the route would be passed to the `path` property.
  *
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-export type AppRoute<TRequest extends Empty = Empty> = HttpApp<TRequest & RequestRoute>;
+export type AppRoute<TContext extends Empty = Empty> = HttpListener<TContext & RouteContext>;
 
 /**
  * A route object, containing a route mather and the route application
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-interface PathRoute<TRequest extends Empty> {
-  matcher: Matcher<TRequest>;
-  app: AppRoute<TRequest>;
+interface PathRoute<TContext extends Empty> {
+  matcher: Matcher<TContext>;
+  listener: AppRoute<TContext>;
 }
 
 /**
  * An options for a route
  *
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-interface PathRouteOptions<TRequest extends Empty> {
+interface PathRouteOptions<TContext extends Empty> {
   /**
    * The http method to match. If omitted will match any method.
    */
@@ -65,7 +65,7 @@ interface PathRouteOptions<TRequest extends Empty> {
   /**
    * Would pass the captured path parameters to the `path` property
    */
-  app: HttpApp<TRequest & RequestRoute>;
+  listener: HttpListener<TContext & RouteContext>;
 }
 
 /**
@@ -80,9 +80,9 @@ interface PathRouteOptions<TRequest extends Empty> {
  * - {@link put}
  * - {@link options}
  *
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-export type Method = <TRequest extends Empty = Empty>(
+export type Method = <TContext extends Empty = Empty>(
   /**
    * If a pathname has a {some_name} in it it would be captured and accessible with the `path` paramters.
    * You can have multiple parameters in the path, all of them will be extracted.
@@ -96,8 +96,8 @@ export type Method = <TRequest extends Empty = Empty>(
   /**
    * Would pass the captured path parameters to the `path` property
    */
-  app: HttpApp<TRequest & RequestRoute>,
-) => PathRoute<TRequest>;
+  listener: HttpListener<TContext & RouteContext>,
+) => PathRoute<TContext>;
 
 /**
  * Options for {@link staticAssets}
@@ -115,28 +115,28 @@ export interface StaticAssetsOptions {
   /**
    * Would be called if a file was not found at all.
    */
-  fileNotFound?: HttpApp;
+  fileNotFound?: HttpListener;
   /**
    * Would be called if a directory was requested, but index file was not found (or was disabled with `index: undefined`).
    */
-  indexNotFound?: HttpApp;
+  indexNotFound?: HttpListener;
 }
 
 /**
  * A generic route function. If you omit the method, would match any method.
  *
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-export const route = <TRequest extends Empty = Empty>({
+export const route = <TContext extends Empty = Empty>({
   method,
   path,
-  app,
-}: PathRouteOptions<TRequest>): PathRoute<TRequest> => {
+  listener,
+}: PathRouteOptions<TContext>): PathRoute<TContext> => {
   const keys = typeof path === 'string' ? toPathKeys(path) : undefined;
   const re = typeof path === 'string' ? toPathRe(path) : path;
   const uppercaseMethod = method?.toUpperCase();
 
-  const matcher: Matcher<TRequest> = (req) => {
+  const matcher: Matcher<TContext> = (req) => {
     if (!req.url || (uppercaseMethod && uppercaseMethod !== req.method)) {
       return false;
     }
@@ -151,29 +151,29 @@ export const route = <TRequest extends Empty = Empty>({
     return false;
   };
 
-  return { matcher, app };
+  return { matcher, listener };
 };
 
 /**
  * If the route's matcher matches the current request,
- * extract the path parameters and return them along with the matched route's app
+ * extract the path parameters and return them along with the matched route's listener
  *
  * @param req
  * @param routes An array of routes to be checked sequentially
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-const selectRoute = <TRequest extends Empty = Empty>(
-  req: TRequest & HttpRequest,
-  routes: (PathRoute<TRequest> | AppRoute<TRequest>)[],
-): false | { path: any; app: HttpApp<TRequest & RequestRoute> } => {
+const selectRoute = <TContext extends Empty = Empty>(
+  req: TContext & HttpContext,
+  routes: (PathRoute<TContext> | AppRoute<TContext>)[],
+): false | { path: any; listener: HttpListener<TContext & RouteContext> } => {
   for (const route of routes) {
     if ('matcher' in route) {
       const params = route.matcher(req);
       if (params) {
-        return { app: route.app, ...params };
+        return { listener: route.listener, ...params };
       }
     } else {
-      return { app: route, path: {} };
+      return { listener: route, path: {} };
     }
   }
   return false;
@@ -185,7 +185,7 @@ const selectRoute = <TRequest extends Empty = Empty>(
  * If you have route parameter in the path, like `/test1/{id}` would pass them down in the `path` property of the request.
  *
  * ```typescript
- * const app:App = router(
+ * const listener:App = router(
  *   get('/route1/{id}', ({ path: { id }}) => {
  *     // ...
  *   }),
@@ -194,25 +194,25 @@ const selectRoute = <TRequest extends Empty = Empty>(
  *   })
  * )
  * ```
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the listener requires. Usually added by the middlewares
  */
-export function router<TRequest extends Empty = Empty>(
-  ...routes: (PathRoute<TRequest> | AppRoute<TRequest>)[]
-): HttpApp<TRequest> {
+export function router<TContext extends Empty = Empty>(
+  ...routes: (PathRoute<TContext> | AppRoute<TContext>)[]
+): HttpListener<TContext> {
   return async (req) => {
-    const selected = selectRoute<TRequest>(req, routes);
+    const selected = selectRoute<TContext>(req, routes);
     return selected
-      ? selected.app({ ...req, path: selected.path })
+      ? selected.listener({ ...req, path: selected.path })
       : jsonNotFound({ message: `Path ${req.method} ${req.url.pathname} not found` });
   };
 }
 
-export const get: Method = (path, app) => route({ method: 'GET', path, app });
-export const post: Method = (path, app) => route({ method: 'POST', path, app });
-export const del: Method = (path, app) => route({ method: 'DELETE', path, app });
-export const patch: Method = (path, app) => route({ method: 'PATCH', path, app });
-export const put: Method = (path, app) => route({ method: 'PUT', path, app });
-export const options: Method = (path, app) => route({ method: 'OPTIONS', path, app });
+export const get: Method = (path, listener) => route({ method: 'GET', path, listener });
+export const post: Method = (path, listener) => route({ method: 'POST', path, listener });
+export const del: Method = (path, listener) => route({ method: 'DELETE', path, listener });
+export const patch: Method = (path, listener) => route({ method: 'PATCH', path, listener });
+export const put: Method = (path, listener) => route({ method: 'PUT', path, listener });
+export const options: Method = (path, listener) => route({ method: 'OPTIONS', path, listener });
 
 /**
  * Validate if a filename is attempting to a file outside of the root
@@ -245,7 +245,7 @@ export function staticAssets<T extends Empty = Empty>(
         ? { path: {} }
         : false;
     },
-    app: async (req) => {
+    listener: async (req) => {
       const relativePath = join('.', normalize(req.incommingMessage.url ?? '').substring(prefixPath.length));
 
       if (parentPathRegEx.test(relativePath)) {

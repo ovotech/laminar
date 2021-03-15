@@ -1,7 +1,7 @@
 import { Empty } from '../../../types';
-import { HttpRequest, HttpResponse } from '../../types';
+import { HttpContext, HttpResponse } from '../../types';
 import { SecurityRequirementObject, SecuritySchemeObject } from 'openapi3-ts';
-import { OapiAuthInfo, OapiSecurity, RequestOapi, Security, SecurityOk } from './types';
+import { OapiAuthInfo, OapiSecurity, OapiContext, Security, SecurityOk } from './types';
 
 /**
  * Return a {@link SecurityOk} object, indicating a successfull security check. Should be returned by a {@link OapiSecurityResolver}
@@ -28,13 +28,13 @@ export function isSecurityResponse(item: Security): item is HttpResponse {
  * Using the OpenApi schema requiremnts over the current request.
  */
 export async function validateSecurity<
-  TRequest extends Empty = Empty,
+  TContext extends Empty = Empty,
   TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo
 >(
-  req: TRequest & HttpRequest & RequestOapi,
+  req: TContext & HttpContext & OapiContext,
   requirements?: SecurityRequirementObject[],
   schemes?: { [securityScheme: string]: SecuritySchemeObject },
-  security?: OapiSecurity<TRequest, TOapiAuthInfo>,
+  security?: OapiSecurity<TContext, TOapiAuthInfo>,
 ): Promise<Security<TOapiAuthInfo> | undefined> {
   if (!requirements?.length || !security || !schemes) {
     return undefined;

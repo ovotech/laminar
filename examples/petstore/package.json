@@ -12,7 +12,6 @@
   "devDependencies": {
     "@ovotech/laminar-cli": "^0.11.0",
     "@types/jest": "^26.0.16",
-    "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^14.14.10",
     "@types/pg": "^7.14.9",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
@@ -21,7 +20,6 @@
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^6.15.0",
     "jest": "^26.6.3",
-    "jsonwebtoken": "^8.5.1",
     "prettier": "^2.2.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.0.0",
@@ -41,7 +39,6 @@
   "dependencies": {
     "@ovotech/laminar": "^0.11.0",
     "@ovotech/laminar-jwt": "^0.11.0",
-    "@ovotech/laminar-pg": "^0.11.0",
     "pg": "^8.5.1"
   }
 }

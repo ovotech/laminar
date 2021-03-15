@@ -1,5 +1,5 @@
 import { DecodedEachBatchPayload } from './types';
-import { AbstractMiddleware } from '@ovotech/laminar';
+import { AbstractMiddleware } from '../types';
 
 export const chunkBatchMiddleware = ({ size = 1000 }): AbstractMiddleware<DecodedEachBatchPayload<unknown>, void> => (
   next,

@@ -1,16 +1,16 @@
 import axios from 'axios';
-import { HttpServer, textOk, router, get, post, route, run } from '../../src';
+import { HttpService, textOk, router, get, post, route, run } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8096' });
 
 describe('router middleware', () => {
   it('Should route resolvers correctly', async () => {
-    const http = new HttpServer({
+    const http = new HttpService({
       port: 8096,
-      app: router(
+      listener: router(
         route({
           path: /^\/one/,
-          app: router(
+          listener: router(
             get('/one/foo/{id}', async ({ path: { id } }) => textOk(`One foo ${id}`)),
             post('/one/bar/{id}', async ({ path: { id } }) => textOk(`One bar ${id}`)),
             async () => textOk('one not found'),
@@ -18,7 +18,7 @@ describe('router middleware', () => {
         }),
         route({
           path: /^\/two/,
-          app: router(
+          listener: router(
             get(/^\/two\/foo\/(\d+)/, async ({ path: [id] }) => textOk(`two foo ${id}`)),
             get(/^\/two\/bar\/(\d+)$/, async ({ path: [id] }) => textOk(`two bar ${id}`)),
             get(/^\/two\/bar\/(\d+)\/(\d+)/, async ({ path: [id, serial] }) => textOk(`two bar ${id}:${serial}`)),

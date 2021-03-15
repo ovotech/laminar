@@ -1,4 +1,4 @@
-import { init, HttpServer, jsonOk, openApi } from '@ovotech/laminar';
+import { init, HttpService, jsonOk, openApi } from '@ovotech/laminar';
 import { jwkPublicKey, keycloakJwtSecurityResolver, createSession } from '@ovotech/laminar-jwt';
 import { join } from 'path';
 import { readFileSync } from 'fs';
@@ -26,7 +26,7 @@ const main = async () => {
     service: 'my-service-name',
   });
 
-  const app = await openApi({
+  const listener = await openApi({
     api: join(__dirname, 'oapi.yaml'),
     security: { JWTSecurity: jwtSecurity },
     paths: {
@@ -39,7 +39,7 @@ const main = async () => {
       },
     },
   });
-  const http = new HttpServer({ app });
+  const http = new HttpService({ listener });
   await init({ services: [http], logger: console });
 };
 

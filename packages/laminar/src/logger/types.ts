@@ -2,7 +2,7 @@ export interface LoggerMetadata {
   [key: string]: unknown;
 }
 
-export interface RequestLogging {
+export interface LoggerContext {
   logger: LoggerLike;
 }
 

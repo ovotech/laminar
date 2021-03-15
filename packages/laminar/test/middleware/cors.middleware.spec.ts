@@ -1,15 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
-import { HttpServer, corsMiddleware, jsonOk, HttpApp } from '../../src';
+import { HttpService, corsMiddleware, jsonOk, HttpListener } from '../../src';
 
 const api = axios.create({ baseURL: 'http://localhost:8095' });
 
-const app: HttpApp = async () => jsonOk({ health: 'ok' });
-const asyncApp: HttpApp = () => Promise.resolve(jsonOk({ health: 'ok' }));
+const listener: HttpListener = async () => jsonOk({ health: 'ok' });
 
 describe('Cors middleware', () => {
   it('Should allow all by default', async () => {
     const cors = corsMiddleware();
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -36,7 +35,7 @@ describe('Cors middleware', () => {
 
   it('Should add headers on async responses', async () => {
     const cors = corsMiddleware();
-    const server = new HttpServer({ port: 8095, app: cors(asyncApp) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -63,7 +62,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to change allowed methods', async () => {
     const cors = corsMiddleware({ allowMethods: ['GET', 'POST', 'DELETE'] });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -90,7 +89,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to change allowed credentials', async () => {
     const cors = corsMiddleware({ allowCredentials: true });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -119,7 +118,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set max age', async () => {
     const cors = corsMiddleware({ maxAge: 1200 });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -147,7 +146,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set exposed headers', async () => {
     const cors = corsMiddleware({ exposeHeaders: ['Authentication', 'Content-Type'] });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -176,7 +175,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set allowed headers directly', async () => {
     const cors = corsMiddleware({ allowHeaders: ['Authentication', 'Content-Type'] });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -196,7 +195,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to infer allowed headers from request headers', async () => {
     const cors = corsMiddleware();
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -222,7 +221,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set origin as string', async () => {
     const cors = corsMiddleware({ allowOrigin: '127.0.0.1' });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -238,7 +237,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set origin as array', async () => {
     const cors = corsMiddleware({ allowOrigin: ['127.0.0.1', '127.0.0.2'] });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -280,7 +279,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set origin as regex', async () => {
     const cors = corsMiddleware({ allowOrigin: /127\.0\.0\.\d/ });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -314,7 +313,7 @@ describe('Cors middleware', () => {
 
   it('Should be able to set origin as function', async () => {
     const cors = corsMiddleware({ allowOrigin: (origin) => origin === '127.0.0.3' });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
     try {
       await server.start();
 
@@ -339,9 +338,9 @@ describe('Cors middleware', () => {
   });
 
   it('Should assign headers even if there is an error', async () => {
-    const app: HttpApp = async () => jsonOk(JSON.parse('{'));
+    const listener: HttpListener = async () => jsonOk(JSON.parse('{'));
     const cors = corsMiddleware({ allowOrigin: '*' });
-    const server = new HttpServer({ port: 8095, app: cors(app) });
+    const server = new HttpService({ port: 8095, listener: cors(listener) });
 
     try {
       await server.start();

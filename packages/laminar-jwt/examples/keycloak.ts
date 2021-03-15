@@ -1,4 +1,4 @@
-import { get, post, HttpServer, router, init, jsonOk } from '@ovotech/laminar';
+import { get, post, HttpService, router, init, jsonOk } from '@ovotech/laminar';
 import { jwkPublicKey, createSession, keycloakAuthMiddleware } from '@ovotech/laminar-jwt';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -26,8 +26,8 @@ const auth = keycloakAuthMiddleware({ secret: publicKey, service: 'my-service-na
 const loggedIn = auth();
 const admin = auth(['admin']);
 
-const http = new HttpServer({
-  app: router(
+const http = new HttpService({
+  listener: router(
     get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
     post('/session', async ({ body }) => jsonOk(createSession(sessionOptions, body))),
     post(

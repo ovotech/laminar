@@ -1,4 +1,4 @@
-import { OapiConfig, openApi, HttpServer, jsonOk, run } from '../../../src';
+import { OapiConfig, openApi, HttpService, jsonOk, run } from '../../../src';
 import axios from 'axios';
 import { join } from 'path';
 
@@ -41,8 +41,8 @@ describe('Statements', () => {
       },
     };
 
-    const app = await openApi(config);
-    const http = new HttpServer({ app, port: 8064 });
+    const listener = await openApi(config);
+    const http = new HttpService({ listener, port: 8064 });
 
     await run({ services: [http] }, async () => {
       const api = axios.create({ baseURL: 'http://localhost:8064' });

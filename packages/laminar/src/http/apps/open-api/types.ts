@@ -3,7 +3,7 @@ import { Schema } from '@ovotech/json-schema';
 import { Empty } from '../../../types';
 import { ResolvedOperationObject } from './resolved-openapi-object';
 import { OpenAPIObject, SecurityRequirementObject, SecuritySchemeObject } from 'openapi3-ts';
-import { HttpRequest, HttpApp, HttpResponse } from '../../types';
+import { HttpContext, HttpListener, HttpResponse } from '../../types';
 
 export interface OapiPath {
   [key: string]: string;
@@ -25,22 +25,22 @@ export interface RequestSecurityResolver {
   securityScheme: SecuritySchemeObject;
 }
 
-export type OapiSecurityResolver<TRequest extends Empty = Empty, TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (
-  req: TRequest & HttpRequest & RequestOapi & RequestSecurityResolver,
+export type OapiSecurityResolver<TContext extends Empty = Empty, TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo> = (
+  req: TContext & HttpContext & OapiContext & RequestSecurityResolver,
 ) => Security<TOapiAuthInfo> | HttpResponse | Promise<Security<TOapiAuthInfo> | HttpResponse>;
 
-export interface OapiSecurity<TRequest extends Empty = Empty, TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo> {
-  [key: string]: OapiSecurityResolver<TRequest, TOapiAuthInfo>;
+export interface OapiSecurity<TContext extends Empty = Empty, TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo> {
+  [key: string]: OapiSecurityResolver<TContext, TOapiAuthInfo>;
 }
 
-export interface RequestOapi {
+export interface OapiContext {
   path: any;
   headers: any;
   cookies: any;
   query: any;
 }
 
-export type AppRouteOapi<TRequest extends Empty = Empty> = HttpApp<TRequest & RequestOapi & SecurityOk>;
+export type AppRouteOapi<TContext extends Empty = Empty> = HttpListener<TContext & OapiContext & SecurityOk>;
 
 export interface ResponseOapi<Content, Status, Type> {
   body: Content;
@@ -48,35 +48,35 @@ export interface ResponseOapi<Content, Status, Type> {
   headers: { 'content-type': Type } & HttpResponse['headers'];
 }
 
-export interface OapiPaths<TRequest extends Empty> {
-  [path: string]: { [method: string]: AppRouteOapi<TRequest> };
+export interface OapiPaths<TContext extends Empty> {
+  [path: string]: { [method: string]: AppRouteOapi<TContext> };
 }
 
-export interface OapiConfig<TRequest extends Empty = Empty, TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo> {
+export interface OapiConfig<TContext extends Empty = Empty, TOapiAuthInfo extends OapiAuthInfo = OapiAuthInfo> {
   api: OpenAPIObject | string;
-  paths: OapiPaths<TRequest>;
-  security?: OapiSecurity<TRequest, TOapiAuthInfo>;
-  notFound?: HttpApp<TRequest>;
+  paths: OapiPaths<TContext>;
+  security?: OapiSecurity<TContext, TOapiAuthInfo>;
+  notFound?: HttpListener<TContext>;
 }
 
-export type Matcher = (req: HttpRequest) => OapiPath | false;
+export type Matcher = (req: HttpContext) => OapiPath | false;
 
 /**
  * A function that will convert a request into desired types.
  */
-export type Coerce<TRequest extends Empty = Empty> = (
-  req: TRequest & HttpRequest & RequestOapi,
-) => TRequest & HttpRequest & RequestOapi;
+export type Coerce<TContext extends Empty = Empty> = (
+  req: TContext & HttpContext & OapiContext,
+) => TContext & HttpContext & OapiContext;
 
 /**
- * @typeParam TRequest pass the request properties that the app requires. Usually added by the middlewares
+ * @typeParam TContext pass the request properties that the app requires. Usually added by the middlewares
  */
-export interface Route<TRequest extends Empty> {
+export interface Route<TContext extends Empty> {
   matcher: Matcher;
   request: Schema;
-  coerce: Coerce<TRequest>;
+  coerce: Coerce<TContext>;
   response: Schema;
   operation: ResolvedOperationObject;
   security?: SecurityRequirementObject[];
-  resolver: HttpApp<TRequest & RequestOapi & SecurityOk>;
+  resolver: HttpListener<TContext & OapiContext & SecurityOk>;
 }

@@ -1,8 +1,8 @@
 import {
-  RequestOapi,
+  OapiContext,
   OapiConfig,
   Empty,
-  HttpApp,
+  HttpListener,
   openApi,
   OapiSecurityResolver,
   OapiAuthInfo,
@@ -11,7 +11,7 @@ import {
 
 export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(
   config: Config<R, TAuthInfo>,
-): Promise<HttpApp<R>> => openApi(config);
+): Promise<HttpListener<R>> => openApi(config);
 
 export interface CreateSession {
   email: string;
@@ -44,7 +44,7 @@ export type ResponseSessionPost =
 /**
  * Cerate a new session
  */
-export interface RequestSessionPost extends RequestOapi {
+export interface RequestSessionPost extends OapiContext {
   body: CreateSession;
 }
 
@@ -64,7 +64,7 @@ export type ResponseTestscopesGet =
 /**
  * Secured by jwt with scopes
  */
-export interface RequestTestscopesGet<TAuthInfo> extends RequestOapi {
+export interface RequestTestscopesGet<TAuthInfo> extends OapiContext {
   authInfo: TAuthInfo;
 }
 
@@ -79,7 +79,7 @@ export type ResponseTestGet =
 /**
  * Secured by jwt without scopes
  */
-export interface RequestTestGet<TAuthInfo> extends RequestOapi {
+export interface RequestTestGet<TAuthInfo> extends OapiContext {
   authInfo: TAuthInfo;
 }
 

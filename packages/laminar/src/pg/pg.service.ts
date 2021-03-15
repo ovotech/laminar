@@ -2,10 +2,10 @@ import { Service } from '../types';
 import type { Pool, PoolClient } from 'pg';
 
 export class PgService implements Service {
-  constructor(public pg: Pool) {}
+  constructor(public pool: Pool) {}
 
   connect(): Promise<PoolClient> {
-    return this.pg.connect();
+    return this.pool.connect();
   }
 
   async start(): Promise<this> {
@@ -13,11 +13,11 @@ export class PgService implements Service {
   }
 
   async stop(): Promise<this> {
-    await this.pg.end();
+    await this.pool.end();
     return this;
   }
 
   describe(): string {
-    return 'PG';
+    return '🛢️ Postgres';
   }
 }

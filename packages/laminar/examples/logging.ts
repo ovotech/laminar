@@ -1,4 +1,4 @@
-import { get, put, HttpServer, router, jsonOk, requestLoggingMiddleware, init } from '@ovotech/laminar';
+import { get, put, HttpService, router, jsonOk, requestLoggingMiddleware, init } from '@ovotech/laminar';
 
 const users: Record<string, string> = {
   '1': 'John',
@@ -7,8 +7,8 @@ const users: Record<string, string> = {
 
 const logging = requestLoggingMiddleware(console);
 
-const http = new HttpServer({
-  app: logging(
+const http = new HttpService({
+  listener: logging(
     router(
       get('/.well-known/health-check', async () => jsonOk({ health: 'ok' })),
       get('/users', async () => jsonOk(users)),

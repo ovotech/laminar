@@ -1,6 +1,6 @@
 import { init } from '@ovotech/laminar';
 import { EnvVarsRecord } from './env';
-import { createContext } from './context';
+import { createApplication } from './application';
 import { config } from 'dotenv';
 
 /**
@@ -8,4 +8,4 @@ import { config } from 'dotenv';
  */
 config();
 
-createContext(EnvVarsRecord.check(process.env)).then(init);
+createApplication(EnvVarsRecord.check(process.env)).then(init);

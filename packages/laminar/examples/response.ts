@@ -1,6 +1,6 @@
 import {
   get,
-  HttpServer,
+  HttpService,
   router,
   jsonOk,
   jsonNotFound,
@@ -22,8 +22,8 @@ import {
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
-const http = new HttpServer({
-  app: router(
+const http = new HttpService({
+  listener: router(
     // Redirects
     get('/redirect', async () => redirect('http://my-new-location.example.com', { headers: { 'X-Other': 'Other' } })),
 

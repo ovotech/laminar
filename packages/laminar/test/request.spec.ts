@@ -2,21 +2,20 @@ import axios from 'axios';
 import * as FormData from 'form-data';
 import { createReadStream, readFileSync, statSync } from 'fs';
 import { join } from 'path';
-import { Context, HttpServer, testRun, textOk } from '../src';
+import { Application, HttpService, run, textOk } from '../src';
 
-const app = jest.fn().mockReturnValue(textOk('Test'));
+const listener = jest.fn().mockReturnValue(textOk('Test'));
 const api = axios.create({ baseURL: 'http://localhost:8051' });
 
-const context: Context = { services: [new HttpServer({ app, port: 8051 })] };
+const app: Application = { services: [new HttpService({ listener, port: 8051 })] };
 
 describe('Requests', () => {
-  beforeEach(() => app.mockClear());
+  beforeEach(() => listener.mockClear());
 
-  it(
-    'Should process request',
-    testRun(context, async () => {
+  it('Should process request', async () => {
+    await run(app, async () => {
       const result = await api.get('/test2');
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.objectContaining({ pathname: '/test2' }),
           headers: expect.objectContaining({ host: 'localhost:8051' }),
@@ -25,16 +24,15 @@ describe('Requests', () => {
       );
       expect(result.status).toEqual(200);
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse headers',
-    testRun(context, async () => {
+  it('Should parse headers', async () => {
+    await run(app, async () => {
       const result = await api.get('/other-test/123', {
         headers: { Authorization: 'Bearer 234' },
       });
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           url: expect.objectContaining({ pathname: '/other-test/123' }),
           headers: expect.objectContaining({ authorization: 'Bearer 234' }),
@@ -42,76 +40,70 @@ describe('Requests', () => {
         }),
       );
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse search params',
-    testRun(context, async () => {
+  it('Should parse search params', async () => {
+    await run(app, async () => {
       const result = await api.get('/me', {
         params: { this: 'other', last: 'new' },
       });
-      expect(app.mock.calls[0][0].url.searchParams.toString()).toEqual('this=other&last=new');
+      expect(listener.mock.calls[0][0].url.searchParams.toString()).toEqual('this=other&last=new');
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse search query',
-    testRun(context, async () => {
+  it('Should parse search query', async () => {
+    await run(app, async () => {
       const result = await api.get('/me', {
         params: { this: 'other', last: 'new' },
       });
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           query: { this: 'other', last: 'new' },
         }),
       );
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse nested search query',
-    testRun(context, async () => {
+  it('Should parse nested search query', async () => {
+    await run(app, async () => {
       const result = await api.get('/me?this[one][two]=other&arr[]=111');
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           query: { this: { one: { two: 'other' } }, arr: ['111'] },
         }),
       );
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse cookies',
-    testRun(context, async () => {
+  it('Should parse cookies', async () => {
+    await run(app, async () => {
       const result = await api.get('http://localhost:8051/login', {
         headers: { cookie: 'accessToken=1234abc; userId=1234' },
       });
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           cookies: { accessToken: '1234abc', userId: '1234' },
         }),
       );
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse json',
-    testRun(context, async () => {
+  it('Should parse json', async () => {
+    await run(app, async () => {
       const result = await api.post('/login', { test: 'other' });
 
-      expect(app).toHaveBeenCalledWith(expect.objectContaining({ body: { test: 'other' }, method: 'POST' }));
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ body: { test: 'other' }, method: 'POST' }));
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse json like',
-    testRun(context, async () => {
+  it('Should parse json like', async () => {
+    await run(app, async () => {
       const result = await api.post(
         '/swish',
         { test: 'other' },
@@ -120,41 +112,40 @@ describe('Requests', () => {
         },
       );
 
-      expect(app).toHaveBeenCalledWith(expect.objectContaining({ body: { test: 'other' }, method: 'POST' }));
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ body: { test: 'other' }, method: 'POST' }));
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse url',
-    testRun(context, async () => {
+  it('Should parse url', async () => {
+    await run(app, async () => {
       const result = await api.post('/logout', 'one=other', {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
 
-      expect(app).toHaveBeenCalledWith(expect.objectContaining({ body: { one: 'other' }, method: 'POST' }));
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ body: { one: 'other' }, method: 'POST' }));
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse text',
-    testRun(context, async () => {
+  it('Should parse text', async () => {
+    await run(app, async () => {
       const result = await api.post('/post', 'document { height: 100%; }', {
         headers: { 'Content-Type': 'text/css' },
       });
 
-      expect(app).toHaveBeenCalledWith(expect.objectContaining({ body: 'document { height: 100%; }', method: 'POST' }));
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({ body: 'document { height: 100%; }', method: 'POST' }),
+      );
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse single file multipart',
-    testRun(context, async () => {
+  it('Should parse single file multipart', async () => {
+    await run(app, async () => {
       const formData = new FormData();
 
       formData.append('name', 'test-name');
@@ -167,7 +158,7 @@ describe('Requests', () => {
         headers: { ...formData.getHeaders(), 'Content-Length': formData.getLengthSync() },
       });
 
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           body: {
             name: 'test-name',
@@ -186,12 +177,11 @@ describe('Requests', () => {
       );
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse multiple files multipart',
-    testRun(context, async () => {
+  it('Should parse multiple files multipart', async () => {
+    await run(app, async () => {
       const formData = new FormData();
 
       formData.append('name', 'test-name');
@@ -207,7 +197,7 @@ describe('Requests', () => {
         headers: { ...formData.getHeaders(), 'Content-Length': formData.getLengthSync() },
       });
 
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           body: {
             name: 'test-name',
@@ -232,12 +222,11 @@ describe('Requests', () => {
       );
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should parse large multipart in streaming chunks',
-    testRun(context, async () => {
+  it('Should parse large multipart in streaming chunks', async () => {
+    await run(app, async () => {
       const formData = new FormData();
 
       const htmlFile = readFileSync(join(__dirname, 'test.html'));
@@ -252,7 +241,7 @@ describe('Requests', () => {
         headers: { ...formData.getHeaders(), 'Content-Length': formData.getLengthSync() },
       });
 
-      expect(app).toHaveBeenCalledWith(
+      expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           body: expect.objectContaining({
             'name-999': 'test-name',
@@ -271,38 +260,35 @@ describe('Requests', () => {
       );
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should handle malformed content type',
-    testRun(context, async () => {
+  it('Should handle malformed content type', async () => {
+    await run(app, async () => {
       const result = await api.post('http://localhost:8051/post', 'test', {
         headers: { 'Content-Type': '123123' },
       });
 
-      expect(app).toHaveBeenCalledWith(expect.objectContaining({ body: 'test', method: 'POST' }));
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ body: 'test', method: 'POST' }));
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should handle unknown content type, fallback to text',
-    testRun(context, async () => {
+  it('Should handle unknown content type, fallback to text', async () => {
+    await run(app, async () => {
       const result = await api.post('http://localhost:8051/post', 'test', {
         headers: { 'Content-Type': 'some/other' },
       });
 
-      expect(app).toHaveBeenCalledWith(expect.objectContaining({ body: 'test', method: 'POST' }));
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({ body: 'test', method: 'POST' }));
 
       expect(result.data).toEqual('Test');
-    }),
-  );
+    });
+  });
 
-  it(
-    'Should handle malformed json',
-    testRun(context, async () => {
+  it('Should handle malformed json', async () => {
+    await run(app, async () => {
       await expect(
         api
           .post('http://localhost:8051/post', '{"test":Date}', {
@@ -317,7 +303,7 @@ describe('Requests', () => {
         },
       });
 
-      expect(app).not.toHaveBeenCalled();
-    }),
-  );
+      expect(listener).not.toHaveBeenCalled();
+    });
+  });
 });

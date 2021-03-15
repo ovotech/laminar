@@ -1,8 +1,8 @@
-import { RequestOapi, OapiConfig, Empty, HttpApp, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from "@ovotech/laminar";
+import { OapiContext, OapiConfig, Empty, HttpListener, openApi, OapiSecurityResolver, OapiAuthInfo, ResponseOapi } from "@ovotech/laminar";
 
 import { Readable } from "stream";
 
-export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpApp<R>> => openApi(config);
+export const openApiTyped = <R extends Empty = Empty, TAuthInfo extends OapiAuthInfo = OapiAuthInfo>(config: Config<R, TAuthInfo>): Promise<HttpListener<R>> => openApi(config);
 
 export type ResponseWellknownHealthcheckGet = ResponseOapi<{
     success: boolean;
@@ -11,14 +11,14 @@ export type ResponseWellknownHealthcheckGet = ResponseOapi<{
 /**
  * Health check endpoint
  */
-export type PathWellknownHealthcheckGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownHealthcheckGet>;
+export type PathWellknownHealthcheckGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseWellknownHealthcheckGet>;
 
 export type ResponseWellknownOpenapiyamlGet = ResponseOapi<string | Readable | Buffer, 200, "application/yaml">;
 
 /**
  * The open api spec for the service. OpenAPI v3.
  */
-export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: RequestOapi & R) => Promise<ResponseWellknownOpenapiyamlGet>;
+export type PathWellknownOpenapiyamlGet<R extends Empty = Empty> = (req: OapiContext & R) => Promise<ResponseWellknownOpenapiyamlGet>;
 
 export type ResponseWellknownOpenapihtmlGet = ResponseOapi<string | Readable | Buffer, 200, "text/html">;
 
@@ -26,7 +26,7 @@ export type ResponseWellknownOpenapihtmlGet = ResponseOapi<string | Readable | B
  * API Docs
  * The open api spec for the service. OpenAPI v3.
  */
-export interface RequestWellknownOpenapihtmlGet<TAuthInfo> extends RequestOapi {
+export interface RequestWellknownOpenapihtmlGet<TAuthInfo> extends OapiContext {
     authInfo: TAuthInfo;
 }
 
@@ -65,7 +65,7 @@ export type ResponseV2StatementsGet = ResponseOapi<StatementsList, 200, "applica
  * Account Statements
  * A full history of statements generated for an account, including invalid statements
  */
-export interface RequestV2StatementsGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsGet<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -94,7 +94,7 @@ export type ResponseV2StatementsPost = ResponseOapi<StatementsListItem, 200, "ap
  * Generate a Statement
  * Manually start generating a statement for a given account
  */
-export interface RequestV2StatementsPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsPost<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -297,7 +297,7 @@ export type ResponseV2StatementsIdDataGet = ResponseOapi<StatementData, 200, "ap
  * Statement Data
  * Raw data used to generate a statement for an account, at the point of generation.
  */
-export interface RequestV2StatementsIdDataGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsIdDataGet<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -326,7 +326,7 @@ export type ResponseV2StatementsIdApprovalPost = ResponseOapi<{
  * Approve a statement
  * Approve a given statement to be sent to the customer
  */
-export interface RequestV2StatementsIdApprovalPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsIdApprovalPost<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -353,7 +353,7 @@ export type ResponseV2StatementsIdModificationsPost = ResponseOapi<StatementData
  * Apply modifications
  * Save modificaitons for the current statement
  */
-export interface RequestV2StatementsIdModificationsPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsIdModificationsPost<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -384,7 +384,7 @@ export type ResponseV2StatementsIdPdfGet = ResponseOapi<string | Readable | Buff
  * Statement PDF
  * Retrieve the pdf of a generated statement
  */
-export interface RequestV2StatementsIdPdfGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsIdPdfGet<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -411,7 +411,7 @@ export type ResponseV2StatementsIdHtmlGet = ResponseOapi<string | Readable | Buf
  * Statement Html
  * Retrieve the html, used to generate the statement pdf
  */
-export interface RequestV2StatementsIdHtmlGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2StatementsIdHtmlGet<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -440,7 +440,7 @@ export type ResponseV2ReportsDailyPost = ResponseOapi<{
  * Generate Daily Reports
  * Generate all daily reports for the day. Should be called by a cron service
  */
-export interface RequestV2ReportsDailyPost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ReportsDailyPost<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -471,7 +471,7 @@ export type ResponseV2ReportsTypeGet = ResponseOapi<ReportsList, 200, "applicati
  * Report list
  * Return a list of reports for a specific type
  */
-export interface RequestV2ReportsTypeGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2ReportsTypeGet<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -506,7 +506,7 @@ export type ResponseV2ReportsTypePost = ResponseOapi<{
  * Generate a Report
  * Trigger report generation for a specific type, you can pick the date range, but by default it would use the current day
  */
-export interface RequestV2ReportsTypePost<TAuthInfo> extends RequestOapi {
+export interface RequestV2ReportsTypePost<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging
@@ -539,7 +539,7 @@ export type ResponseV2ReportsTypeFilenameGet = ResponseOapi<string | Readable | 
  * Report file
  * A report file in CSV format
  */
-export interface RequestV2ReportsTypeFilenameGet<TAuthInfo> extends RequestOapi {
+export interface RequestV2ReportsTypeFilenameGet<TAuthInfo> extends OapiContext {
     headers: {
         /**
          * An optional trace token to be passed to the service and used for logging

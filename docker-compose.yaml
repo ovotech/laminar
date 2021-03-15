@@ -14,8 +14,7 @@ services:
       - ./examples/petstore/init.sql:/docker-entrypoint-initdb.d/petstore.sql
       - ./examples/split/init.sql:/docker-entrypoint-initdb.d/split.sql
       - ./examples/data-loader/init.sql:/docker-entrypoint-initdb.d/data-loader.sql
-      - ./packages/laminar-pg/init.sql:/docker-entrypoint-initdb.d/laminar-pg.sql
-      - ./packages/laminar-queue/init.sql:/docker-entrypoint-initdb.d/laminar-queue.sql
+      - ./packages/laminar/init.sql:/docker-entrypoint-initdb.d/laminar.sql
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.2
